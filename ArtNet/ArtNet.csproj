@@ -8,7 +8,7 @@
     <Authors>Hakan Lindestaf</Authors>
     <Product>Haukcode ArtNet Library</Product>
     <Description>ArtNet library for .NET Core (.NET Standard 2.0)</Description>
-    <PackageLicenseUrl>https://github.com/HakanL/Haukcode.ArtNet/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/HakanL/Haukcode.ArtNet</PackageProjectUrl>
     <Copyright>(C) Copyright 2018, Hakan Lindestaf</Copyright>
     <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
