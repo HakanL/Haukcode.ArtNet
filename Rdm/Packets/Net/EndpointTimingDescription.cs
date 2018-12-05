@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Haukcode.Rdm.Packets.Net
+{
+    public class EndpointTimingDescription
+    {
+        public class Get : RdmRequestPacket
+        {
+            public Get()
+                : base(RdmCommands.Get, RdmParameters.EndpointTimingDescription)
+            {
+            }
+
+            public byte SettingIndex { get; set; }
+
+            protected override void ReadData(RdmBinaryReader data)
+            {
+                SettingIndex = data.ReadByte();
+            }
+
+            protected override void WriteData(RdmBinaryWriter data)
+            {
+                data.Write(SettingIndex);
+            }
+        }
+
+        public class GetReply : RdmResponsePacket
+        {
+            public GetReply()
+                : base(RdmCommands.GetResponse, RdmParameters.EndpointTimingDescription)
+            {
+            }
+
+            public byte SettingIndex { get; set; }
+
+            public string Description { get; set; }
+
+            protected override void ReadData(RdmBinaryReader data)
+            {
+                SettingIndex = data.ReadByte();
+                Description = data.ReadNetworkString(Header.ParameterDataLength - 1);
+            }
+
+            protected override void WriteData(RdmBinaryWriter data)
+            {
+                data.Write(SettingIndex);
+                data.WriteNetwork(Description);
+            }
+        }
+    }
+}
