@@ -7,12 +7,12 @@ namespace Haukcode.ArtNet
 {
     public static class Helper
     {
-        public static IEnumerable<(IPAddress Address, IPAddress NetMask)> GetAddressesFromInterfaceType(NetworkInterfaceType interfaceType = NetworkInterfaceType.Ethernet,
+        public static IEnumerable<(IPAddress Address, IPAddress NetMask)> GetAddressesFromInterfaceType(NetworkInterfaceType? interfaceType = null,
             Func<NetworkInterface, bool> predicate = null)
         {
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (adapter.SupportsMulticast && adapter.NetworkInterfaceType == interfaceType &&
+                if (adapter.SupportsMulticast && (!interfaceType.HasValue || adapter.NetworkInterfaceType == interfaceType) &&
                     adapter.OperationalStatus == OperationalStatus.Up)
                 {
                     if (predicate != null)
