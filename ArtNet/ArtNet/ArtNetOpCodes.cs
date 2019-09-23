@@ -1,6 +1,6 @@
 namespace Haukcode.ArtNet
 {
-    public enum ArtNetOpCodes
+    public enum ArtNetOpCodes : ushort
     {
         None = 0,
         Poll = 0x20,

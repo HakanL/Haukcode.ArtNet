@@ -16,7 +16,7 @@ namespace Haukcode.ArtNet.Packets
         ROMBoot = 4
     }
 
-    public class ArtPollReplyPacket:ArtNetPacket
+    public class ArtPollReplyPacket : ArtNetPacket
     {
         public ArtPollReplyPacket()
             : base(ArtNetOpCodes.PollReply)
@@ -26,26 +26,26 @@ namespace Haukcode.ArtNet.Packets
         public ArtPollReplyPacket(ArtNetReceiveData data)
             : base(data)
         {
-            
+
         }
 
         #region Packet Properties
 
-        private byte[] ipAddress=new byte[4];
+        private byte[] ipAddress = new byte[4];
 
         public byte[] IpAddress
         {
             get { return ipAddress; }
-            set 
+            set
             {
                 if (value.Length != 4)
                     throw new ArgumentException("The IP address must be an array of 4 bytes.");
 
-                ipAddress = value; 
+                ipAddress = value;
             }
         }
 
-        private short port= ArtNetSocket.Port;
+        private short port = ArtNetSocket.Port;
 
         public short Port
         {
@@ -79,7 +79,7 @@ namespace Haukcode.ArtNet.Packets
             set { oem = value; }
         }
 
-        private byte ubeaVersion= 0;
+        private byte ubeaVersion = 0;
 
         public byte UbeaVersion
         {
@@ -119,7 +119,7 @@ namespace Haukcode.ArtNet.Packets
             set { longName = value; }
         }
 
-        private string nodeReport= string.Empty;
+        private string nodeReport = string.Empty;
 
         public string NodeReport
         {
@@ -127,7 +127,7 @@ namespace Haukcode.ArtNet.Packets
             set { nodeReport = value; }
         }
 
-        private short portCount=0;
+        private short portCount = 0;
 
         public short PortCount
         {
@@ -135,17 +135,17 @@ namespace Haukcode.ArtNet.Packets
             set { portCount = value; }
         }
 
-        private byte[] portTypes= new byte[4];
+        private byte[] portTypes = new byte[4];
 
         public byte[] PortTypes
         {
             get { return portTypes; }
-            set 
+            set
             {
                 if (value.Length != 4)
                     throw new ArgumentException("The port types must be an array of 4 bytes.");
 
-                portTypes = value; 
+                portTypes = value;
             }
         }
 
@@ -154,12 +154,12 @@ namespace Haukcode.ArtNet.Packets
         public byte[] GoodInput
         {
             get { return goodInput; }
-            set 
+            set
             {
                 if (value.Length != 4)
                     throw new ArgumentException("The good input must be an array of 4 bytes.");
 
-                goodInput = value; 
+                goodInput = value;
             }
         }
 
@@ -168,11 +168,12 @@ namespace Haukcode.ArtNet.Packets
         public byte[] GoodOutput
         {
             get { return goodOutput; }
-            set {
+            set
+            {
                 if (value.Length != 4)
                     throw new ArgumentException("The good output must be an array of 4 bytes.");
 
-                goodOutput = value; 
+                goodOutput = value;
             }
         }
 
@@ -192,7 +193,7 @@ namespace Haukcode.ArtNet.Packets
             set { swOut = value; }
         }
 
-        private byte swVideo=0;
+        private byte swVideo = 0;
 
         public byte SwVideo
         {
@@ -200,7 +201,7 @@ namespace Haukcode.ArtNet.Packets
             set { swVideo = value; }
         }
 
-        private byte swMacro=0;
+        private byte swMacro = 0;
 
         public byte SwMacro
         {
@@ -208,7 +209,7 @@ namespace Haukcode.ArtNet.Packets
             set { swMacro = value; }
         }
 
-        private byte swRemote=0;
+        private byte swRemote = 0;
 
         public byte SwRemote
         {
@@ -216,7 +217,7 @@ namespace Haukcode.ArtNet.Packets
             set { swRemote = value; }
         }
 
-        private byte style=0;
+        private byte style = 0;
 
         public byte Style
         {
@@ -224,17 +225,17 @@ namespace Haukcode.ArtNet.Packets
             set { style = value; }
         }
 
-        private byte[] macAddress= new byte[6];
+        private byte[] macAddress = new byte[6];
 
         public byte[] MacAddress
         {
             get { return macAddress; }
-            set 
+            set
             {
-                if (value.Length != 6) 
+                if (value.Length != 6)
                     throw new ArgumentException("The mac address must be an array of 6 bytes.");
-                
-                macAddress = value; 
+
+                macAddress = value;
             }
         }
 
@@ -243,20 +244,22 @@ namespace Haukcode.ArtNet.Packets
         public byte[] BindIpAddress
         {
             get { return bindIpAddress; }
-            set {
+            set
+            {
                 if (value.Length != 4)
                     throw new ArgumentException("The bind IP address must be an array of 4 bytes.");
 
-                bindIpAddress = value; }
+                bindIpAddress = value;
+            }
         }
 
-        private byte bindIndex= 0;
+        private byte bindIndex = 0;
 
-	    public byte BindIndex
-	    {
-		    get { return bindIndex;}
-		    set { bindIndex = value;}
-	    }
+        public byte BindIndex
+        {
+            get { return bindIndex; }
+            set { bindIndex = value; }
+        }
 
         private byte status2 = 0;
 
@@ -265,8 +268,8 @@ namespace Haukcode.ArtNet.Packets
             get { return status2; }
             set { status2 = value; }
         }
-	
-	
+
+
         #endregion
 
         #region Packet Helpers
@@ -332,18 +335,18 @@ namespace Haukcode.ArtNet.Packets
         public override void WriteData(ArtNetBinaryWriter data)
         {
             base.WriteData(data);
-            
+
             data.Write(IpAddress);
             data.Write(Port);
             data.WriteNetwork(FirmwareVersion);
             data.WriteNetwork(SubSwitch);
             data.WriteNetwork(Oem);
             data.Write(UbeaVersion);
-            data.Write((byte) Status);
+            data.Write((byte)Status);
             data.Write(EstaCode);
-            data.WriteNetwork(ShortName,18);
-            data.WriteNetwork(LongName,64);
-            data.WriteNetwork(NodeReport,64);
+            data.WriteNetwork(ShortName, 18);
+            data.WriteNetwork(LongName, 64);
+            data.WriteNetwork(NodeReport, 64);
             data.WriteNetwork(PortCount);
             data.Write(PortTypes);
             data.Write(GoodInput);

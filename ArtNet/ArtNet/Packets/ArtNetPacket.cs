@@ -1,4 +1,5 @@
 using Haukcode.ArtNet.IO;
+using System;
 using System.IO;
 
 namespace Haukcode.ArtNet.Packets
@@ -12,9 +13,12 @@ namespace Haukcode.ArtNet.Packets
 
         public ArtNetPacket(ArtNetReceiveData data)
         {
+            DataLength = data.DataLength - 12;  // Subtract ArtNet header
             var packetReader = new ArtNetBinaryReader(new MemoryStream(data.buffer));
             ReadData(packetReader);
         }
+
+        public int DataLength { get; }
 
         public byte[] ToArray()
         {
@@ -83,7 +87,7 @@ namespace Haukcode.ArtNet.Packets
 
         }
 
-        public static ArtNetPacket Create(ArtNetReceiveData data)
+        public static ArtNetPacket Create(ArtNetReceiveData data, Func<ushort, ArtNetReceiveData, ArtNetPacket> customPacketCreator)
         {
             switch ((ArtNetOpCodes)data.OpCode)
             {
@@ -113,9 +117,17 @@ namespace Haukcode.ArtNet.Packets
 
                 case ArtNetOpCodes.ArtTrigger:
                     return new ArtTriggerPacket(data);
-            }
 
-            return null;
+                default:
+                    if (customPacketCreator != null)
+                    {
+                        var customPacket = customPacketCreator(data.OpCode, data);
+                        if (customPacket != null)
+                            return customPacket;
+                    }
+
+                    return new ArtNetUnknownPacket(data);
+            }
         }
     }
 }

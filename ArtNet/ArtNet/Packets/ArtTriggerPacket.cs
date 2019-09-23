@@ -13,7 +13,6 @@ namespace Haukcode.ArtNet.Packets
         public ArtTriggerPacket(ArtNetReceiveData data)
             : base(data)
         {
-
         }
 
         public byte Filler1 { get; set; }

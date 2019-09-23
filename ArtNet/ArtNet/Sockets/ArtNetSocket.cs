@@ -41,6 +41,8 @@ namespace Haukcode.ArtNet.Sockets
 
         public IPAddress LocalSubnetMask { get; protected set; }
 
+        public Func<ushort, ArtNetReceiveData, ArtNetPacket> CustomPacketCreator { get; set; }
+
         private static IPAddress GetBroadcastAddress(IPAddress address, IPAddress subnetMask)
         {
             byte[] ipAdressBytes = address.GetAddressBytes();
@@ -115,7 +117,7 @@ namespace Haukcode.ArtNet.Sockets
                         {
                             LastPacket = DateTime.Now;
 
-                            ProcessPacket((IPEndPoint)remoteEndPoint, ArtNetPacket.Create(receiveState));
+                            ProcessPacket((IPEndPoint)remoteEndPoint, ArtNetPacket.Create(receiveState, CustomPacketCreator));
                         }
                     }
                 }

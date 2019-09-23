@@ -11,11 +11,11 @@ namespace Haukcode.ArtNet.IO
             get { return DataLength > 12; }
         }
 
-        public int OpCode
+        public ushort OpCode
         {
             get
             {
-                return buffer[9] + (buffer[8] << 8);
+                return (ushort)(this.buffer[9] + (this.buffer[8] << 8));
             }
         }
     }
