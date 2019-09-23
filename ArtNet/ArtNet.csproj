@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -10,15 +10,20 @@
     <Description>ArtNet library for .NET Core (.NET Standard 2.0)</Description>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/HakanL/Haukcode.ArtNet</PackageProjectUrl>
-    <Copyright>(C) Copyright 2018, Hakan Lindestaf</Copyright>
+    <Copyright>(C) Copyright 2019, Hakan Lindestaf</Copyright>
     <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>ArtNet</PackageTags>
     <PackageReleaseNotes>1.0.0 - Initial release</PackageReleaseNotes>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rdm\Rdm.csproj" />
+    <ProjectReference Include="..\Rdm\Rdm.csproj">
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

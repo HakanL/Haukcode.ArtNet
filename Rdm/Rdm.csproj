@@ -1,8 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Haukcode.Rdm</RootNamespace>
+    <PackageId>Haukcode.ArtNet.Rdm</PackageId>
+    <Authors>Hakan Lindestaf</Authors>
+    <Product>Haukcode ArtNet Library</Product>
+    <Description>ArtNet library for .NET Core (.NET Standard 2.0). RDM packets</Description>
+    <Copyright>(C) Copyright 2019, Hakan Lindestaf</Copyright>
+    <PackageProjectUrl>https://github.com/HakanL/Haukcode.ArtNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>ArtNet RDM</PackageTags>
+    <PackageReleaseNotes>1.0.0 - Initial release</PackageReleaseNotes>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>
