@@ -111,7 +111,7 @@ namespace Haukcode.ArtNet.Sockets
                         receiveState.DataLength = EndReceiveFrom(state, ref remoteEndPoint);
 
                         //Protect against UDP loopback where we receive our own packets.
-                        if (LocalEndPoint != remoteEndPoint && receiveState.Valid)
+                        if (!LocalEndPoint.Equals(remoteEndPoint) && receiveState.Valid)
                         {
                             LastPacket = DateTime.Now;
 
