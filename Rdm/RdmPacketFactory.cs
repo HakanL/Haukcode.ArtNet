@@ -199,8 +199,8 @@ namespace Haukcode.Rdm
             RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BootSoftwareVersionId, typeof(BootSoftwareVersionId.GetReply));
 
             //SoftwareVersionLabel
-            RegisterPacketType(RdmCommands.Get, RdmParameters.BootSoftwareVersionLabel, typeof(SoftwareVersionLabel.Get));
-            RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BootSoftwareVersionLabel, typeof(SoftwareVersionLabel.GetReply));
+            RegisterPacketType(RdmCommands.Get, RdmParameters.BootSoftwareVersionLabel, typeof(BootSoftwareVersionLabel.Get));
+            RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BootSoftwareVersionLabel, typeof(BootSoftwareVersionLabel.GetReply));
         }
 
         private static void RegisterPowerMessages()
