@@ -100,6 +100,9 @@ namespace Haukcode.ArtNet.Packets
                 case ArtNetOpCodes.Dmx:
                     return new ArtNetDmxPacket(data);
 
+                case ArtNetOpCodes.Sync:
+                    return new ArtSyncPacket(data);
+
                 case ArtNetOpCodes.TodRequest:
                     return new ArtTodRequestPacket(data);
 

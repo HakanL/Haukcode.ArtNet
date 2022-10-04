@@ -11,16 +11,18 @@
     <Description>ArtNet library for .NET Core (.NET Standard 2.0)</Description>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/HakanL/Haukcode.ArtNet</PackageProjectUrl>
-    <Copyright>(C) Copyright 2020, Hakan Lindestaf</Copyright>
+    <Copyright>(C) Copyright 2022 Hakan Lindestaf</Copyright>
     <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>ArtNet</PackageTags>
-    <PackageReleaseNotes>1.0.0 - Initial release
+    <PackageReleaseNotes>1.1.0 - Implemented ArtSync
+1.0.18 - Fixed bug in RdmPacketFactory
 1.0.17 - Fixed bug in ArtNetReplyPacket
-1.0.18 - Fixed bug in RdmPacketFactory</PackageReleaseNotes>
+1.0.0 - Initial release
+</PackageReleaseNotes>
     <AssemblyVersion>1.0.18.0</AssemblyVersion>
     <FileVersion>1.0.18.0</FileVersion>
-    <Version>1.0.18</Version>
+    <Version>1.1.0</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 

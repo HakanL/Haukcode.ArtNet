@@ -16,7 +16,6 @@ namespace Haukcode.ArtNet.Packets
         public ArtNetDmxPacket(ArtNetReceiveData data)
             : base(data)
         {
-            
         }
 
         #region Packet Properties
