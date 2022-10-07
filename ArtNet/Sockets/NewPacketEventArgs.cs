@@ -5,9 +5,10 @@ namespace Haukcode.Sockets
 {
     public class NewPacketEventArgs<TPacketType> : EventArgs
     {
-        public NewPacketEventArgs(IPEndPoint source, TPacketType packet)
+        public NewPacketEventArgs(IPEndPoint source, IPEndPoint destination, TPacketType packet)
         {
             Source = source;
+            Destination = destination;
             Packet = packet;
         }
 
@@ -19,6 +20,14 @@ namespace Haukcode.Sockets
             protected set { source = value; }
         }
 
+        private IPEndPoint destination;
+
+        public IPEndPoint Destination
+        {
+            get { return destination; }
+            protected set { destination = value; }
+        }
+
         private TPacketType packet;
 
         public TPacketType Packet
@@ -26,6 +35,5 @@ namespace Haukcode.Sockets
             get { return packet; }
             private set { packet = value; }
         }
-
     }
 }

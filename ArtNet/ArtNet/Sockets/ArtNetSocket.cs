@@ -90,7 +90,7 @@ namespace Haukcode.ArtNet.Sockets
             {
                 EndPoint localPort = new IPEndPoint(IPAddress.Any, Port);
                 var receiveState = new ArtNetReceiveData();
-                BeginReceiveFrom(receiveState.buffer, 0, receiveState.bufferSize, SocketFlags.None, ref localPort, new AsyncCallback(OnReceive), receiveState);
+                BeginReceiveMessageFrom(receiveState.buffer, 0, receiveState.bufferSize, SocketFlags.None, ref localPort, new AsyncCallback(OnReceive), receiveState);
             }
             catch (Exception ex)
             {
@@ -110,14 +110,15 @@ namespace Haukcode.ArtNet.Sockets
 
                     if (receiveState != null)
                     {
-                        receiveState.DataLength = EndReceiveFrom(state, ref remoteEndPoint);
+                        var socketFlags = SocketFlags.None;
+                        receiveState.DataLength = EndReceiveMessageFrom(state, ref socketFlags, ref remoteEndPoint, out var ipPacketInfo);
 
                         //Protect against UDP loopback where we receive our own packets.
                         if (!LocalEndPoint.Equals(remoteEndPoint) && receiveState.Valid)
                         {
                             LastPacket = DateTime.Now;
 
-                            ProcessPacket((IPEndPoint)remoteEndPoint, ArtNetPacket.Create(receiveState, CustomPacketCreator));
+                            ProcessPacket((IPEndPoint)remoteEndPoint, new IPEndPoint(ipPacketInfo.Address, ((IPEndPoint)LocalEndPoint).Port), ArtNetPacket.Create(receiveState, CustomPacketCreator));
                         }
                     }
                 }
@@ -133,18 +134,16 @@ namespace Haukcode.ArtNet.Sockets
             }
         }
 
-        private void ProcessPacket(IPEndPoint source, ArtNetPacket packet)
+        private void ProcessPacket(IPEndPoint source, IPEndPoint destination, ArtNetPacket packet)
         {
             if (packet != null)
             {
-                if (NewPacket != null)
-                    NewPacket(this, new NewPacketEventArgs<ArtNetPacket>(source, packet));
+                NewPacket?.Invoke(this, new NewPacketEventArgs<ArtNetPacket>(source, destination, packet));
 
-                var rdmPacket = packet as ArtRdmPacket;
-                if (rdmPacket != null && NewRdmPacket != null)
+                if (packet is ArtRdmPacket rdmPacket && NewRdmPacket != null)
                 {
                     RdmPacket rdm = RdmPacket.ReadPacket(new RdmBinaryReader(new MemoryStream(rdmPacket.RdmData)));
-                    NewRdmPacket(this, new NewPacketEventArgs<RdmPacket>(source, rdm));
+                    NewRdmPacket(this, new NewPacketEventArgs<RdmPacket>(source, destination, rdm));
                 }
             }
         }
@@ -198,7 +197,7 @@ namespace Haukcode.ArtNet.Sockets
 
                 Send(rdmPacket, targetAddress);
 
-                RdmPacketSent?.Invoke(this, new NewPacketEventArgs<RdmPacket>(new IPEndPoint(targetAddress.IpAddress, Port), packet));
+                RdmPacketSent?.Invoke(this, new NewPacketEventArgs<RdmPacket>((IPEndPoint)LocalEndPoint, new IPEndPoint(targetAddress.IpAddress, Port), packet));
             }
         }
 
