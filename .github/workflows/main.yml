@@ -61,7 +61,7 @@ jobs:
 
     ## Publish and Tag
     - name: Publish NuGet
-      run: dotnet nuget push Haukcode.ArtNet/ArtNet/bin/Release/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
+      run: dotnet nuget push ArtNet/bin/Release/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
     - name: Tag
       run: |
         git tag "v${PACKAGE_VERSION}"
