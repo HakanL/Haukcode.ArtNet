@@ -121,6 +121,17 @@ namespace Haukcode.ArtNet.Packets
                 case ArtNetOpCodes.ArtTrigger:
                     return new ArtTriggerPacket(data);
 
+                case ArtNetOpCodes.IpProg:
+                    return new ArtIpProgPacket(data);
+
+                case ArtNetOpCodes.IpProgReply:
+                    return new ArtIpProgReplyPacket(data);
+
+                case ArtNetOpCodes.Address:
+                    return new ArtAddressPacket(data);
+                case ArtNetOpCodes.Input:
+                    return new ArtInputPacket(data);
+
                 default:
                     if (customPacketCreator != null)
                     {

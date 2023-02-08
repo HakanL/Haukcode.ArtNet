@@ -7,15 +7,6 @@ using Haukcode.ArtNet.Sockets;
 
 namespace Haukcode.ArtNet.Packets
 {
-    [Flags]
-    public enum PollReplyStatus
-    {
-        None = 0,
-        UBEA = 1,
-        RdmCapable = 2,
-        ROMBoot = 4
-    }
-
     public class ArtPollReplyPacket : ArtNetPacket
     {
         public ArtPollReplyPacket()
@@ -42,6 +33,19 @@ namespace Haukcode.ArtNet.Packets
                     throw new ArgumentException("The IP address must be an array of 4 bytes.");
 
                 ipAddress = value;
+            }
+        }
+
+        private byte[] respUID = new byte[6];
+
+        public byte[] RespUID
+        {
+            get { return respUID; }
+            set {
+                if (value.Length != 6)
+                    throw new ArgumentException("The Responder Default UID must be an array of 6 bytes.");
+
+                respUID = value;
             }
         }
 
@@ -87,9 +91,9 @@ namespace Haukcode.ArtNet.Packets
             set { ubeaVersion = value; }
         }
 
-        private PollReplyStatus status = 0;
+        private byte status = 0;
 
-        public PollReplyStatus Status
+        public byte Status
         {
             get { return status; }
             set { status = value; }
@@ -163,17 +167,31 @@ namespace Haukcode.ArtNet.Packets
             }
         }
 
-        private byte[] goodOutput = new byte[4];
+        private byte[] _goodOutputA = new byte[4];
 
-        public byte[] GoodOutput
+        public byte[] GoodOutputA
         {
-            get { return goodOutput; }
+            get { return _goodOutputA; }
             set
             {
                 if (value.Length != 4)
                     throw new ArgumentException("The good output must be an array of 4 bytes.");
 
-                goodOutput = value;
+                _goodOutputA = value;
+            }
+        }
+
+        private byte[] _goodOutputB = new byte[4];
+
+        public byte[] GoodOutputB
+        {
+            get { return _goodOutputB; }
+            set
+            {
+                if (value.Length != 4)
+                    throw new ArgumentException("The good output must be an array of 4 bytes.");
+
+                _goodOutputB = value;
             }
         }
 
@@ -193,12 +211,12 @@ namespace Haukcode.ArtNet.Packets
             set { swOut = value; }
         }
 
-        private byte swVideo = 0;
+        private byte _acnPriority = 0;
 
-        public byte SwVideo
+        public byte AcnPriority
         {
-            get { return swVideo; }
-            set { swVideo = value; }
+            get { return _acnPriority; }
+            set { _acnPriority = value; }
         }
 
         private byte swMacro = 0;
@@ -269,6 +287,13 @@ namespace Haukcode.ArtNet.Packets
             set { status2 = value; }
         }
 
+        private byte status3 = 0;
+
+        public byte Status3
+        {
+            get { return status3; }
+            set { status3 = value; }
+        }
 
         #endregion
 
@@ -310,18 +335,18 @@ namespace Haukcode.ArtNet.Packets
             SubSwitch = data.ReadNetwork16();
             Oem = data.ReadNetwork16();
             UbeaVersion = data.ReadByte();
-            Status = (PollReplyStatus)data.ReadByte();
+            Status = data.ReadByte();
             EstaCode = data.ReadInt16();
-            ShortName = data.ReadNetworkString(18);
-            LongName = data.ReadNetworkString(64);
-            NodeReport = data.ReadNetworkString(64);
+            ShortName = data.ReadNetworkString(18).TrimEnd('\0');
+            LongName = data.ReadNetworkString(64).TrimEnd('\0');
+            NodeReport = data.ReadNetworkString(64).TrimEnd('\0');
             PortCount = data.ReadNetwork16();
             PortTypes = data.ReadBytes(4);
             GoodInput = data.ReadBytes(4);
-            GoodOutput = data.ReadBytes(4);
+            GoodOutputA = data.ReadBytes(4);
             SwIn = data.ReadBytes(4);
             SwOut = data.ReadBytes(4);
-            SwVideo = data.ReadByte();
+            AcnPriority = data.ReadByte();
             SwMacro = data.ReadByte();
             SwRemote = data.ReadByte();
             data.ReadBytes(3);
@@ -330,6 +355,9 @@ namespace Haukcode.ArtNet.Packets
             BindIpAddress = data.ReadBytes(4);
             BindIndex = data.ReadByte();
             Status2 = data.ReadByte();
+            GoodOutputB = data.ReadBytes(4);
+            Status3 = data.ReadByte();
+            RespUID = data.ReadBytes(6);
         }
 
         public override void WriteData(ArtNetBinaryWriter data)
@@ -350,10 +378,10 @@ namespace Haukcode.ArtNet.Packets
             data.WriteNetwork(PortCount);
             data.Write(PortTypes);
             data.Write(GoodInput);
-            data.Write(GoodOutput);
+            data.Write(GoodOutputA);
             data.Write(SwIn);
             data.Write(SwOut);
-            data.Write(SwVideo);
+            data.Write(AcnPriority);
             data.Write(SwMacro);
             data.Write(SwRemote);
             data.Write(new byte[3]);
@@ -362,7 +390,10 @@ namespace Haukcode.ArtNet.Packets
             data.Write(BindIpAddress);
             data.Write(BindIndex);
             data.Write(Status2);
-            data.Write(new byte[208]);
+            data.Write(GoodOutputB);
+            data.Write(Status3);
+            data.Write(respUID);
+            data.Write(new byte[162]);
         }
     }
 }
