@@ -1,24 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Haukcode.ArtNet.IO;
-using Haukcode.ArtNet.Packets;
 
-namespace Haukcode.ArtNet.ArtNet.Packets
+namespace Haukcode.ArtNet.Packets
 {
     public class ArtInputPacket : ArtNetPacket
     {
+        private byte[] inputs = { 0, 0, 0, 0 };
         public byte BindIndex { get; set; } = 0;
 
         public short NumPorts { get; set; } = 0;
 
-        public byte[] Inputs { get; set; } = { 0, 0, 0, 0 };
+        public byte[] Inputs
+        {
+            get => inputs;
+            set
+            {
+                if (value.Length != 4)
+                    throw new ArgumentException("The input must be an array of 4 bytes.");
 
-        public ArtInputPacket() : base(ArtNetOpCodes.Input) 
+                inputs = value;
+            }
+        }
+
+        public ArtInputPacket() : base(ArtNetOpCodes.Input)
         {
         }
 
-        public ArtInputPacket(ArtNetReceiveData data) : base(data) 
+        public ArtInputPacket(ArtNetReceiveData data) : base(data)
         {
         }
 
