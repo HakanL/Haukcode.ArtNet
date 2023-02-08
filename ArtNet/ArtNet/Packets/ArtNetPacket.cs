@@ -1,7 +1,6 @@
 using Haukcode.ArtNet.IO;
 using System;
 using System.IO;
-using Haukcode.ArtNet.ArtNet.Packets;
 
 namespace Haukcode.ArtNet.Packets
 {
