@@ -71,13 +71,13 @@ namespace Haukcode.ArtNet.Sockets
 
         public DateTime? LastPacket { get; protected set; } = null;
 
-        public void Open(IPAddress localIp, IPAddress localSubnetMask)
+        public void Open(IPAddress localIp, IPAddress localSubnetMask, IPAddress bindAddress = null)
         {
             LocalIP = localIp;
             LocalSubnetMask = localSubnetMask;
 
             SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            Bind(new IPEndPoint(LocalIP, Port));
+            Bind(new IPEndPoint(bindAddress ?? LocalIP, Port));
             SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
             PortOpen = true;
 
