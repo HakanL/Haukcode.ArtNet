@@ -393,7 +393,7 @@ namespace Haukcode.ArtNet.Packets
             data.Write(GoodOutputB);
             data.Write(Status3);
             data.Write(respUID);
-            data.Write(new byte[162]);
+            data.Write(new byte[15]);
         }
     }
 }
