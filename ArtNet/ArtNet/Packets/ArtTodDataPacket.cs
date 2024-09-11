@@ -25,9 +25,11 @@ namespace Haukcode.ArtNet.Packets
 
         public byte Port { get; set; }
 
+        public byte BindIndex {  get; set; }
+
         public byte Net { get; set; }
 
-        public byte Command { get; set; }
+        public byte CommandResponse { get; set; } // 0x00 TodFull 0xFF TodNack
 
         public byte Universe { get; set; }
 
@@ -48,9 +50,10 @@ namespace Haukcode.ArtNet.Packets
 
             RdmVersion = data.ReadByte();
             Port = data.ReadByte();
-            data.BaseStream.Seek(7, System.IO.SeekOrigin.Current);
+            data.BaseStream.Seek(6, System.IO.SeekOrigin.Current);
+            BindIndex = data.ReadByte();
             Net = data.ReadByte();
-            Command = data.ReadByte();
+            CommandResponse = data.ReadByte();
             Universe = data.ReadByte();
             UIdTotal = rdmReader.ReadNetwork16();
             BlockCount = data.ReadByte();
@@ -69,9 +72,10 @@ namespace Haukcode.ArtNet.Packets
 
             data.Write(RdmVersion);
             data.Write(Port);
-            data.Write(new byte[7]);
+            data.Write(new byte[6]);
+            data.Write(BindIndex);
             data.Write(Net);
-            data.Write(Command);
+            data.Write(CommandResponse);
             data.Write(Universe);
             rdmWriter.WriteNetwork(UIdTotal);
             data.Write(BlockCount);
@@ -80,7 +84,6 @@ namespace Haukcode.ArtNet.Packets
             foreach (UId id in Devices)
                 rdmWriter.Write(id);
         }
-
 
     }
 }
