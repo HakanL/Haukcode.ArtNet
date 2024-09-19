@@ -194,7 +194,7 @@ namespace Haukcode.ArtNet.Sockets
                 rdmPacket.Address = (byte)(targetAddress.Universe & 0x00FF);
                 rdmPacket.Net = (byte)(targetAddress.Universe >> 8); 
                 rdmPacket.SubStartCode = (byte)RdmVersions.SubMessage;
-                rdmPacket.RdmData = rdmData.GetBuffer();
+                rdmPacket.RdmData = rdmData.ToArray();
 
                 Send(rdmPacket, targetAddress);
 
