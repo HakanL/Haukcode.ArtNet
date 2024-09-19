@@ -56,9 +56,9 @@ namespace Haukcode.Sockets
             set { gatewayId = value; }
         }
 
-        private int universe = 0;
+        private ushort universe = 0;
 
-        public int Universe
+        public ushort Universe
         {
             get { return universe; }
             set { universe = value; }
