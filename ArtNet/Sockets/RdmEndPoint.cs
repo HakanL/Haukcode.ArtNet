@@ -11,7 +11,7 @@ namespace Haukcode.Sockets
         {
         }
 
-        public RdmEndPoint(IPAddress ipAddress, int universe)
+        public RdmEndPoint(IPAddress ipAddress, ushort universe)
             : this(ipAddress, 0, universe)
         {
         }
@@ -21,12 +21,12 @@ namespace Haukcode.Sockets
         {
         }
 
-        public RdmEndPoint(IPEndPoint ipEndPoint, int universe)
+        public RdmEndPoint(IPEndPoint ipEndPoint, ushort universe)
             : this(ipEndPoint.Address, ipEndPoint.Port, universe)
         {
         }
 
-        public RdmEndPoint(IPAddress ipAddress, int port, int universe) : base(ipAddress, port)
+        public RdmEndPoint(IPAddress ipAddress, int port, ushort universe) : base(ipAddress, port)
         {
             IpAddress = ipAddress;
             Universe = universe;
