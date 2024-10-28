@@ -113,8 +113,10 @@ namespace Haukcode.ArtNet.Sockets
                         var socketFlags = SocketFlags.None;
                         receiveState.DataLength = EndReceiveMessageFrom(state, ref socketFlags, ref remoteEndPoint, out var ipPacketInfo);
 
-                        //Protect against UDP loopback where we receive our own packets, except for poll commands.
-                        if (receiveState.Valid && (!LocalEndPoint.Equals(remoteEndPoint) || receiveState.OpCode == (ushort)ArtNetOpCodes.Poll))
+                        //Protect against UDP loopback where we receive our own packets, except for poll/pollreply commands.
+                        if (receiveState.Valid && (!LocalEndPoint.Equals(remoteEndPoint) ||
+                            receiveState.OpCode == (ushort)ArtNetOpCodes.Poll ||
+                            receiveState.OpCode == (ushort)ArtNetOpCodes.PollReply))
                         {
                             LastPacket = DateTime.Now;
 
