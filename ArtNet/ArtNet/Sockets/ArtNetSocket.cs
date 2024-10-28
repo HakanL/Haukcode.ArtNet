@@ -187,7 +187,7 @@ namespace Haukcode.ArtNet.Sockets
                 RdmPacket.WritePacket(packet, rdmWriter);
 
                 //Write the checksum
-                rdmWriter.WriteNetwork((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) + (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
+                rdmWriter.WriteHiLoInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) + (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
 
                 //Create sACN Packet
                 var rdmPacket = new ArtRdmPacket();

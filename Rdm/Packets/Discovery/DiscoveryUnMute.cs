@@ -76,15 +76,15 @@ namespace Haukcode.Rdm.Packets.Discovery
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ControlField = data.ReadNetwork16();
+                ControlField = data.ReadHiLoInt16();
                 if (Header.ParameterDataLength > 2)
                     BindingId = data.ReadUId();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(ControlField);
-                data.Write(BindingId);
+                data.WriteHiLoInt16(ControlField);
+                data.WriteUid(BindingId);
             }
 
             #endregion

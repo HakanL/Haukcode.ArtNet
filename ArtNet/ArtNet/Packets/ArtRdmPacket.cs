@@ -55,13 +55,13 @@ namespace Haukcode.ArtNet.Packets
         {
             base.WriteData(data);
 
-            data.Write(RdmVersion);
-            data.Write(new byte[8]);
-            data.Write(Net);
-            data.Write(Command);
-            data.Write(Address);
-            data.Write(SubStartCode);
-            data.Write(RdmData);
+            data.WriteByte(RdmVersion);
+            data.WriteByteArray(new byte[8]);
+            data.WriteByte(Net);
+            data.WriteByte(Command);
+            data.WriteByte(Address);
+            data.WriteByte(SubStartCode);
+            data.WriteByteArray(RdmData);
         }
 	
 

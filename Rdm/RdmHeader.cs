@@ -49,9 +49,9 @@ namespace Haukcode.Rdm
             TransactionNumber = data.ReadByte();
             PortOrResponseType = data.ReadByte();
             MessageCount = data.ReadByte();
-            SubDevice = data.ReadNetwork16();
+            SubDevice = data.ReadHiLoInt16();
             Command = (RdmCommands)data.ReadByte();
-            ParameterId = (RdmParameters)data.ReadNetwork16();
+            ParameterId = (RdmParameters)data.ReadHiLoInt16();
             ParameterDataLength = data.ReadByte();
         }
 
@@ -60,22 +60,22 @@ namespace Haukcode.Rdm
 
         public void WriteData(RdmBinaryWriter data)
         {
-            //Save position so we can write length later.
+            // Save position so we can write length later.
             messageLengthPosition = data.BaseStream.Position;
 
-            data.Write(MessageLength);
-            data.Write(DestinationId);
-            data.Write(SourceId);
-            data.Write(TransactionNumber);
-            data.Write(PortOrResponseType);
-            data.Write(MessageCount);
-            data.WriteNetwork(SubDevice);
-            data.Write((byte)Command);
-            data.WriteNetwork((short)ParameterId);
+            data.WriteByte(MessageLength);
+            data.WriteUid(DestinationId);
+            data.WriteUid(SourceId);
+            data.WriteByte(TransactionNumber);
+            data.WriteByte(PortOrResponseType);
+            data.WriteByte(MessageCount);
+            data.WriteHiLoInt16(SubDevice);
+            data.WriteByte((byte)Command);
+            data.WriteHiLoInt16((short)ParameterId);
 
-            //Save position so we can write length later.
+            // Save position so we can write length later.
             dataLengthPosition = data.BaseStream.Position;
-            data.Write(ParameterDataLength);
+            data.WriteByte(ParameterDataLength);
         }
 
         public void WriteLength(RdmBinaryWriter data)
@@ -88,11 +88,11 @@ namespace Haukcode.Rdm
 
             //Write Message Length
             data.BaseStream.Seek(messageLengthPosition, System.IO.SeekOrigin.Begin);
-            data.Write(MessageLength);
+            data.WriteByte(MessageLength);
 
             //Write Parameter Data Length
             data.BaseStream.Seek(dataLengthPosition, System.IO.SeekOrigin.Begin);
-            data.Write(ParameterDataLength);
+            data.WriteByte(ParameterDataLength);
 
             //Move back to end of stream.
             data.BaseStream.Seek(0, System.IO.SeekOrigin.End);

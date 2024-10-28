@@ -50,12 +50,12 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                Language = new CultureInfo(data.ReadNetworkString(Header.ParameterDataLength));
+                Language = new CultureInfo(data.ReadString(Header.ParameterDataLength));
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(Language.TwoLetterISOLanguageName);
+                data.WriteString(Language.TwoLetterISOLanguageName);
             }
 
             #endregion
@@ -74,12 +74,12 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                Language = new CultureInfo(data.ReadNetworkString(Header.ParameterDataLength));
+                Language = new CultureInfo(data.ReadString(Header.ParameterDataLength));
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(Language.TwoLetterISOLanguageName);
+                data.WriteString(Language.TwoLetterISOLanguageName);
             }
 
             #endregion

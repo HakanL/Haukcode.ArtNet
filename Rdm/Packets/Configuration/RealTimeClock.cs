@@ -43,10 +43,8 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                int year = data.ReadNetwork16();
-
                 ClockTime = new DateTime(
-                    data.ReadNetwork16(),   //Year    
+                    data.ReadHiLoInt16(),   //Year    
                     data.ReadByte(),        //Month
                     data.ReadByte(),        //Day
                     data.ReadByte(),        //Hour
@@ -57,12 +55,12 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(ClockTime.Year);
-                data.Write(ClockTime.Month);
-                data.Write(ClockTime.Day);
-                data.Write(ClockTime.Hour);
-                data.Write(ClockTime.Minute);
-                data.Write(ClockTime.Second);
+                data.WriteHiLoInt16((short)ClockTime.Year);
+                data.WriteByte((byte)ClockTime.Month);
+                data.WriteByte((byte)ClockTime.Day);
+                data.WriteByte((byte)ClockTime.Hour);
+                data.WriteByte((byte)ClockTime.Minute);
+                data.WriteByte((byte)ClockTime.Second);
             }
 
             #endregion
@@ -81,10 +79,8 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                int year = data.ReadNetwork16();
-
                 ClockTime = new DateTime(
-                    data.ReadNetwork16(),   //Year    
+                    data.ReadHiLoInt16(),   //Year    
                     data.ReadByte(),        //Month
                     data.ReadByte(),        //Day
                     data.ReadByte(),        //Hour
@@ -95,12 +91,12 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(ClockTime.Year);
-                data.Write(ClockTime.Month);
-                data.Write(ClockTime.Day);
-                data.Write(ClockTime.Hour);
-                data.Write(ClockTime.Minute);
-                data.Write(ClockTime.Second);
+                data.WriteHiLoInt16((short)ClockTime.Year);
+                data.WriteByte((byte)ClockTime.Month);
+                data.WriteByte((byte)ClockTime.Day);
+                data.WriteByte((byte)ClockTime.Hour);
+                data.WriteByte((byte)ClockTime.Minute);
+                data.WriteByte((byte)ClockTime.Second);
             }
 
             #endregion

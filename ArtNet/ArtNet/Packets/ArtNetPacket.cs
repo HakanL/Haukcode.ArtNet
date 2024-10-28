@@ -67,24 +67,22 @@ namespace Haukcode.ArtNet.Packets
 
         public virtual void ReadData(ArtNetBinaryReader data)
         {
-            Protocol = data.ReadNetworkString(8);
-            OpCode = (ArtNetOpCodes)data.ReadNetwork16();
+            Protocol = data.ReadString(8);
+            OpCode = (ArtNetOpCodes)data.ReadLoHiInt16();
 
             //For some reason the poll packet header does not include the version.
             if (OpCode != ArtNetOpCodes.PollReply)
-                Version = data.ReadNetwork16();
-
+                Version = data.ReadHiLoInt16();
         }
 
         public virtual void WriteData(ArtNetBinaryWriter data)
         {
-            data.WriteNetwork(Protocol, 8);
-            data.WriteNetwork((short)OpCode);
+            data.WriteString(Protocol, 8);
+            data.WriteLoHiInt16((short)OpCode);
 
             //For some reason the poll packet header does not include the version.
             if (OpCode != ArtNetOpCodes.PollReply)
-                data.WriteNetwork(Version);
-
+                data.WriteHiLoInt16(Version);
         }
 
         public static ArtNetPacket Create(ArtNetReceiveData data, Func<ushort, ArtNetReceiveData, ArtNetPacket> customPacketCreator)
@@ -97,7 +95,7 @@ namespace Haukcode.ArtNet.Packets
                 case ArtNetOpCodes.PollReply:
                     return new ArtPollReplyPacket(data);
 
-                case ArtNetOpCodes.Dmx:
+                case ArtNetOpCodes.Output:
                     return new ArtNetDmxPacket(data);
 
                 case ArtNetOpCodes.Sync:
@@ -118,7 +116,7 @@ namespace Haukcode.ArtNet.Packets
                 case ArtNetOpCodes.RdmSub:
                     return new ArtRdmSubPacket(data);
 
-                case ArtNetOpCodes.ArtTrigger:
+                case ArtNetOpCodes.Trigger:
                     return new ArtTriggerPacket(data);
 
                 case ArtNetOpCodes.IpProg:

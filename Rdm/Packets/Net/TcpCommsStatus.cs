@@ -42,15 +42,15 @@ namespace Haukcode.Rdm.Packets.Net
             protected override void ReadData(RdmBinaryReader data)
             {
                 CurrentConnectionIP = new IPAddress(data.ReadBytes(4));
-                UnhealthyTCPEvents = data.ReadNetwork16();
-                TCPConnectEvents = data.ReadNetwork16();
+                UnhealthyTCPEvents = data.ReadHiLoInt16();
+                TCPConnectEvents = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(CurrentConnectionIP.GetAddressBytes());                
-                data.Write(UnhealthyTCPEvents);
-                data.Write(TCPConnectEvents);
+                data.WriteByteArray(CurrentConnectionIP.GetAddressBytes());                
+                data.WriteHiLoInt16(UnhealthyTCPEvents);
+                data.WriteHiLoInt16(TCPConnectEvents);
             }
         }
 

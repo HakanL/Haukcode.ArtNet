@@ -75,7 +75,7 @@ namespace Haukcode.Rdm.Packets.Status
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte)StatusType);
+                data.WriteByte((byte)StatusType);
             }
 
             #endregion
@@ -99,11 +99,11 @@ namespace Haukcode.Rdm.Packets.Status
                 for (int n = 0; n < (Header.ParameterDataLength / 9); n++)
                 {
                     Status subDeviceStatus = new Status();
-                    subDeviceStatus.SubDeviceId = data.ReadNetwork16();
+                    subDeviceStatus.SubDeviceId = data.ReadHiLoInt16();
                     subDeviceStatus.StatusType = (StatusTypes) data.ReadByte();
-                    subDeviceStatus.StatusMessageId = data.ReadNetwork16();
-                    subDeviceStatus.DataValue1 = data.ReadNetwork16();
-                    subDeviceStatus.DataValue2 = data.ReadNetwork16();
+                    subDeviceStatus.StatusMessageId = data.ReadHiLoInt16();
+                    subDeviceStatus.DataValue1 = data.ReadHiLoInt16();
+                    subDeviceStatus.DataValue2 = data.ReadHiLoInt16();
 
                     StatusMessages.Add(subDeviceStatus);
                 }
@@ -116,11 +116,11 @@ namespace Haukcode.Rdm.Packets.Status
 
                 foreach (Status item in StatusMessages)
                 {
-                    data.WriteNetwork(item.SubDeviceId);
-                    data.Write((byte) item.StatusType);
-                    data.WriteNetwork(item.StatusMessageId);
-                    data.WriteNetwork(item.DataValue1);
-                    data.WriteNetwork(item.DataValue2);
+                    data.WriteHiLoInt16(item.SubDeviceId);
+                    data.WriteByte((byte) item.StatusType);
+                    data.WriteHiLoInt16(item.StatusMessageId);
+                    data.WriteHiLoInt16(item.DataValue1);
+                    data.WriteHiLoInt16(item.DataValue2);
                 }
             }
 

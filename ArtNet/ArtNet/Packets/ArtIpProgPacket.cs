@@ -69,13 +69,13 @@ namespace Haukcode.ArtNet.Packets
         public override void WriteData(ArtNetBinaryWriter data) 
         {
             base.WriteData(data);
-            data.Write(new byte[2]);
-            data.Write((byte)Command);
-            data.Write(new byte[1]);
-            data.Write(IpAddress);
-            data.Write(Netmask);
-            data.Write((short)6454);
-            data.Write(DefaultGateway);
+            data.WriteByteArray(new byte[2]);
+            data.WriteByte((byte)Command);
+            data.WriteByteArray(new byte[1]);
+            data.WriteByteArray(IpAddress);
+            data.WriteByteArray(Netmask);
+            data.WriteHiLoInt16(6454);
+            data.WriteByteArray(DefaultGateway);
         }
     }
 }

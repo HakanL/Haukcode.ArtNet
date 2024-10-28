@@ -66,8 +66,8 @@ namespace Haukcode.ArtNet.Packets
             base.ReadData(data);
             NetSwitch = data.ReadByte();
             BindIndex = data.ReadByte();
-            ShortName = data.ReadNetworkString(18);
-            LongName = data.ReadNetworkString(64);
+            ShortName = data.ReadString(18);
+            LongName = data.ReadString(64);
             SwIn = data.ReadBytes(4);
             SwOut = data.ReadBytes(4);
             SubSwitch = data.ReadByte();
@@ -78,15 +78,15 @@ namespace Haukcode.ArtNet.Packets
         public override void WriteData(ArtNetBinaryWriter data)
         {
             base.WriteData(data);
-            data.Write(NetSwitch);
-            data.Write(BindIndex);
-            data.WriteNetwork(ShortName, 18);
-            data.WriteNetwork(LongName, 64);
-            data.Write(SwIn);
-            data.Write(SwOut);
-            data.Write(SubSwitch);
-            data.Write(AcnPriority);
-            data.Write((byte)Command);
+            data.WriteByte(NetSwitch);
+            data.WriteByte(BindIndex);
+            data.WriteString(ShortName, 18);
+            data.WriteString(LongName, 64);
+            data.WriteByteArray(SwIn);
+            data.WriteByteArray(SwOut);
+            data.WriteByte(SubSwitch);
+            data.WriteByte(AcnPriority);
+            data.WriteByte((byte)Command);
         }
     }
 }

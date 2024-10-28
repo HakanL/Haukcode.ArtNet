@@ -48,8 +48,8 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(CurrentPersonalityIndex);
-                data.Write(PersonalityCount);
+                data.WriteByte(CurrentPersonalityIndex);
+                data.WriteByte(PersonalityCount);
             }
 
             #endregion
@@ -73,7 +73,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(PersonalityIndex);
+                data.WriteByte(PersonalityIndex);
             }
 
             #endregion

@@ -74,7 +74,7 @@ namespace Haukcode.Rdm.Packets.Status
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte) StatusType);
+                data.WriteByte((byte) StatusType);
             }
 
             #endregion

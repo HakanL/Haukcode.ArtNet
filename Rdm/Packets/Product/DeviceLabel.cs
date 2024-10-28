@@ -42,12 +42,12 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                Label = data.ReadNetworkString(Header.ParameterDataLength);
+                Label = data.ReadString(Header.ParameterDataLength);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(Encoding.ASCII.GetBytes(Label));
+                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
             }
         }
 
@@ -69,7 +69,7 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(Encoding.ASCII.GetBytes(Label));
+                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
             }
 
             #endregion

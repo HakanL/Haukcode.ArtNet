@@ -55,7 +55,7 @@ namespace Haukcode.ArtNet.Packets
             Net = data.ReadByte();
             CommandResponse = data.ReadByte();
             Universe = data.ReadByte();
-            UIdTotal = rdmReader.ReadNetwork16();
+            UIdTotal = rdmReader.ReadHiLoInt16();
             BlockCount = data.ReadByte();
 
             Devices = new List<UId>();
@@ -70,19 +70,19 @@ namespace Haukcode.ArtNet.Packets
 
             var rdmWriter = new RdmBinaryWriter(data.BaseStream);
 
-            data.Write(RdmVersion);
-            data.Write(Port);
-            data.Write(new byte[6]);
-            data.Write(BindIndex);
-            data.Write(Net);
-            data.Write(CommandResponse);
-            data.Write(Universe);
-            rdmWriter.WriteNetwork(UIdTotal);
-            data.Write(BlockCount);
-            data.Write((byte)Devices.Count);
+            data.WriteByte(RdmVersion);
+            data.WriteByte(Port);
+            data.WriteByteArray(new byte[6]);
+            data.WriteByte(BindIndex);
+            data.WriteByte(Net);
+            data.WriteByte(CommandResponse);
+            data.WriteByte(Universe);
+            rdmWriter.WriteHiLoInt16(UIdTotal);
+            data.WriteByte(BlockCount);
+            data.WriteByte((byte)Devices.Count);
 
             foreach (UId id in Devices)
-                rdmWriter.Write(id);
+                rdmWriter.WriteUid(id);
         }
 
     }

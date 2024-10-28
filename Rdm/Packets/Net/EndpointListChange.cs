@@ -51,12 +51,12 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ListChangeNumber = data.ReadNetwork32();
+                ListChangeNumber = data.ReadHiLoInt32();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(ListChangeNumber);
+                data.WriteHiLoInt32(ListChangeNumber);
             }
         }
     }

@@ -34,14 +34,14 @@ namespace Haukcode.ArtNet.Packets
         {
             base.ReadData(data);
 
-            Aux = data.ReadInt16();
+            Aux = data.ReadLoHiInt16();
         }
 
         public override void WriteData(ArtNetBinaryWriter data)
         {
             base.WriteData(data);
             
-            data.WriteNetwork(Aux);
+            data.WriteHiLoInt16(Aux);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Haukcode.ArtNet.Packets
     public class ArtNetDmxPacket : ArtNetPacket
     {
         public ArtNetDmxPacket()
-            : base(ArtNetOpCodes.Dmx)
+            : base(ArtNetOpCodes.Output)
         {
         }
 
@@ -70,8 +70,8 @@ namespace Haukcode.ArtNet.Packets
 
             Sequence = data.ReadByte();
             Physical = data.ReadByte();
-            Universe = data.ReadInt16();
-            int length = data.ReadNetwork16();
+            Universe = data.ReadLoHiInt16();
+            int length = data.ReadHiLoInt16();
             DmxData = data.ReadBytes(length);
         }
 
@@ -79,11 +79,11 @@ namespace Haukcode.ArtNet.Packets
         {
             base.WriteData(data);
             
-            data.Write(Sequence);
-            data.Write(Physical);
-            data.Write(Universe);
-            data.WriteNetwork(Length);
-            data.Write(DmxData);
+            data.WriteByte(Sequence);
+            data.WriteByte(Physical);
+            data.WriteLoHiInt16(Universe);
+            data.WriteHiLoInt16(Length);
+            data.WriteByteArray(DmxData);
         }
 
     }

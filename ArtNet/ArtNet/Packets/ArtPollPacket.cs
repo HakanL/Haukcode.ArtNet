@@ -42,8 +42,8 @@ namespace Haukcode.ArtNet.Packets
         {
             base.WriteData(data);
 
-            data.Write(TalkToMe);
-            data.Write((byte)0);
+            data.WriteByte(TalkToMe);
+            data.WriteByte((byte)0);
         }
 
     }

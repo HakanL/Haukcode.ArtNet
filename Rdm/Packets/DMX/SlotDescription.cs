@@ -28,12 +28,12 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SlotOffset = data.ReadNetwork16();
+                SlotOffset = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(SlotOffset);
+                data.WriteHiLoInt16(SlotOffset);
             }
 
             #endregion
@@ -54,14 +54,14 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SlotOffset = data.ReadNetwork16();
-                Description = data.ReadNetworkString(Header.ParameterDataLength - 2);
+                SlotOffset = data.ReadHiLoInt16();
+                Description = data.ReadString(Header.ParameterDataLength - 2);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(SlotOffset);
-                data.WriteNetwork(Description);
+                data.WriteHiLoInt16(SlotOffset);
+                data.WriteString(Description);
             }
 
             #endregion

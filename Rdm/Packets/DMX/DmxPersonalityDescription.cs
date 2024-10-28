@@ -25,7 +25,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(PersonalityIndex);
+                data.WriteByte(PersonalityIndex);
             }
 
             #endregion
@@ -49,16 +49,16 @@ namespace Haukcode.Rdm.Packets.DMX
             protected override void ReadData(RdmBinaryReader data)
             {
                 PersonalityIndex = data.ReadByte();
-                DmxSlotsRequired = data.ReadNetwork16();
+                DmxSlotsRequired = data.ReadHiLoInt16();
                 if(Header.ParameterDataLength > 3)
-                    Description = data.ReadNetworkString(Header.ParameterDataLength - 3);
+                    Description = data.ReadString(Header.ParameterDataLength - 3);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(PersonalityIndex);
-                data.WriteNetwork(DmxSlotsRequired);
-                data.WriteNetwork(Description);
+                data.WriteByte(PersonalityIndex);
+                data.WriteHiLoInt16(DmxSlotsRequired);
+                data.WriteString(Description);
             }
 
             #endregion

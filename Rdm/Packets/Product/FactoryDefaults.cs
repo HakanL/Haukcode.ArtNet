@@ -44,12 +44,12 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                IsFactoryDefaults = data.ReadBoolean();
+                IsFactoryDefaults = data.ReadBool();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(IsFactoryDefaults);
+                data.WriteBool(IsFactoryDefaults);
             }
 
             #endregion

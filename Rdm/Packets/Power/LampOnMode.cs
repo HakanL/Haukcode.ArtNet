@@ -75,7 +75,7 @@ namespace Haukcode.Rdm.Packets.Power
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte)LampOnMode);
+                data.WriteByte((byte)LampOnMode);
             }
 
             #endregion
@@ -99,7 +99,7 @@ namespace Haukcode.Rdm.Packets.Power
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte)LampOnMode);
+                data.WriteByte((byte)LampOnMode);
             }
 
             #endregion

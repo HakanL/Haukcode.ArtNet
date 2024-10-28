@@ -140,9 +140,9 @@ namespace Haukcode.Rdm.Packets.DMX
                 for (int n = 0; n < Header.ParameterDataLength / 5; n++)
                 {
                     SlotInformation slot = new SlotInformation();
-                    slot.Offset = data.ReadNetwork16();
+                    slot.Offset = data.ReadHiLoInt16();
                     slot.Type = (SlotTypes) data.ReadByte();
-                    slot.SlotLink = (int)data.ReadNetwork16();
+                    slot.SlotLink = (int)data.ReadHiLoInt16();
                     Slots.Add(slot);
                 }
             }
@@ -151,9 +151,9 @@ namespace Haukcode.Rdm.Packets.DMX
             {
                 foreach (SlotInformation slot in Slots)
                 {
-                    data.WriteNetwork(slot.Offset);
-                    data.WriteNetwork((byte) slot.Type);
-                    data.WriteNetwork((short)slot.SlotLink);
+                    data.WriteHiLoInt16(slot.Offset);
+                    data.WriteByte((byte) slot.Type);
+                    data.WriteHiLoInt16((short)slot.SlotLink);
                 }
             }
 

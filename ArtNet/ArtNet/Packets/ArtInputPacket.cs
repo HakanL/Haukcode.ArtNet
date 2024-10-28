@@ -35,17 +35,17 @@ namespace Haukcode.ArtNet.Packets
             base.ReadData(data);
             data.ReadByte();
             BindIndex = data.ReadByte();
-            NumPorts = data.ReadInt16();
+            NumPorts = data.ReadHiLoInt16();
             Inputs = data.ReadBytes(4);
         }
 
         public override void WriteData(ArtNetBinaryWriter data)
         {
             base.WriteData(data);
-            data.Write((byte)0);
-            data.Write(BindIndex);
-            data.WriteNetwork(NumPorts);
-            data.Write(Inputs);
+            data.WriteByte((byte)0);
+            data.WriteByte(BindIndex);
+            data.WriteHiLoInt16(NumPorts);
+            data.WriteByteArray(Inputs);
         }
     }
 }

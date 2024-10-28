@@ -62,30 +62,30 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                RdmProtocolVersion = data.ReadNetwork16();
-                DeviceModelId = data.ReadNetwork16();
-                ProductCategory = (ProductCategories) data.ReadNetwork16();
-                SoftwareVersionId = data.ReadNetwork32();
-                DmxFootprint = data.ReadNetwork16();
+                RdmProtocolVersion = data.ReadHiLoInt16();
+                DeviceModelId = data.ReadHiLoInt16();
+                ProductCategory = (ProductCategories) data.ReadHiLoInt16();
+                SoftwareVersionId = data.ReadHiLoInt32();
+                DmxFootprint = data.ReadHiLoInt16();
                 DmxPersonality = data.ReadByte();
                 DmxPersonalityCount = data.ReadByte();
-                DmxStartAddress = data.ReadNetwork16();
-                SubDeviceCount = data.ReadNetwork16();
+                DmxStartAddress = data.ReadHiLoInt16();
+                SubDeviceCount = data.ReadHiLoInt16();
                 SensorCount = data.ReadByte();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(RdmProtocolVersion);
-                data.WriteNetwork(DeviceModelId);
-                data.WriteNetwork((short) ProductCategory);
-                data.WriteNetwork(SoftwareVersionId);
-                data.WriteNetwork(DmxFootprint);
-                data.Write(DmxPersonality);
-                data.Write(DmxPersonalityCount);
-                data.WriteNetwork(DmxStartAddress);
-                data.WriteNetwork(SubDeviceCount);
-                data.Write(SensorCount);
+                data.WriteHiLoInt16(RdmProtocolVersion);
+                data.WriteHiLoInt16(DeviceModelId);
+                data.WriteHiLoInt16((short) ProductCategory);
+                data.WriteHiLoInt32(SoftwareVersionId);
+                data.WriteHiLoInt16(DmxFootprint);
+                data.WriteByte(DmxPersonality);
+                data.WriteByte(DmxPersonalityCount);
+                data.WriteHiLoInt16(DmxStartAddress);
+                data.WriteHiLoInt16(SubDeviceCount);
+                data.WriteByte(SensorCount);
             }
 
             #endregion

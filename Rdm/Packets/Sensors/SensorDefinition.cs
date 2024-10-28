@@ -124,7 +124,7 @@ namespace Haukcode.Rdm.Packets.Sensors
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(SensorNumber);
+                data.WriteByte(SensorNumber);
             }
 
             #endregion
@@ -165,26 +165,26 @@ namespace Haukcode.Rdm.Packets.Sensors
                 Type = (SensorTypes) data.ReadByte();
                 Unit = (SensorUnit)data.ReadByte();
                 Prefix = (SensorPrefix)data.ReadByte();
-                RangeMinValue = data.ReadNetwork16();
-                RangeMaxValue = data.ReadNetwork16();
-                NormalMinValue = data.ReadNetwork16();
-                NormalMaxValue = data.ReadNetwork16();
+                RangeMinValue = data.ReadHiLoInt16();
+                RangeMaxValue = data.ReadHiLoInt16();
+                NormalMinValue = data.ReadHiLoInt16();
+                NormalMaxValue = data.ReadHiLoInt16();
                 RecordValueSupport = data.ReadByte();
-                Description = data.ReadNetworkString(Header.ParameterDataLength-13);
+                Description = data.ReadString(Header.ParameterDataLength-13);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(SensorNumber);
-                data.Write((byte) Type);
-                data.Write((byte) Unit);
-                data.Write((byte) Prefix);
-                data.Write(RangeMinValue);
-                data.Write(RangeMaxValue);
-                data.Write(NormalMinValue);
-                data.Write(NormalMaxValue);
-                data.Write(RecordValueSupport);
-                data.Write(Description);
+                data.WriteByte(SensorNumber);
+                data.WriteByte((byte) Type);
+                data.WriteByte((byte) Unit);
+                data.WriteByte((byte) Prefix);
+                data.WriteHiLoInt16(RangeMinValue);
+                data.WriteHiLoInt16(RangeMaxValue);
+                data.WriteHiLoInt16(NormalMinValue);
+                data.WriteHiLoInt16(NormalMaxValue);
+                data.WriteByte(RecordValueSupport);
+                data.WriteString(Description);
             }
 
             #endregion

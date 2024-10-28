@@ -1,29 +1,49 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 
 namespace Haukcode.ArtNet.IO
 {
-    public class ArtNetBinaryReader : BinaryReader
+    public class ArtNetBinaryReader
     {
+        private readonly BinaryReader reader;
+
         public ArtNetBinaryReader(Stream input)
-            : base(input)
         {
+            this.reader = new BinaryReader(input);
         }
 
-        public short ReadNetwork16()
+        public Stream BaseStream => this.reader.BaseStream;
+
+        public short ReadHiLoInt16()
         {
-            return (short)IPAddress.NetworkToHostOrder(ReadInt16());
+            // Read the bytes individually
+            byte highByte = this.reader.ReadByte();
+            byte lowByte = this.reader.ReadByte();
+
+            // Combine the bytes in big-endian order
+            return (short)((highByte << 8) | lowByte);
         }
 
-        public int ReadNetwork32()
+        public string ReadString(int length)
         {
-            return (int)IPAddress.NetworkToHostOrder(ReadInt32());
+            return Encoding.ASCII.GetString(this.reader.ReadBytes(length));
         }
 
-        public string ReadNetworkString(int length)
+        public byte ReadByte()
         {
-            return Encoding.UTF8.GetString(ReadBytes(length));
+            return this.reader.ReadByte();
+        }
+
+        public byte[] ReadBytes(int count)
+        {
+            return this.reader.ReadBytes(count);
+        }
+
+        public short ReadLoHiInt16()
+        {
+            return this.reader.ReadInt16();
         }
     }
 }

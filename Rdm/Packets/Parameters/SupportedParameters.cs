@@ -13,7 +13,7 @@ namespace Haukcode.Rdm.Packets.Parameters
         public class Get : RdmRequestPacket
         {
             public Get()
-                : base(RdmCommands.Get,RdmParameters.SupportedParameters)
+                : base(RdmCommands.Get, RdmParameters.SupportedParameters)
             {
             }
 
@@ -43,14 +43,14 @@ namespace Haukcode.Rdm.Packets.Parameters
             {
                 for (int n = 0; n < base.Header.ParameterDataLength / 2; n++)
                 {
-                    ParameterIds.Add((RdmParameters) data.ReadNetworkU16());
+                    ParameterIds.Add((RdmParameters)data.ReadHiLoInt16());
                 }
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
                 foreach (RdmParameters parameterId in ParameterIds)
-                    data.WriteNetwork((ushort) parameterId);
+                    data.WriteHiLoInt16((ushort)parameterId);
             }
         }
     }

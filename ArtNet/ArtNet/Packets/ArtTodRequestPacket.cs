@@ -46,11 +46,11 @@ namespace Haukcode.ArtNet.Packets
         {
             base.WriteData(data);
 
-            data.Write(new byte[9]);
-            data.Write(Net);
-            data.Write(Command);
-            data.Write((byte) RequestedUniverses.Count);
-            data.Write(RequestedUniverses.ToArray());
+            data.WriteByteArray(new byte[9]);
+            data.WriteByte(Net);
+            data.WriteByte(Command);
+            data.WriteByte((byte) RequestedUniverses.Count);
+            data.WriteByteArray(RequestedUniverses.ToArray());
         }
 	
 

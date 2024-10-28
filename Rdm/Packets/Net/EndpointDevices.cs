@@ -17,12 +17,12 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
+                data.WriteHiLoInt16(EndpointID);
             }
         }
 
@@ -48,8 +48,8 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
-                ListChangeNumber = data.ReadNetwork32();
+                EndpointID = data.ReadHiLoInt16();
+                ListChangeNumber = data.ReadHiLoInt32();
                 
                 for (int n = 0; n < (Header.ParameterDataLength - 6) / 6; n++)
                 {
@@ -59,11 +59,11 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
-                data.WriteNetwork(ListChangeNumber);
+                data.WriteHiLoInt16(EndpointID);
+                data.WriteHiLoInt32(ListChangeNumber);
 
                 foreach (UId id in DeviceIds)
-                    data.Write(id);                
+                    data.WriteUid(id);                
             }
         }
     }

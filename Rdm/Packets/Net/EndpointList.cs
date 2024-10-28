@@ -54,12 +54,12 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ListChangeNumber = data.ReadNetwork32();
+                ListChangeNumber = data.ReadHiLoInt32();
 
                 List<short> endpoints = new List<short>();
                 for (int n = 0; n < ((Header.ParameterDataLength-4)/2); n++)
                 {
-                    endpoints.Add(data.ReadNetwork16());
+                    endpoints.Add(data.ReadHiLoInt16());
                 }
 
                 EndpointIDs = endpoints;
@@ -67,10 +67,10 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(ListChangeNumber);
+                data.WriteHiLoInt32(ListChangeNumber);
                 foreach (short endpointId in EndpointIDs)
                 {
-                    data.WriteNetwork(endpointId);
+                    data.WriteHiLoInt16(endpointId);
                 }
             }
         }

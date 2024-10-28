@@ -4,23 +4,48 @@ namespace Haukcode.ArtNet
 {
     public enum ArtNetOpCodes : ushort
     {
-        None = 0,
-        Poll = 0x20,
-        PollReply = 0x21,
-        Dmx = 0x50,
-        Sync = 0x52,
-        TodRequest = 0x80,
-        TodData = 0x81,
-        TodControl = 0x82,
-        Rdm = 0x83,
-        RdmSub = 0x84,
-        ArtTrigger = 0x99,
-
-        Address = 0x60,
-        IpProg = 0xF8,
-        IpProgReply = 0xF9,
-
-        Input = 0x70
+        None = 0x0000,
+        Poll = 0x2000,
+        PollReply = 0x2100,
+        DiagData = 0x2300,
+        Command = 0x2400,
+        DataRequest = 0x2700,
+        DataReply = 0x2800,
+        [Obsolete]
+        Dmx = 0x5000,           // Duplicate, non-standard names
+        Output = 0x5000,
+        Nzs = 0x5100,
+        Sync = 0x5200,
+        Address = 0x6000,
+        Input = 0x7000,
+        TodRequest = 0x8000,
+        TodData = 0x8100,
+        TodControl = 0x8200,
+        Rdm = 0x8300,
+        RdmSub = 0x8400,
+        VideoSetup = 0xa010,
+        Videalette = 0xa020,
+        VideoData = 0xa040,
+        MacMaster = 0xf000,
+        MacSlave = 0xf100,
+        FirmwareMaster = 0xf200,
+        FirmwareReply = 0xf300,
+        FileTnMaster = 0xf400,
+        FileFnMaster = 0xf500,
+        FileFnReply = 0xf600,
+        IpProg = 0xf800,
+        IpProgReply = 0xf900,
+        Media = 0x9000,
+        MediaPatch = 0x9100,
+        MediaControl = 0x9200,
+        MediaContrlReply = 0x9300,
+        TimeCode = 0x9700,
+        TimeSync = 0x9800,
+        [Obsolete]
+        ArtTrigger = 0x9900,        // Duplicate, non-standard names
+        Trigger = 0x9900,
+        Directory = 0x9a00,
+        DirectoryReply = 0x9b00
     }
 
     public enum ArtNetStyles

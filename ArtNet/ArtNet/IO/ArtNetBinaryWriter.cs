@@ -1,34 +1,51 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 
 namespace Haukcode.ArtNet.IO
 {
-    public class ArtNetBinaryWriter : BinaryWriter
+    public class ArtNetBinaryWriter
     {
+        private readonly BinaryWriter writer;
+
         public ArtNetBinaryWriter(Stream output)
-            : base(output)
         {
+            this.writer = new BinaryWriter(output);
         }
 
-        public void WriteNetwork(byte value)
+        public Stream BaseStream => this.writer.BaseStream;
+
+        public void WriteHiLoInt16(short value)
         {
-            base.Write(IPAddress.HostToNetworkOrder(value));
+            // Split the short into two bytes
+            byte highByte = (byte)((value >> 8) & 0xFF);
+            byte lowByte = (byte)(value & 0xFF);
+
+            // Write the bytes in big-endian order
+            this.writer.Write(highByte);
+            this.writer.Write(lowByte);
         }
 
-        public void WriteNetwork(short value)
+        public void WriteString(string value, int length)
         {
-            base.Write(IPAddress.HostToNetworkOrder(value));
+            this.writer.Write(Encoding.ASCII.GetBytes(value.PadRight(length, (char)0x00)));
         }
 
-        public void WriteNetwork(int value)
+        public void WriteByte(byte value)
         {
-            base.Write(IPAddress.HostToNetworkOrder(value));
+            this.writer.Write(value);
         }
 
-        public void WriteNetwork(string value, int length)
+        public void WriteLoHiInt16(short value)
         {
-            Write(Encoding.UTF8.GetBytes(value.PadRight(length, (char)0x0)));
+            // Low byte first
+            this.writer.Write(value);
+        }
+
+        public void WriteByteArray(byte[] value)
+        {
+            this.writer.Write(value);
         }
     }
 }

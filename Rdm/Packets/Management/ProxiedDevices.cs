@@ -87,7 +87,7 @@ namespace Haukcode.Rdm.Packets.Management
             protected override void WriteData(RdmBinaryWriter data)
             {
                 foreach (UId id in DeviceIds)
-                    data.Write(id);
+                    data.WriteUid(id);
             }
 
             #endregion

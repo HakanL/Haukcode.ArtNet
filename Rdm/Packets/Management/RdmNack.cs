@@ -23,12 +23,12 @@ namespace Haukcode.Rdm.Packets.Management
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            Reason = (NackReason) data.ReadNetwork16();
+            Reason = (NackReason) data.ReadHiLoInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteNetwork((byte) Reason);
+            data.WriteByte((byte) Reason);
         }
 
         #endregion

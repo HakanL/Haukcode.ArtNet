@@ -56,7 +56,7 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte)Invert);
+                data.WriteByte((byte)Invert);
             }
 
             #endregion
@@ -80,7 +80,7 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte)Invert);
+                data.WriteByte((byte)Invert);
             }
 
             #endregion

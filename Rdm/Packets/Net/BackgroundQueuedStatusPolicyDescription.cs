@@ -23,7 +23,7 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(PolicyID);
+                data.WriteByte(PolicyID);
             }
         }
 
@@ -41,13 +41,13 @@ namespace Haukcode.Rdm.Packets.Net
             protected override void ReadData(RdmBinaryReader data)
             {
                 PolicyID = data.ReadByte();
-                Description = data.ReadNetworkString(Header.ParameterDataLength - 1);
+                Description = data.ReadString(Header.ParameterDataLength - 1);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(PolicyID);
-                data.WriteNetwork(Description);
+                data.WriteByte(PolicyID);
+                data.WriteString(Description);
             }
         }
     }

@@ -46,12 +46,12 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                IsTestActive = data.ReadBoolean();
+                IsTestActive = data.ReadBool();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(IsTestActive);
+                data.WriteBool(IsTestActive);
             }
 
             #endregion
@@ -95,7 +95,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(TestNumber);
+                data.WriteByte(TestNumber);
             }
 
             #endregion

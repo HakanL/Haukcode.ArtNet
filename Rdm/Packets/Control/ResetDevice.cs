@@ -36,7 +36,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte)Reset);
+                data.WriteByte((byte)Reset);
             }
 
             #endregion

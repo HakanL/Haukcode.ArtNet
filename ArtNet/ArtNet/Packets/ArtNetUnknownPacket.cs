@@ -28,7 +28,7 @@ namespace Haukcode.ArtNet.Packets
         {
             base.WriteData(data);
 
-            data.Write(Data);
+            data.WriteByteArray(Data);
         }
     }
 }

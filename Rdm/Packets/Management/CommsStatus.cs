@@ -98,16 +98,16 @@ namespace Haukcode.Rdm.Packets.Management
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ShortMessage = data.ReadNetwork16();
-                LengthMismatch = data.ReadNetwork16();
-                ChecksumFail = data.ReadNetwork16();
+                ShortMessage = data.ReadHiLoInt16();
+                LengthMismatch = data.ReadHiLoInt16();
+                ChecksumFail = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(ShortMessage);
-                data.WriteNetwork(LengthMismatch);
-                data.WriteNetwork(ChecksumFail);
+                data.WriteHiLoInt16(ShortMessage);
+                data.WriteHiLoInt16(LengthMismatch);
+                data.WriteHiLoInt16(ChecksumFail);
             }
 
             #endregion

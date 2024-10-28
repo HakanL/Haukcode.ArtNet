@@ -14,7 +14,7 @@ namespace Haukcode.Rdm.Packets.Net
     public class EndpointToUniverse
     {
         public enum EndpointTypes
-        {            
+        {
             Virtual = 0,
             Physical = 1
         }
@@ -26,9 +26,9 @@ namespace Haukcode.Rdm.Packets.Net
             Composite
         }
 
-        public class Get:RdmRequestPacket
+        public class Get : RdmRequestPacket
         {
-            public Get():base(RdmCommands.Get,RdmParameters.EndpointToUniverse)
+            public Get() : base(RdmCommands.Get, RdmParameters.EndpointToUniverse)
             {
             }
 
@@ -36,18 +36,18 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
+                data.WriteHiLoInt16(EndpointID);
             }
         }
 
-        public class GetReply:RdmResponsePacket
+        public class GetReply : RdmResponsePacket
         {
-            public GetReply():base(RdmCommands.GetResponse,RdmParameters.EndpointToUniverse)
+            public GetReply() : base(RdmCommands.GetResponse, RdmParameters.EndpointToUniverse)
             {
             }
 
@@ -59,12 +59,12 @@ namespace Haukcode.Rdm.Packets.Net
             public short UniverseNumber
             {
                 get { return universeNumber; }
-                set 
+                set
                 {
                     if (EndpointMode != UniverseMode.Standard)
                         throw new ArgumentException("Unable to assign universe to endpoint that is not a standard endpoint. Please change the endpoint mode to Standard and try again.");
 
-                    universeNumber = value; 
+                    universeNumber = value;
                 }
             }
 
@@ -74,9 +74,9 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
 
-                int universeNumber = data.ReadNetwork16();
+                int universeNumber = data.ReadHiLoInt16();
                 switch (universeNumber)
                 {
                     case 0:
@@ -87,38 +87,38 @@ namespace Haukcode.Rdm.Packets.Net
                         break;
                     default:
                         EndpointMode = UniverseMode.Standard;
-                        UniverseNumber = (short) universeNumber;
+                        UniverseNumber = (short)universeNumber;
                         break;
 
                 }
-                EndpointType = (EndpointTypes) data.ReadByte();
+                EndpointType = (EndpointTypes)data.ReadByte();
 
             }
 
             protected override void WriteData(RdmBinaryWriter data)
-            {                
-                data.WriteNetwork(EndpointID);
+            {
+                data.WriteHiLoInt16(EndpointID);
 
                 switch (EndpointMode)
                 {
                     case UniverseMode.Disabled:
-                        data.WriteNetwork((short) 0);
+                        data.WriteHiLoInt16(0);
                         break;
                     case UniverseMode.Composite:
-                        data.WriteNetwork((ushort) 65535);
+                        data.WriteHiLoInt16(65535);
                         break;
                     default:
-                        data.WriteNetwork(UniverseNumber);
+                        data.WriteHiLoInt16(UniverseNumber);
                         break;
                 }
-                
-                data.Write((byte) EndpointType);               
+
+                data.WriteByte((byte)EndpointType);
             }
         }
 
         public class Set : RdmRequestPacket
         {
-            public Set():base(RdmCommands.Set,RdmParameters.EndpointToUniverse)
+            public Set() : base(RdmCommands.Set, RdmParameters.EndpointToUniverse)
             {
                 EndpointMode = UniverseMode.Standard;
             }
@@ -143,9 +143,9 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
 
-                int universeNumber = data.ReadNetwork16();
+                int universeNumber = data.ReadHiLoInt16();
                 switch (universeNumber)
                 {
                     case 0:
@@ -164,18 +164,18 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
+                data.WriteHiLoInt16(EndpointID);
 
                 switch (EndpointMode)
                 {
                     case UniverseMode.Disabled:
-                        data.WriteNetwork((short)0);
+                        data.WriteHiLoInt16(0);
                         break;
                     case UniverseMode.Composite:
-                        data.WriteNetwork((ushort)65535);
+                        data.WriteHiLoInt16(65535);
                         break;
                     default:
-                        data.WriteNetwork(UniverseNumber);
+                        data.WriteHiLoInt16(UniverseNumber);
                         break;
                 }
             }
@@ -183,7 +183,7 @@ namespace Haukcode.Rdm.Packets.Net
 
         public class SetReply : RdmResponsePacket
         {
-            public SetReply():base(RdmCommands.SetResponse,RdmParameters.EndpointToUniverse)
+            public SetReply() : base(RdmCommands.SetResponse, RdmParameters.EndpointToUniverse)
             {
             }
 

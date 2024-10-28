@@ -51,12 +51,12 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                VersionId = data.ReadNetwork32();
+                VersionId = data.ReadHiLoInt32();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(VersionId);
+                data.WriteHiLoInt32(VersionId);
             }
 
             #endregion

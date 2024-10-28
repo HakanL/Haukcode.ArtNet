@@ -48,7 +48,7 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(Level);
+                data.WriteByte(Level);
             }
 
             #endregion
@@ -72,7 +72,7 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(Level);
+                data.WriteByte(Level);
             }
 
             #endregion

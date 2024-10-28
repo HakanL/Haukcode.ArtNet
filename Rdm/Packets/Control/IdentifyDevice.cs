@@ -47,12 +47,12 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                IdentifyEnabled = data.ReadBoolean();
+                IdentifyEnabled = data.ReadBool();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(IdentifyEnabled);
+                data.WriteBool(IdentifyEnabled);
             }
 
             #endregion
@@ -71,12 +71,12 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                IdentifyEnabled = data.ReadBoolean();
+                IdentifyEnabled = data.ReadBool();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(IdentifyEnabled);
+                data.WriteBool(IdentifyEnabled);
             }
 
             #endregion

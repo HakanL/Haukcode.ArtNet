@@ -29,7 +29,7 @@ namespace Haukcode.Rdm.Packets.Sensors
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(SensorNumber);
+                data.WriteByte(SensorNumber);
             }
 
             #endregion

@@ -52,8 +52,8 @@ namespace Haukcode.Rdm.Packets.Discovery
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(LowerBoundId);
-                data.Write(UpperBoundId);
+                data.WriteUid(LowerBoundId);
+                data.WriteUid(UpperBoundId);
             }
 
             #endregion

@@ -25,7 +25,7 @@ namespace Haukcode.Rdm.Packets.Sensors
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(SensorNumber);
+                data.WriteByte(SensorNumber);
             }
 
             #endregion
@@ -53,19 +53,19 @@ namespace Haukcode.Rdm.Packets.Sensors
             protected override void ReadData(RdmBinaryReader data)
             {
                 SensorNumber = data.ReadByte();
-                PresentValue = data.ReadNetwork16();
-                MinValue = data.ReadNetwork16();
-                MaxValue = data.ReadNetwork16();
-                RecordedValue = data.ReadNetwork16();
+                PresentValue = data.ReadHiLoInt16();
+                MinValue = data.ReadHiLoInt16();
+                MaxValue = data.ReadHiLoInt16();
+                RecordedValue = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(SensorNumber);
-                data.Write(PresentValue);
-                data.Write(MinValue);
-                data.Write(MaxValue);
-                data.Write(RecordedValue);
+                data.WriteByte(SensorNumber);
+                data.WriteHiLoInt16(PresentValue);
+                data.WriteHiLoInt16(MinValue);
+                data.WriteHiLoInt16(MaxValue);
+                data.WriteHiLoInt16(RecordedValue);
             }
 
             #endregion
@@ -89,7 +89,7 @@ namespace Haukcode.Rdm.Packets.Sensors
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(SensorNumber);
+                data.WriteByte(SensorNumber);
             }
 
             #endregion
@@ -117,19 +117,19 @@ namespace Haukcode.Rdm.Packets.Sensors
             protected override void ReadData(RdmBinaryReader data)
             {
                 SensorNumber = data.ReadByte();
-                PresentValue = data.ReadNetwork16();
-                MinValue = data.ReadNetwork16();
-                MaxValue = data.ReadNetwork16();
-                RecordedValue = data.ReadNetwork16();
+                PresentValue = data.ReadHiLoInt16();
+                MinValue = data.ReadHiLoInt16();
+                MaxValue = data.ReadHiLoInt16();
+                RecordedValue = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(SensorNumber);
-                data.Write(PresentValue);
-                data.Write(MinValue);
-                data.Write(MaxValue);
-                data.Write(RecordedValue);
+                data.WriteByte(SensorNumber);
+                data.WriteHiLoInt16(PresentValue);
+                data.WriteHiLoInt16(MinValue);
+                data.WriteHiLoInt16(MaxValue);
+                data.WriteHiLoInt16(RecordedValue);
             }
 
             #endregion

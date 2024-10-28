@@ -43,12 +43,12 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                Description = data.ReadNetworkString(Header.ParameterDataLength);
+                Description = data.ReadString(Header.ParameterDataLength);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(Encoding.ASCII.GetBytes(Description));
+                data.WriteByteArray(Encoding.ASCII.GetBytes(Description));
             }
 
             #endregion

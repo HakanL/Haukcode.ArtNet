@@ -21,14 +21,14 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
                 StatusType = (StatusTypes) data.ReadByte();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
-                data.Write((byte) StatusType);
+                data.WriteHiLoInt16(EndpointID);
+                data.WriteByte((byte) StatusType);
             }
         }
 

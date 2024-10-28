@@ -45,12 +45,12 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                VersionLabel = data.ReadNetworkString(Header.ParameterDataLength);
+                VersionLabel = data.ReadString(Header.ParameterDataLength);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(VersionLabel);
+                data.WriteString(VersionLabel);
             }
 
             #endregion

@@ -23,12 +23,12 @@ namespace Haukcode.Rdm.Packets.Management
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EstimatedResponseTime = data.ReadNetwork16();
+            EstimatedResponseTime = data.ReadHiLoInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteNetwork(EstimatedResponseTime);
+            data.WriteHiLoInt16(EstimatedResponseTime);
         }
 
         #endregion

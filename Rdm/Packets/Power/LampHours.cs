@@ -44,12 +44,12 @@ namespace Haukcode.Rdm.Packets.Power
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                LampHours = data.ReadNetwork32();
+                LampHours = data.ReadHiLoInt32();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(LampHours);
+                data.WriteHiLoInt32(LampHours);
             }
 
             #endregion
@@ -68,12 +68,12 @@ namespace Haukcode.Rdm.Packets.Power
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                LampHours = data.ReadNetwork32();
+                LampHours = data.ReadHiLoInt32();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(LampHours);
+                data.WriteHiLoInt32(LampHours);
             }
 
             #endregion

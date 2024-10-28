@@ -85,14 +85,14 @@ namespace Haukcode.Rdm.Packets.Management
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                DeviceCount = data.ReadNetwork16();
-                ListChanged = data.ReadBoolean();
+                DeviceCount = data.ReadHiLoInt16();
+                ListChanged = data.ReadBool();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(DeviceCount);
-                data.Write(ListChanged);
+                data.WriteHiLoInt16(DeviceCount);
+                data.WriteBool(ListChanged);
             }
 
             #endregion

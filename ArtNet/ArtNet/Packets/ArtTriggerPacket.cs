@@ -6,7 +6,7 @@ namespace Haukcode.ArtNet.Packets
     public class ArtTriggerPacket : ArtNetPacket
     {
         public ArtTriggerPacket()
-            : base(ArtNetOpCodes.ArtTrigger)
+            : base(ArtNetOpCodes.Trigger)
         {
         }
 
@@ -33,7 +33,7 @@ namespace Haukcode.ArtNet.Packets
 
             Filler1 = data.ReadByte();
             Filler2 = data.ReadByte();
-            OemCode = data.ReadNetwork16();
+            OemCode = data.ReadHiLoInt16();
             Key = data.ReadByte();
             SubKey = data.ReadByte();
             Data = data.ReadBytes(512);
@@ -43,12 +43,12 @@ namespace Haukcode.ArtNet.Packets
         {
             base.WriteData(data);
 
-            data.Write(Filler1);
-            data.Write(Filler2);
-            data.WriteNetwork(OemCode);
-            data.Write(Key);
-            data.Write(SubKey);
-            data.Write(Data);
+            data.WriteByte(Filler1);
+            data.WriteByte(Filler2);
+            data.WriteHiLoInt16(OemCode);
+            data.WriteByte(Key);
+            data.WriteByte(SubKey);
+            data.WriteByteArray(Data);
         }
     }
 }

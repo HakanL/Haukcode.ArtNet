@@ -50,10 +50,10 @@ namespace Haukcode.ArtNet.Packets
         {
             base.WriteData(data);
 
-            data.Write(new byte[9]);
-            data.Write(Net);
-            data.Write((byte) Command);
-            data.Write(Address);
+            data.WriteByteArray(new byte[9]);
+            data.WriteByte(Net);
+            data.WriteByte((byte) Command);
+            data.WriteByte(Address);
         }
 	
 

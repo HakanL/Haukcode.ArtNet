@@ -18,12 +18,12 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
+                data.WriteHiLoInt16(EndpointID);
             }
         }
 
@@ -40,14 +40,14 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
                 Label = Encoding.ASCII.GetString(data.ReadBytes(Header.ParameterDataLength-2));
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
-                data.Write(Encoding.ASCII.GetBytes(Label));
+                data.WriteHiLoInt16(EndpointID);
+                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
             }
         }
 
@@ -64,14 +64,14 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
                 Label = Encoding.ASCII.GetString(data.ReadBytes(Header.ParameterDataLength - 2));
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
-                data.Write(Encoding.ASCII.GetBytes(Label));
+                data.WriteHiLoInt16(EndpointID);
+                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
             }
         }
 

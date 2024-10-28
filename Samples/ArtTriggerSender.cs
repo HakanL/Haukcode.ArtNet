@@ -18,7 +18,7 @@ namespace Haukcode.Samples
 
             switch (e.Packet.OpCode)
             {
-                case ArtNet.ArtNetOpCodes.ArtTrigger:
+                case ArtNet.ArtNetOpCodes.Trigger:
                     DebugPrintArtTrigger(e.Packet as ArtNet.Packets.ArtTriggerPacket);
                     break;
             }

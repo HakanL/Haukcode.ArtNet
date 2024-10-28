@@ -53,12 +53,12 @@ namespace Haukcode.Rdm.Packets.Status
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                StatusId = data.ReadNetwork16();
+                StatusId = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(StatusId);
+                data.WriteHiLoInt16(StatusId);
             }
 
             #endregion
@@ -80,12 +80,12 @@ namespace Haukcode.Rdm.Packets.Status
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                Description = data.ReadNetworkString(Header.ParameterDataLength);
+                Description = data.ReadString(Header.ParameterDataLength);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(Description);
+                data.WriteString(Description);
             }
 
             #endregion

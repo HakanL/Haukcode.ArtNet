@@ -52,7 +52,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SceneNumber = (ushort) data.ReadNetwork16();
+                SceneNumber = (ushort) data.ReadHiLoInt16();
                 if (SceneNumber > (ushort) PlayMode.Off || SceneNumber < (ushort) PlayMode.All)
                     Mode = PlayMode.Scene;
                 else
@@ -62,9 +62,9 @@ namespace Haukcode.Rdm.Packets.Control
             protected override void WriteData(RdmBinaryWriter data)
             {
                 if (Mode == PlayMode.Scene)
-                    data.WriteNetwork((short) SceneNumber);
+                    data.WriteHiLoInt16((short) SceneNumber);
                 else
-                    data.WriteNetwork((short) Mode);
+                    data.WriteHiLoInt16((short) Mode);
             }
 
             #endregion
@@ -87,7 +87,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SceneNumber = (ushort) data.ReadNetwork16();
+                SceneNumber = (ushort) data.ReadHiLoInt16();
                 if (SceneNumber > (ushort)PlayMode.Off || SceneNumber < (ushort)PlayMode.All)
                     Mode = PlayMode.Scene;
                 else
@@ -98,10 +98,10 @@ namespace Haukcode.Rdm.Packets.Control
             protected override void WriteData(RdmBinaryWriter data)
             {
                 if (Mode == PlayMode.Scene)
-                    data.WriteNetwork(SceneNumber);
+                    data.WriteHiLoInt16((short)SceneNumber);
                 else
-                    data.WriteNetwork((short)Mode);
-                data.Write(Level);
+                    data.WriteHiLoInt16((short)Mode);
+                data.WriteByte(Level);
             }
 
             #endregion

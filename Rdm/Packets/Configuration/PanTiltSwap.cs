@@ -43,12 +43,12 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                Swapped = data.ReadBoolean();
+                Swapped = data.ReadBool();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(Swapped);
+                data.WriteBool(Swapped);
             }
 
             #endregion
@@ -67,12 +67,12 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                Swapped = data.ReadBoolean();
+                Swapped = data.ReadBool();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(Swapped);
+                data.WriteBool(Swapped);
             }
 
             #endregion

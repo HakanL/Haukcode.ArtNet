@@ -59,12 +59,12 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                DmxAddress = data.ReadNetwork16();
+                DmxAddress = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(DmxAddress);
+                data.WriteHiLoInt16(DmxAddress);
             }
 
             #endregion
@@ -90,12 +90,12 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                DmxAddress = data.ReadNetwork16();
+                DmxAddress = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(DmxAddress);
+                data.WriteHiLoInt16(DmxAddress);
             }
 
             #endregion

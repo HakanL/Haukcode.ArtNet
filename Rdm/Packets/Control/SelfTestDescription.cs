@@ -29,7 +29,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(TestNumber);
+                data.WriteByte(TestNumber);
             }
 
             #endregion
@@ -51,13 +51,13 @@ namespace Haukcode.Rdm.Packets.Control
             protected override void ReadData(RdmBinaryReader data)
             {
                 TestNumber = data.ReadByte();
-                Description = data.ReadNetworkString(Header.ParameterDataLength - 1);
+                Description = data.ReadString(Header.ParameterDataLength - 1);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write(TestNumber);
-                data.WriteNetwork(Description);
+                data.WriteByte(TestNumber);
+                data.WriteString(Description);
             }
 
             #endregion

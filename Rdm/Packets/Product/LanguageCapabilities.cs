@@ -52,13 +52,13 @@ namespace Haukcode.Rdm.Packets.Product
             protected override void ReadData(RdmBinaryReader data)
             {
                 for(int n=0;n<Header.ParameterDataLength/2;n++)
-                    Languages.Add(new CultureInfo(data.ReadNetworkString(2)));
+                    Languages.Add(new CultureInfo(data.ReadString(2)));
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
                 foreach(CultureInfo language in Languages)
-                    data.WriteNetwork(language.TwoLetterISOLanguageName);
+                    data.WriteString(language.TwoLetterISOLanguageName);
             }
 
             #endregion

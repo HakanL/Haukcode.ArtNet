@@ -26,12 +26,12 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
+                data.WriteHiLoInt16(EndpointID);
             }
         }
 
@@ -50,17 +50,17 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
-                DeviceCount = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
+                DeviceCount = data.ReadHiLoInt16();
                 DiscoveryState = (DiscoveryStates)data.ReadByte();
 
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
-                data.WriteNetwork(DeviceCount);
-                data.Write((byte)DiscoveryState);
+                data.WriteHiLoInt16(EndpointID);
+                data.WriteHiLoInt16(DeviceCount);
+                data.WriteByte((byte)DiscoveryState);
             }
         }
 
@@ -77,15 +77,15 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadNetwork16();
+                EndpointID = data.ReadHiLoInt16();
                 DiscoveryState = (DiscoveryStates)data.ReadByte();
 
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork(EndpointID);
-                data.Write((byte)DiscoveryState);
+                data.WriteHiLoInt16(EndpointID);
+                data.WriteByte((byte)DiscoveryState);
             }
         }
 

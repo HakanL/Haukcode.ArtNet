@@ -57,7 +57,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte) State);
+                data.WriteByte((byte) State);
             }
 
             #endregion
@@ -81,7 +81,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.Write((byte)State);
+                data.WriteByte((byte)State);
             }
 
             #endregion

@@ -15,7 +15,7 @@ namespace Haukcode.Rdm.Packets.Parameters
         public class Get : RdmRequestPacket
         {
             public Get()
-                : base(RdmCommands.Get,RdmParameters.ParameterDescription)
+                : base(RdmCommands.Get, RdmParameters.ParameterDescription)
             {
             }
 
@@ -23,12 +23,12 @@ namespace Haukcode.Rdm.Packets.Parameters
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ParameterId = (RdmParameters) ((ushort) data.ReadNetwork16());
+                ParameterId = (RdmParameters)((ushort)data.ReadHiLoInt16());
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork((short) ParameterId);
+                data.WriteHiLoInt16((short)ParameterId);
             }
         }
 
@@ -117,33 +117,33 @@ namespace Haukcode.Rdm.Packets.Parameters
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ParameterId = (RdmParameters) ((ushort) data.ReadNetwork16());
+                ParameterId = (RdmParameters)((ushort)data.ReadHiLoInt16());
                 PDLSize = data.ReadByte();
                 DataType = data.ReadByte();
                 CommandClass = data.ReadByte();
                 Type = data.ReadByte();
                 Unit = data.ReadByte();
                 Prefix = data.ReadByte();
-                MinValidValue = data.ReadNetwork32();
-                MaxValidValue = data.ReadNetwork32();
-                DefaultValue = data.ReadNetwork32();
-                Description = data.ReadNetworkString(Header.ParameterDataLength - 20);
+                MinValidValue = data.ReadHiLoInt32();
+                MaxValidValue = data.ReadHiLoInt32();
+                DefaultValue = data.ReadHiLoInt32();
+                Description = data.ReadString(Header.ParameterDataLength - 20);
             }
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteNetwork((ushort) ParameterId);
-                data.Write(PDLSize);
-                data.Write(DataType);
-                data.Write(CommandClass);
-                data.Write(Type);
-                data.Write(Unit);
-                data.Write(Prefix);
-                data.WriteNetwork(MinValidValue);
-                data.WriteNetwork(MaxValidValue);
-                data.WriteNetwork(DefaultValue);
-                data.Write(Encoding.ASCII.GetBytes(Description));
-;
+                data.WriteHiLoInt16((ushort)ParameterId);
+                data.WriteByte(PDLSize);
+                data.WriteByte(DataType);
+                data.WriteByte(CommandClass);
+                data.WriteByte(Type);
+                data.WriteByte(Unit);
+                data.WriteByte(Prefix);
+                data.WriteHiLoInt32(MinValidValue);
+                data.WriteHiLoInt32(MaxValidValue);
+                data.WriteHiLoInt32(DefaultValue);
+                data.WriteByteArray(Encoding.ASCII.GetBytes(Description));
+                ;
             }
         }
     }
