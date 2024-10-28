@@ -113,8 +113,8 @@ namespace Haukcode.ArtNet.Sockets
                         var socketFlags = SocketFlags.None;
                         receiveState.DataLength = EndReceiveMessageFrom(state, ref socketFlags, ref remoteEndPoint, out var ipPacketInfo);
 
-                        //Protect against UDP loopback where we receive our own packets.
-                        if (!LocalEndPoint.Equals(remoteEndPoint) && receiveState.Valid)
+                        //Protect against UDP loopback where we receive our own packets, except for poll commands.
+                        if (receiveState.Valid && (!LocalEndPoint.Equals(remoteEndPoint) || receiveState.OpCode == (ushort)ArtNetOpCodes.Poll))
                         {
                             LastPacket = DateTime.Now;
 
@@ -192,7 +192,7 @@ namespace Haukcode.ArtNet.Sockets
                 //Create sACN Packet
                 var rdmPacket = new ArtRdmPacket();
                 rdmPacket.Address = (byte)(targetAddress.Universe & 0x00FF);
-                rdmPacket.Net = (byte)(targetAddress.Universe >> 8); 
+                rdmPacket.Net = (byte)(targetAddress.Universe >> 8);
                 rdmPacket.SubStartCode = (byte)RdmVersions.SubMessage;
                 rdmPacket.RdmData = rdmData.ToArray();
 
