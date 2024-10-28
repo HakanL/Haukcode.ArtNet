@@ -11,7 +11,7 @@ namespace Haukcode.ArtNet
         Command = 0x2400,
         DataRequest = 0x2700,
         DataReply = 0x2800,
-        [Obsolete]
+        [Obsolete("Use Output instead of DMX to match the standard")]
         Dmx = 0x5000,           // Duplicate, non-standard names
         Output = 0x5000,
         Nzs = 0x5100,
@@ -41,7 +41,7 @@ namespace Haukcode.ArtNet
         MediaContrlReply = 0x9300,
         TimeCode = 0x9700,
         TimeSync = 0x9800,
-        [Obsolete]
+        [Obsolete("Use Trigger instead of ArtTrigger to match the standard")]
         ArtTrigger = 0x9900,        // Duplicate, non-standard names
         Trigger = 0x9900,
         Directory = 0x9a00,
