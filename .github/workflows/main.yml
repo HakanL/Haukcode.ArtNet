@@ -48,9 +48,9 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '9.0.x'
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore /p:Configuration=Release
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
     - name: Build

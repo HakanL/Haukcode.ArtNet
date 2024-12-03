@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <RootNamespace>Haukcode.ArtNet</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -28,8 +28,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rdm\Rdm.csproj" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="all" />
+    <ProjectReference Include="..\Rdm\Haukcode.Rdm.csproj" />
   </ItemGroup>
+
+  <Choose>
+    <When Condition="'$(Configuration)' == 'Debug'">
+      <ItemGroup>
+        <ProjectReference Include="..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.8" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
     <ItemGroup>
