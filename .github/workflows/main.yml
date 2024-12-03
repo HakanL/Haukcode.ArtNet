@@ -2,53 +2,45 @@ name: Build and Publish
 
 on:
   push:
-  workflow_dispatch:
-  pull_request_target:
+  pull_request:
     branches:
-      - master
+      - main
 
 defaults:
   run:  
-    working-directory: .
+    working-directory: src/ArtNet
     
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@master
-      with:
-        submodules: recursive
-      
-    - name: Get main version from /version.json
+    - uses: actions/checkout@v4
+
+    - name: Get main version
       id: version
       uses: notiz-dev/github-action-json-property@release
       with:
         path: version.json
         prop_path: 'version'
-
-    - name: Output branch name
-      run: echo "github.ref ${{github.ref}} baseref ${{github.base_ref}}  head ${{github.head_ref}}"
-
-    - name: Get branch name from github.ref
-      run: echo "BRANCH_NAME=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }' | sed "s/[[:space:]_]/-/g")" | sed -e 's|/|-|g' >> $GITHUB_ENV
-      if: github.head_ref == ''
+    - name: Get branch name from branch
+      run: echo "BRANCH_NAME=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }' | sed "s/[[:space:]_]/-/g")" >> $GITHUB_ENV
+      if: startsWith(github.ref, 'refs/heads/')
     - name: Get branch name from PR
-      run: echo "BRANCH_NAME=PR-$(echo $GITHUB_HEAD_REF)" | sed -e 's|/|-|g' >> $GITHUB_ENV
-      if: github.head_ref != ''
+      run: echo "BRANCH_NAME=PR-$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')" >> $GITHUB_ENV
+      if: startsWith(github.ref, 'refs/pull/')
       
     - run: echo Version ${BRANCH_NAME}
     - run: echo "PACKAGE_VERSION=${{steps.version.outputs.prop}}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-      if: github.ref == 'refs/heads/master' && github.head_ref == ''
+      if: github.ref == 'refs/heads/main'
     - run: echo "PACKAGE_VERSION=${{steps.version.outputs.prop}}.${GITHUB_RUN_NUMBER}-${BRANCH_NAME}-${GITHUB_SHA::8}" >> $GITHUB_ENV
-      if: github.ref != 'refs/heads/master' || github.head_ref != ''
+      if: github.ref != 'refs/heads/main'
     - run: echo Version is ${PACKAGE_VERSION}
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: 9.0.100
     - name: Install dependencies
       run: dotnet restore /p:Configuration=Release
       env:
@@ -57,7 +49,6 @@ jobs:
       run: dotnet build --configuration Release --no-restore /p:Version="${PACKAGE_VERSION}"
     - name: Test
       run: dotnet test --no-restore --verbosity normal
-      if: false
 
     ## Publish and Tag
     - name: Publish NuGet
@@ -66,4 +57,4 @@ jobs:
       run: |
         git tag "v${PACKAGE_VERSION}"
         git push origin "v${PACKAGE_VERSION}"
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/main'
