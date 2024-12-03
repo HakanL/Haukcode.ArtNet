@@ -8,7 +8,7 @@ on:
 
 defaults:
   run:  
-    working-directory: src/ArtNet
+    working-directory: ArtNet
     
 jobs:
   build:
