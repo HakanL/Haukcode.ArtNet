@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35521.163
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Haukcode.ArtNet", "ArtNet\Haukcode.ArtNet.csproj", "{FE79213B-0C06-4AFA-8BD7-23200879BC9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Haukcode.ArtNet", "src\Haukcode.ArtNet.csproj", "{FE79213B-0C06-4AFA-8BD7-23200879BC9A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "Samples\Samples.csproj", "{695B172A-8C82-4B7F-9C67-D2BB195CF024}"
 EndProject
