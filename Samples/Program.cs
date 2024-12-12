@@ -10,10 +10,9 @@ namespace Haukcode.Samples
         {
             Console.WriteLine("ArtNet samples!");
 
-            var addresses = ArtNet.Helper.GetAddressesFromInterfaceType();
-            var addr = addresses.First();
+            var addr = Haukcode.Network.Utils.GetFirstBindAddress();
 
-            using (var tester = new ArtTriggerSender(localIp: addr.Address, localSubnetMask: addr.NetMask))
+            using (var tester = new ArtTriggerSender(localIp: addr.IPAddress, localSubnetMask: addr.NetMask))
             {
                 Console.WriteLine("Hit enter to send select/play command...");
                 Console.ReadLine();

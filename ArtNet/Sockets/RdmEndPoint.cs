@@ -69,18 +69,4 @@ namespace Haukcode.Sockets
             return IpAddress.ToString();
         }
     }
-
-    public class RdmEndpointComparer : IEqualityComparer<RdmEndPoint>
-    {
-
-        public bool Equals(RdmEndPoint x, RdmEndPoint y)
-        {
-            return x.Id.Equals(y.Id) && x.Universe.Equals(y.Universe);
-        }
-
-        public int GetHashCode(RdmEndPoint obj)
-        {
-            return obj.Id.GetHashCode();
-        }
-    }
 }

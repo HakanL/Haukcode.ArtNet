@@ -11,7 +11,7 @@
     <Description>ArtNet library for .NET Core (.NET Standard 2.0)</Description>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/HakanL/Haukcode.ArtNet</PackageProjectUrl>
-    <Copyright>(C) Copyright 2023 Hakan Lindestaf</Copyright>
+    <Copyright>(C) Copyright 2024 Hakan Lindestaf</Copyright>
     <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>ArtNet</PackageTags>
@@ -25,11 +25,8 @@
     <FileVersion>1.0.18.0</FileVersion>
     <Version>1.2.2</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Rdm\Haukcode.Rdm.csproj" />
-  </ItemGroup>
 
   <Choose>
     <When Condition="'$(Configuration)' == 'Debug'">
@@ -39,7 +36,7 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.8" />
+        <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.13" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -49,4 +46,8 @@
       <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Haukcode.Network" Version="1.0.16" />
+  </ItemGroup>
 </Project>

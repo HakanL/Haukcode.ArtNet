@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using Haukcode.ArtNet.IO;
-using Haukcode.ArtNet.Sockets;
 
 namespace Haukcode.ArtNet.Packets
 {
@@ -49,7 +48,7 @@ namespace Haukcode.ArtNet.Packets
             }
         }
 
-        private short port = ArtNetSocket.Port;
+        private short port = ArtNetClient.DefaultPort;
 
         public short Port
         {

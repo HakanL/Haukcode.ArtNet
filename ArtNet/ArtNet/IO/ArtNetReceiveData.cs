@@ -18,5 +18,9 @@ namespace Haukcode.ArtNet.IO
                 return (ushort)(this.buffer[8] + (this.buffer[9] << 8));
             }
         }
+
+        public ArtNetReceiveData()
+        {
+        }
     }
 }

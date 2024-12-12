@@ -6,6 +6,8 @@ namespace Haukcode.ArtNet.Packets
 {
     public class ArtNetPacket
     {
+        public const int MAX_PACKET_SIZE = 572;
+
         public ArtNetPacket(ArtNetOpCodes opCode)
         {
             OpCode = opCode;
@@ -85,7 +87,15 @@ namespace Haukcode.ArtNet.Packets
                 data.WriteHiLoInt16(Version);
         }
 
-        public static ArtNetPacket Create(ArtNetReceiveData data, Func<ushort, ArtNetReceiveData, ArtNetPacket> customPacketCreator)
+        public static ArtNetPacket Parse(ReadOnlyMemory<byte> buffer)
+        {
+            var data = new ArtNetReceiveData();
+            buffer.Span.CopyTo(data.buffer);
+
+            return Create(data, null);
+        }
+
+        public static ArtNetPacket Create(ArtNetReceiveData data, Func<ushort, ArtNetReceiveData, ArtNetPacket>? customPacketCreator)
         {
             switch ((ArtNetOpCodes)data.OpCode)
             {

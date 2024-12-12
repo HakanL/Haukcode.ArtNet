@@ -26,13 +26,13 @@ namespace Haukcode.Samples
 
         public void SendArtTrigger(Int16 oemCode, byte key, byte subKey)
         {
-            this.socket.Send(new ArtTriggerPacket
-            {
-                OemCode = oemCode,
-                Key = key,
-                SubKey = subKey,
-                Data = new byte[512]
-            });
+            //this.socket.Send(new ArtTriggerPacket
+            //{
+            //    OemCode = oemCode,
+            //    Key = key,
+            //    SubKey = subKey,
+            //    Data = new byte[512]
+            //});
         }
 
         private void DebugPrintArtTrigger(ArtNet.Packets.ArtTriggerPacket input)
