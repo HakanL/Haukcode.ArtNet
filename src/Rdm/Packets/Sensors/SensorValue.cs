@@ -62,10 +62,10 @@ namespace Haukcode.Rdm.Packets.Sensors
             protected override void WriteData(RdmBinaryWriter data)
             {
                 data.WriteByte(SensorNumber);
-                data.WriteHiLoInt16(PresentValue);
-                data.WriteHiLoInt16(MinValue);
-                data.WriteHiLoInt16(MaxValue);
-                data.WriteHiLoInt16(RecordedValue);
+                data.WriteUInt16(PresentValue);
+                data.WriteUInt16(MinValue);
+                data.WriteUInt16(MaxValue);
+                data.WriteUInt16(RecordedValue);
             }
 
             #endregion
@@ -126,10 +126,10 @@ namespace Haukcode.Rdm.Packets.Sensors
             protected override void WriteData(RdmBinaryWriter data)
             {
                 data.WriteByte(SensorNumber);
-                data.WriteHiLoInt16(PresentValue);
-                data.WriteHiLoInt16(MinValue);
-                data.WriteHiLoInt16(MaxValue);
-                data.WriteHiLoInt16(RecordedValue);
+                data.WriteUInt16(PresentValue);
+                data.WriteUInt16(MinValue);
+                data.WriteUInt16(MaxValue);
+                data.WriteUInt16(RecordedValue);
             }
 
             #endregion

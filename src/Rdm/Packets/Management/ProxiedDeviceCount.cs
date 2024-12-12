@@ -91,7 +91,7 @@ namespace Haukcode.Rdm.Packets.Management
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(DeviceCount);
+                data.WriteUInt16(DeviceCount);
                 data.WriteBool(ListChanged);
             }
 

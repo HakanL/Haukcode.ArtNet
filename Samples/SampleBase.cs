@@ -1,28 +1,66 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 using Haukcode.ArtNet;
+using Haukcode.ArtNet.Packets;
 
-namespace Haukcode.Samples
+namespace Haukcode.ArtNet.Samples;
+
+public abstract class SampleBase : IDisposable
 {
-    public abstract class SampleBase : IDisposable
+    protected readonly ArtNetClient client;
+    private Task writerTask;
+
+    public SampleBase(IPAddress localIp, IPAddress localSubnetMask)
     {
-        protected readonly ArtNetClient socket;
+        this.client = new ArtNetClient(
+            localAddress: localIp,
+            localSubnetMask: localSubnetMask);
 
-        public SampleBase(IPAddress localIp, IPAddress localSubnetMask)
+        var channel = Channel.CreateUnbounded<ReceiveDataPacket>();
+
+        this.client.StartRecordPipeline(p => WritePacket(channel, p), () => channel.Writer.Complete());
+
+        this.writerTask = Task.Factory.StartNew(async () =>
         {
-            //this.socket = new ArtNetClient();
+            await WriteToDiskAsync(channel, CancellationToken.None);
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
+    }
 
-            //this.socket.NewPacket += Socket_NewPacket;
+    private static async Task WritePacket(Channel<ReceiveDataPacket> channel, ReceiveDataPacket receiveData)
+    {
+        var dmxData = TransformPacket(receiveData);
 
-            //this.socket.Open(localIp, localSubnetMask);
-        }
+        if (dmxData == null)
+            return;
 
-        protected abstract void Socket_NewPacket(object sender, Sockets.NewPacketEventArgs<ArtNet.Packets.ArtNetPacket> e);
+        await channel.Writer.WriteAsync(dmxData, CancellationToken.None);
+    }
 
-        public void Dispose()
+    private static ReceiveDataPacket TransformPacket(ReceiveDataPacket receiveData)
+    {
+        var copyBuf = new byte[receiveData.Packet.PacketLength];
+        receiveData.Packet.WriteToBuffer(copyBuf);
+
+        receiveData.Packet = ArtNetPacket.Parse(copyBuf);
+
+        return receiveData;
+    }
+
+    private async Task WriteToDiskAsync(Channel<ReceiveDataPacket> inputChannel, CancellationToken cancellationToken)
+    {
+        await foreach (var dmxData in inputChannel.Reader.ReadAllAsync(cancellationToken))
         {
-            //this.socket.Close();
-            this.socket.Dispose();
+            Socket_NewPacket(dmxData.TimestampMS, dmxData);
         }
+    }
+
+    protected abstract void Socket_NewPacket(double timestampMS, ReceiveDataPacket e);
+
+    public void Dispose()
+    {
+        this.client.Dispose();
     }
 }

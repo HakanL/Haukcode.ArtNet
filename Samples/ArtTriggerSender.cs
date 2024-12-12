@@ -1,43 +1,44 @@
-﻿using Haukcode.ArtNet.Packets;
+﻿using Haukcode.ArtNet;
+using Haukcode.ArtNet.Packets;
 using Haukcode.Sockets;
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
-namespace Haukcode.Samples
+namespace Haukcode.ArtNet.Samples;
+
+public class ArtTriggerSender : SampleCapture
 {
-    public class ArtTriggerSender : SampleCapture
+    public ArtTriggerSender(IPAddress localIp, IPAddress localSubnetMask)
+        : base(localIp, localSubnetMask)
     {
-        public ArtTriggerSender(IPAddress localIp, IPAddress localSubnetMask)
-            : base(localIp, localSubnetMask)
-        {
-        }
+    }
 
-        protected override void Socket_NewPacket(object sender, NewPacketEventArgs<ArtNetPacket> e)
-        {
-            base.Socket_NewPacket(sender, e);
+    protected override void Socket_NewPacket(double timestampMS, ReceiveDataPacket e)
+    {
+        base.Socket_NewPacket(timestampMS, e);
 
-            switch (e.Packet.OpCode)
-            {
-                case ArtNet.ArtNetOpCodes.Trigger:
-                    DebugPrintArtTrigger(e.Packet as ArtNet.Packets.ArtTriggerPacket);
-                    break;
-            }
-        }
-
-        public void SendArtTrigger(Int16 oemCode, byte key, byte subKey)
+        switch (e.Packet.OpCode)
         {
-            //this.socket.Send(new ArtTriggerPacket
-            //{
-            //    OemCode = oemCode,
-            //    Key = key,
-            //    SubKey = subKey,
-            //    Data = new byte[512]
-            //});
+            case ArtNet.ArtNetOpCodes.Trigger:
+                DebugPrintArtTrigger(e.Packet as ArtNet.Packets.ArtTriggerPacket);
+                break;
         }
+    }
 
-        private void DebugPrintArtTrigger(ArtNet.Packets.ArtTriggerPacket input)
+    public Task SendArtTrigger(Int16 oemCode, byte key, byte subKey)
+    {
+        return this.client.QueuePacketForSending((IPAddress)null, new ArtTriggerPacket
         {
-            Console.WriteLine($"Trigger - OemCode: 0x{input.OemCode:X}  Key: {input.Key:X}   SubKey: {input.SubKey:X}");
-        }
+            OemCode = oemCode,
+            Key = key,
+            SubKey = subKey,
+            Data = new byte[512]
+        });
+    }
+
+    private void DebugPrintArtTrigger(ArtNet.Packets.ArtTriggerPacket input)
+    {
+        Console.WriteLine($"Trigger - OemCode: 0x{input.OemCode:X}  Key: {input.Key:X}   SubKey: {input.SubKey:X}");
     }
 }

@@ -70,7 +70,7 @@ namespace Haukcode.Rdm.Packets.Net
                 data.WriteHiLoInt32(ListChangeNumber);
                 foreach (short endpointId in EndpointIDs)
                 {
-                    data.WriteHiLoInt16(endpointId);
+                    data.WriteUInt16(endpointId);
                 }
             }
         }

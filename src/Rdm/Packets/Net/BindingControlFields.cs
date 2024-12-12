@@ -53,8 +53,8 @@ namespace Haukcode.Rdm.Packets.Net
             protected override void WriteData(RdmBinaryWriter data)
             {
                 data.WriteUid(Id);
-                data.WriteHiLoInt16(EndpointID);
-                data.WriteHiLoInt16(ControlFields);
+                data.WriteUInt16(EndpointID);
+                data.WriteUInt16(ControlFields);
                 data.WriteUid(BindingId);
             }
         }

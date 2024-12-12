@@ -116,7 +116,7 @@ namespace Haukcode.Rdm.Packets.Product
             protected override void WriteData(RdmBinaryWriter data)
             {
                 foreach (DetailId id in Details)
-                    data.WriteHiLoInt16((short)id);
+                    data.WriteUInt16((short)id);
             }
 
             #endregion

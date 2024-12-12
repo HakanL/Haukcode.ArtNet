@@ -39,9 +39,7 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     private readonly IPEndPoint localEndPoint;
     private readonly IPEndPoint broadcastEndPoint;
     private readonly Dictionary<ushort, byte> sequenceIds = [];
-    private readonly Dictionary<ushort, byte> sequenceIdsSync = [];
     private readonly object lockObject = new();
-    private readonly HashSet<ushort> dmxUniverses = [];
     private readonly Dictionary<IPAddress, IPEndPoint> endPointCache = [];
 
 
@@ -76,82 +74,6 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
 
     public IPAddress BroadcastAddress => this.broadcastEndPoint.Address;
 
-    /*    public void StartReceive()
-        {
-            try
-            {
-                EndPoint localPort = new IPEndPoint(IPAddress.Any, Port);
-                var receiveState = new ArtNetReceiveData();
-                BeginReceiveMessageFrom(receiveState.buffer, 0, receiveState.bufferSize, SocketFlags.None, ref localPort, new AsyncCallback(OnReceive), receiveState);
-            }
-            catch (Exception ex)
-            {
-                OnUnhandledException(new ApplicationException("An error ocurred while trying to start recieving ArtNet.", ex));
-            }
-        }
-
-        private void OnReceive(IAsyncResult state)
-        {
-            EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-
-            if (PortOpen)
-            {
-                try
-                {
-                    var receiveState = (ArtNetReceiveData)(state.AsyncState);
-
-                    if (receiveState != null)
-                    {
-                        var socketFlags = SocketFlags.None;
-                        receiveState.DataLength = EndReceiveMessageFrom(state, ref socketFlags, ref remoteEndPoint, out var ipPacketInfo);
-
-                        //Protect against UDP loopback where we receive our own packets, except for poll/pollreply commands.
-                        if (receiveState.Valid && (!LocalEndPoint.Equals(remoteEndPoint) ||
-                            receiveState.OpCode == (ushort)ArtNetOpCodes.Poll ||
-                            receiveState.OpCode == (ushort)ArtNetOpCodes.PollReply))
-                        {
-                            LastPacket = DateTime.Now;
-
-                            ProcessPacket((IPEndPoint)remoteEndPoint, new IPEndPoint(ipPacketInfo.Address, ((IPEndPoint)LocalEndPoint).Port), ArtNetPacket.Create(receiveState, CustomPacketCreator));
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    OnUnhandledException(ex);
-                }
-                finally
-                {
-                    //Attempt to receive another packet.
-                    StartReceive();
-                }
-            }
-        }*/
-
-    //private void ProcessPacket(IPEndPoint source, IPEndPoint destination, ArtNetPacket packet)
-    //{
-    //    if (packet != null)
-    //    {
-    //        NewPacket?.Invoke(this, new NewPacketEventArgs<ArtNetPacket>(source, destination, packet));
-
-    //        if (packet is ArtRdmPacket rdmPacket && NewRdmPacket != null)
-    //        {
-    //            RdmPacket rdm = RdmPacket.ReadPacket(new RdmBinaryReader(new MemoryStream(rdmPacket.RdmData)));
-    //            NewRdmPacket(this, new NewPacketEventArgs<RdmPacket>(source, destination, rdm));
-    //        }
-    //    }
-    //}
-
-    //public void Send(ArtNetPacket packet)
-    //{
-    //    SendTo(packet.ToArray(), new IPEndPoint(BroadcastAddress, Port));
-    //}
-
-    //public void Send(ArtNetPacket packet, RdmEndPoint address)
-    //{
-    //    SendTo(packet.ToArray(), new IPEndPoint(address.IpAddress, Port));
-    //}
-
     /*    TODO
      *    public void SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId)
         {
@@ -177,7 +99,7 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
                 RdmPacket.WritePacket(packet, rdmWriter);
 
                 //Write the checksum
-                rdmWriter.WriteHiLoInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) + (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
+                rdmWriter.WriteUInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) + (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
 
                 //Create sACN Packet
                 var rdmPacket = new ArtRdmPacket();
@@ -283,7 +205,7 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     /// <param name="destination">Destination</param>
     /// <param name="packet">Packet</param>
     /// <param name="important">Important</param>
-    private Task QueuePacketForSending(IPAddress? destination, ArtNetPacket packet, bool important = false)
+    public Task QueuePacketForSending(IPAddress? destination, ArtNetPacket packet, bool important = false)
     {
         IPEndPoint? sendDataDestination = null;
 
@@ -314,16 +236,10 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     public async Task QueuePacketForSending(IPEndPoint destination, ArtNetPacket packet, bool important = false)
     {
         await base.QueuePacket(
-            allocatePacketLength: packet.DataLength,
+            allocatePacketLength: packet.PacketLength,
             important: important,
             sendDataFactory: () => new SendData(destination),
-            packetWriter: m =>
-            {
-                var packetData = packet.ToArray();
-                packetData.CopyTo(m.Span);
-
-                return packetData.Length;
-            });
+            packetWriter: packet.WriteToBuffer);
     }
 
     protected override ValueTask<int> SendPacketAsync(SendData sendData, ReadOnlyMemory<byte> payload)
@@ -378,38 +294,33 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
 
     protected override ReceiveDataPacket? TryParseObject(ReadOnlyMemory<byte> buffer, double timestampMS, IPEndPoint sourceIP, IPAddress destinationIP)
     {
-        //FIXME
-        //Protect against UDP loopback where we receive our own packets, except for poll/pollreply commands.
-        //if (receiveState.Valid && (!LocalEndPoint.Equals(remoteEndPoint) ||
-        //    receiveState.OpCode == (ushort)ArtNetOpCodes.Poll ||
-        //    receiveState.OpCode == (ushort)ArtNetOpCodes.PollReply))
-        //{
-        //    LastPacket = DateTime.Now;
-
-        //    ProcessPacket((IPEndPoint)remoteEndPoint, new IPEndPoint(ipPacketInfo.Address, ((IPEndPoint)LocalEndPoint).Port), ArtNetPacket.Create(receiveState, CustomPacketCreator));
-        //}
-
         var packet = ArtNetPacket.Parse(buffer);
 
         // Note that we're still using the memory from the pipeline here, the packet is not allocating its own DMX data byte array
         if (packet != null)
         {
-            var parsedObject = new ReceiveDataPacket
+            // Protect against UDP loopback where we receive our own packets, except for poll/pollreply commands.
+            if (!LocalEndPoint.Equals(sourceIP) ||
+                packet.OpCode == ArtNetOpCodes.Poll ||
+                packet.OpCode == ArtNetOpCodes.PollReply)
             {
-                TimestampMS = timestampMS,
-                Source = sourceIP,
-                Packet = packet
-            };
+                var parsedObject = new ReceiveDataPacket
+                {
+                    TimestampMS = timestampMS,
+                    Source = sourceIP,
+                    Packet = packet
+                };
 
-            if (!this.endPointCache.TryGetValue(destinationIP, out var ipEndPoint))
-            {
-                ipEndPoint = new IPEndPoint(destinationIP, this.localEndPoint.Port);
-                this.endPointCache.Add(destinationIP, ipEndPoint);
+                if (!this.endPointCache.TryGetValue(destinationIP, out var ipEndPoint))
+                {
+                    ipEndPoint = new IPEndPoint(destinationIP, this.localEndPoint.Port);
+                    this.endPointCache.Add(destinationIP, ipEndPoint);
+                }
+
+                parsedObject.Destination = ipEndPoint ?? this.broadcastEndPoint;
+
+                return parsedObject;
             }
-
-            parsedObject.Destination = ipEndPoint ?? this.broadcastEndPoint;
-
-            return parsedObject;
         }
 
         return null;

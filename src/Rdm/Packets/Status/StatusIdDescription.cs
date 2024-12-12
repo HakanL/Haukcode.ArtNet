@@ -58,7 +58,7 @@ namespace Haukcode.Rdm.Packets.Status
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(StatusId);
+                data.WriteUInt16(StatusId);
             }
 
             #endregion

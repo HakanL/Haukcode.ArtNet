@@ -28,7 +28,7 @@ namespace Haukcode.Rdm.Packets
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteByteArray(Data);
+            data.WriteBytes(Data);
         }
 
         #endregion

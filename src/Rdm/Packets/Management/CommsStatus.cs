@@ -105,9 +105,9 @@ namespace Haukcode.Rdm.Packets.Management
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(ShortMessage);
-                data.WriteHiLoInt16(LengthMismatch);
-                data.WriteHiLoInt16(ChecksumFail);
+                data.WriteUInt16(ShortMessage);
+                data.WriteUInt16(LengthMismatch);
+                data.WriteUInt16(ChecksumFail);
             }
 
             #endregion

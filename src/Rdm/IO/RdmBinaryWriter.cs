@@ -16,7 +16,7 @@ namespace Haukcode.Rdm
 
         public Stream BaseStream => this.writer.BaseStream;
 
-        public void WriteHiLoInt16(short value)
+        public void WriteUInt16(short value)
         {
             // Split the short into two bytes
             byte highByte = (byte)((value >> 8) & 0xFF);
@@ -27,9 +27,9 @@ namespace Haukcode.Rdm
             this.writer.Write(lowByte);
         }
 
-        public void WriteHiLoInt16(ushort value)
+        public void WriteUInt16(ushort value)
         {
-            WriteHiLoInt16((short)value);
+            WriteUInt16((short)value);
         }
 
         public void WriteHiLoInt32(int value)
@@ -60,7 +60,7 @@ namespace Haukcode.Rdm
 
         public void WriteUid(UId value)
         {
-            WriteHiLoInt16((short)value.ManufacturerId);
+            WriteUInt16((short)value.ManufacturerId);
             WriteHiLoInt32((int)value.DeviceId);
         }
 
@@ -69,7 +69,7 @@ namespace Haukcode.Rdm
             this.writer.Write(value);
         }
 
-        public void WriteByteArray(byte[] value)
+        public void WriteBytes(byte[] value)
         {
             this.writer.Write(value);
         }

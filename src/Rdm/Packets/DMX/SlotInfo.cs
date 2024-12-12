@@ -151,9 +151,9 @@ namespace Haukcode.Rdm.Packets.DMX
             {
                 foreach (SlotInformation slot in Slots)
                 {
-                    data.WriteHiLoInt16(slot.Offset);
+                    data.WriteUInt16(slot.Offset);
                     data.WriteByte((byte) slot.Type);
-                    data.WriteHiLoInt16((short)slot.SlotLink);
+                    data.WriteUInt16((short)slot.SlotLink);
                 }
             }
 

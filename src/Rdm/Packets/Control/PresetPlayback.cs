@@ -62,9 +62,9 @@ namespace Haukcode.Rdm.Packets.Control
             protected override void WriteData(RdmBinaryWriter data)
             {
                 if (Mode == PlayMode.Scene)
-                    data.WriteHiLoInt16((short) SceneNumber);
+                    data.WriteUInt16((short) SceneNumber);
                 else
-                    data.WriteHiLoInt16((short) Mode);
+                    data.WriteUInt16((short) Mode);
             }
 
             #endregion
@@ -98,9 +98,9 @@ namespace Haukcode.Rdm.Packets.Control
             protected override void WriteData(RdmBinaryWriter data)
             {
                 if (Mode == PlayMode.Scene)
-                    data.WriteHiLoInt16((short)SceneNumber);
+                    data.WriteUInt16((short)SceneNumber);
                 else
-                    data.WriteHiLoInt16((short)Mode);
+                    data.WriteUInt16((short)Mode);
                 data.WriteByte(Level);
             }
 

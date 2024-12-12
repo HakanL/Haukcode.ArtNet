@@ -83,7 +83,7 @@ namespace Haukcode.Rdm.Packets.Discovery
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(ControlField);
+                data.WriteUInt16(ControlField);
                 data.WriteUid(BindingId);
             }
 

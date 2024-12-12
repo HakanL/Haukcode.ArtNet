@@ -116,11 +116,11 @@ namespace Haukcode.Rdm.Packets.Status
 
                 foreach (Status item in StatusMessages)
                 {
-                    data.WriteHiLoInt16(item.SubDeviceId);
+                    data.WriteUInt16(item.SubDeviceId);
                     data.WriteByte((byte) item.StatusType);
-                    data.WriteHiLoInt16(item.StatusMessageId);
-                    data.WriteHiLoInt16(item.DataValue1);
-                    data.WriteHiLoInt16(item.DataValue2);
+                    data.WriteUInt16(item.StatusMessageId);
+                    data.WriteUInt16(item.DataValue1);
+                    data.WriteUInt16(item.DataValue2);
                 }
             }
 

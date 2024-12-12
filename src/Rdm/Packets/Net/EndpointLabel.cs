@@ -23,7 +23,7 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(EndpointID);
+                data.WriteUInt16(EndpointID);
             }
         }
 
@@ -46,8 +46,8 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(EndpointID);
-                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
+                data.WriteUInt16(EndpointID);
+                data.WriteBytes(Encoding.ASCII.GetBytes(Label));
             }
         }
 
@@ -70,8 +70,8 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(EndpointID);
-                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
+                data.WriteUInt16(EndpointID);
+                data.WriteBytes(Encoding.ASCII.GetBytes(Label));
             }
         }
 

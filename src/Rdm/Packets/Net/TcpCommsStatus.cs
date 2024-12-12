@@ -48,9 +48,9 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteByteArray(CurrentConnectionIP.GetAddressBytes());                
-                data.WriteHiLoInt16(UnhealthyTCPEvents);
-                data.WriteHiLoInt16(TCPConnectEvents);
+                data.WriteBytes(CurrentConnectionIP.GetAddressBytes());                
+                data.WriteUInt16(UnhealthyTCPEvents);
+                data.WriteUInt16(TCPConnectEvents);
             }
         }
 

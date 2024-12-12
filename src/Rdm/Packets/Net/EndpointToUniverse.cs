@@ -41,7 +41,7 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(EndpointID);
+                data.WriteUInt16(EndpointID);
             }
         }
 
@@ -97,18 +97,18 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(EndpointID);
+                data.WriteUInt16(EndpointID);
 
                 switch (EndpointMode)
                 {
                     case UniverseMode.Disabled:
-                        data.WriteHiLoInt16(0);
+                        data.WriteUInt16(0);
                         break;
                     case UniverseMode.Composite:
-                        data.WriteHiLoInt16(65535);
+                        data.WriteUInt16(65535);
                         break;
                     default:
-                        data.WriteHiLoInt16(UniverseNumber);
+                        data.WriteUInt16(UniverseNumber);
                         break;
                 }
 
@@ -164,18 +164,18 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(EndpointID);
+                data.WriteUInt16(EndpointID);
 
                 switch (EndpointMode)
                 {
                     case UniverseMode.Disabled:
-                        data.WriteHiLoInt16(0);
+                        data.WriteUInt16(0);
                         break;
                     case UniverseMode.Composite:
-                        data.WriteHiLoInt16(65535);
+                        data.WriteUInt16(65535);
                         break;
                     default:
-                        data.WriteHiLoInt16(UniverseNumber);
+                        data.WriteUInt16(UniverseNumber);
                         break;
                 }
             }

@@ -50,7 +50,7 @@ namespace Haukcode.Rdm.Packets.Parameters
             protected override void WriteData(RdmBinaryWriter data)
             {
                 foreach (RdmParameters parameterId in ParameterIds)
-                    data.WriteHiLoInt16((ushort)parameterId);
+                    data.WriteUInt16((ushort)parameterId);
             }
         }
     }

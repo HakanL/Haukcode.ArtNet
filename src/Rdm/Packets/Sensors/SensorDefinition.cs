@@ -179,10 +179,10 @@ namespace Haukcode.Rdm.Packets.Sensors
                 data.WriteByte((byte) Type);
                 data.WriteByte((byte) Unit);
                 data.WriteByte((byte) Prefix);
-                data.WriteHiLoInt16(RangeMinValue);
-                data.WriteHiLoInt16(RangeMaxValue);
-                data.WriteHiLoInt16(NormalMinValue);
-                data.WriteHiLoInt16(NormalMaxValue);
+                data.WriteUInt16(RangeMinValue);
+                data.WriteUInt16(RangeMaxValue);
+                data.WriteUInt16(NormalMinValue);
+                data.WriteUInt16(NormalMaxValue);
                 data.WriteByte(RecordValueSupport);
                 data.WriteString(Description);
             }

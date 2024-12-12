@@ -64,7 +64,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(DmxAddress);
+                data.WriteUInt16(DmxAddress);
             }
 
             #endregion
@@ -95,7 +95,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(DmxAddress);
+                data.WriteUInt16(DmxAddress);
             }
 
             #endregion

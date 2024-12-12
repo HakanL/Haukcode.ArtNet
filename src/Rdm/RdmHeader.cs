@@ -69,9 +69,9 @@ namespace Haukcode.Rdm
             data.WriteByte(TransactionNumber);
             data.WriteByte(PortOrResponseType);
             data.WriteByte(MessageCount);
-            data.WriteHiLoInt16(SubDevice);
+            data.WriteUInt16(SubDevice);
             data.WriteByte((byte)Command);
-            data.WriteHiLoInt16((short)ParameterId);
+            data.WriteUInt16((short)ParameterId);
 
             // Save position so we can write length later.
             dataLengthPosition = data.BaseStream.Position;

@@ -55,7 +55,7 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16((short)ClockTime.Year);
+                data.WriteUInt16((short)ClockTime.Year);
                 data.WriteByte((byte)ClockTime.Month);
                 data.WriteByte((byte)ClockTime.Day);
                 data.WriteByte((byte)ClockTime.Hour);
@@ -91,7 +91,7 @@ namespace Haukcode.Rdm.Packets.Configuration
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16((short)ClockTime.Year);
+                data.WriteUInt16((short)ClockTime.Year);
                 data.WriteByte((byte)ClockTime.Month);
                 data.WriteByte((byte)ClockTime.Day);
                 data.WriteByte((byte)ClockTime.Hour);

@@ -48,7 +48,7 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteByteArray(Encoding.ASCII.GetBytes(Description));
+                data.WriteBytes(Encoding.ASCII.GetBytes(Description));
             }
 
             #endregion

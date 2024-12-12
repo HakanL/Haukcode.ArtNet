@@ -57,7 +57,7 @@ namespace Haukcode.Rdm.Packets.DMX
             protected override void WriteData(RdmBinaryWriter data)
             {
                 data.WriteByte(PersonalityIndex);
-                data.WriteHiLoInt16(DmxSlotsRequired);
+                data.WriteUInt16(DmxSlotsRequired);
                 data.WriteString(Description);
             }
 

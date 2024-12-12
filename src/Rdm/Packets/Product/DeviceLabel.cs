@@ -47,7 +47,7 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
+                data.WriteBytes(Encoding.ASCII.GetBytes(Label));
             }
         }
 
@@ -69,7 +69,7 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteByteArray(Encoding.ASCII.GetBytes(Label));
+                data.WriteBytes(Encoding.ASCII.GetBytes(Label));
             }
 
             #endregion

@@ -28,7 +28,7 @@ namespace Haukcode.Rdm.Packets.Parameters
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16((short)ParameterId);
+                data.WriteUInt16((short)ParameterId);
             }
         }
 
@@ -132,7 +132,7 @@ namespace Haukcode.Rdm.Packets.Parameters
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16((ushort)ParameterId);
+                data.WriteUInt16((ushort)ParameterId);
                 data.WriteByte(PDLSize);
                 data.WriteByte(DataType);
                 data.WriteByte(CommandClass);
@@ -142,7 +142,7 @@ namespace Haukcode.Rdm.Packets.Parameters
                 data.WriteHiLoInt32(MinValidValue);
                 data.WriteHiLoInt32(MaxValidValue);
                 data.WriteHiLoInt32(DefaultValue);
-                data.WriteByteArray(Encoding.ASCII.GetBytes(Description));
+                data.WriteBytes(Encoding.ASCII.GetBytes(Description));
                 ;
             }
         }

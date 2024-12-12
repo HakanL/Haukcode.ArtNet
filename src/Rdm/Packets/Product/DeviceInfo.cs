@@ -76,15 +76,15 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(RdmProtocolVersion);
-                data.WriteHiLoInt16(DeviceModelId);
-                data.WriteHiLoInt16((short) ProductCategory);
+                data.WriteUInt16(RdmProtocolVersion);
+                data.WriteUInt16(DeviceModelId);
+                data.WriteUInt16((short) ProductCategory);
                 data.WriteHiLoInt32(SoftwareVersionId);
-                data.WriteHiLoInt16(DmxFootprint);
+                data.WriteUInt16(DmxFootprint);
                 data.WriteByte(DmxPersonality);
                 data.WriteByte(DmxPersonalityCount);
-                data.WriteHiLoInt16(DmxStartAddress);
-                data.WriteHiLoInt16(SubDeviceCount);
+                data.WriteUInt16(DmxStartAddress);
+                data.WriteUInt16(SubDeviceCount);
                 data.WriteByte(SensorCount);
             }
 

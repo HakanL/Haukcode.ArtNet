@@ -48,10 +48,10 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(SceneNumber);
-                data.WriteHiLoInt16(UpFadeTime);
-                data.WriteHiLoInt16(DownFadeTime);
-                data.WriteHiLoInt16(WaitTime);
+                data.WriteUInt16(SceneNumber);
+                data.WriteUInt16(UpFadeTime);
+                data.WriteUInt16(DownFadeTime);
+                data.WriteUInt16(WaitTime);
             }
 
             #endregion

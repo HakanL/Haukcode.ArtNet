@@ -72,7 +72,7 @@ namespace Haukcode.Rdm.Packets.DMX
             {
                 foreach (SlotValue value in DefaultValues)
                 {
-                    data.WriteHiLoInt16(value.Offset);
+                    data.WriteUInt16(value.Offset);
                     data.WriteByte(value.Value);
                 }
             }

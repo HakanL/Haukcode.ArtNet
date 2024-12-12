@@ -33,7 +33,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(SlotOffset);
+                data.WriteUInt16(SlotOffset);
             }
 
             #endregion
@@ -60,7 +60,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void WriteData(RdmBinaryWriter data)
             {
-                data.WriteHiLoInt16(SlotOffset);
+                data.WriteUInt16(SlotOffset);
                 data.WriteString(Description);
             }
 

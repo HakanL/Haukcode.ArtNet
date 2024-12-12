@@ -3,45 +3,47 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using Haukcode.ArtNet.IO;
+using Haukcode.Network;
 
-namespace Haukcode.ArtNet.Packets
+namespace Haukcode.ArtNet.Packets;
+
+public class ArtSyncPacket : ArtNetPacket
 {
-    public class ArtSyncPacket : ArtNetPacket
+    public ArtSyncPacket()
+        : base(ArtNetOpCodes.Sync)
     {
-        public ArtSyncPacket()
-            : base(ArtNetOpCodes.Sync)
-        {
-        }
+    }
 
-        public ArtSyncPacket(ArtNetReceiveData data)
-            : base(data)
-        {
-        }
+    public ArtSyncPacket(ArtNetReceiveData data)
+        : base(data)
+    {
+    }
 
-        #region Packet Properties
+    #region Packet Properties
 
-        private short aux = 0;
+    private short aux = 0;
 
-        public short Aux
-        {
-            get { return aux; }
-            set { aux = value; }
-        }
+    public short Aux
+    {
+        get { return aux; }
+        set { aux = value; }
+    }
 
-        #endregion
+    protected override int DataLength => 2;
 
-        public override void ReadData(ArtNetBinaryReader data)
-        {
-            base.ReadData(data);
+    #endregion
 
-            Aux = data.ReadLoHiInt16();
-        }
+    public override void ReadData(ArtNetBinaryReader data)
+    {
+        base.ReadData(data);
 
-        public override void WriteData(ArtNetBinaryWriter data)
-        {
-            base.WriteData(data);
-            
-            data.WriteHiLoInt16(Aux);
-        }
+        Aux = data.ReadLoHiInt16();
+    }
+
+    public override void WriteData(BigEndianBinaryWriter writer)
+    {
+        base.WriteData(writer);
+        
+        writer.WriteInt16(Aux);
     }
 }
