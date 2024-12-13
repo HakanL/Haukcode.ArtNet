@@ -35,7 +35,7 @@ public abstract class ArtNetPacket
 
         var target = Create(opCode, reader);
 
-        Debug.Assert(target.PacketLength == inputBuffer.Length);
+        Debug.Assert(target.PacketLength == reader.BytesRead);
 
         return target;
     }
