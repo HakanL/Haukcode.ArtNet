@@ -52,7 +52,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SceneNumber = (ushort) data.ReadHiLoInt16();
+                SceneNumber = (ushort) data.ReadInt16();
                 if (SceneNumber > (ushort) PlayMode.Off || SceneNumber < (ushort) PlayMode.All)
                     Mode = PlayMode.Scene;
                 else
@@ -87,7 +87,7 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SceneNumber = (ushort) data.ReadHiLoInt16();
+                SceneNumber = (ushort) data.ReadInt16();
                 if (SceneNumber > (ushort)PlayMode.Off || SceneNumber < (ushort)PlayMode.All)
                     Mode = PlayMode.Scene;
                 else

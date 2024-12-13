@@ -59,29 +59,26 @@ public class ArtAddressPacket : ArtNetPacket
         NetSwitch = (byte)(((src.SubSwitch & 0x7F00) >> 8) | 0x80);
     }
 
-    public ArtAddressPacket(ArtNetReceiveData data) : base(data)
+    internal static ArtAddressPacket Parse(BigEndianBinaryReader reader)
     {
+        var target = new ArtAddressPacket
+        {
+            NetSwitch = reader.ReadByte(),
+            BindIndex = reader.ReadByte(),
+            ShortName = reader.ReadString(18),
+            LongName = reader.ReadString(64),
+            SwIn = reader.ReadBytes(4),
+            SwOut = reader.ReadBytes(4),
+            SubSwitch = reader.ReadByte(),
+            AcnPriority = reader.ReadByte(),
+            Command = (ArtAddressCommand)reader.ReadByte()
+        };
+
+        return target;
     }
 
-    public override void ReadData(ArtNetBinaryReader data)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.ReadData(data);
-
-        NetSwitch = data.ReadByte();
-        BindIndex = data.ReadByte();
-        ShortName = data.ReadString(18);
-        LongName = data.ReadString(64);
-        SwIn = data.ReadBytes(4);
-        SwOut = data.ReadBytes(4);
-        SubSwitch = data.ReadByte();
-        AcnPriority = data.ReadByte();
-        Command = (ArtAddressCommand)data.ReadByte();
-    }
-
-    public override void WriteData(BigEndianBinaryWriter writer)
-    {
-        base.WriteData(writer);
-
         writer.WriteByte(NetSwitch);
         writer.WriteByte(BindIndex);
         writer.WriteString(ShortName, 18);

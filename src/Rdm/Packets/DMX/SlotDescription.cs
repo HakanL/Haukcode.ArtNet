@@ -28,7 +28,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SlotOffset = data.ReadHiLoInt16();
+                SlotOffset = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
@@ -54,7 +54,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SlotOffset = data.ReadHiLoInt16();
+                SlotOffset = data.ReadInt16();
                 Description = data.ReadString(Header.ParameterDataLength - 2);
             }
 

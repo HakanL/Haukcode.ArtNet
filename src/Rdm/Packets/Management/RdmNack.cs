@@ -23,7 +23,7 @@ namespace Haukcode.Rdm.Packets.Management
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            Reason = (NackReason) data.ReadHiLoInt16();
+            Reason = (NackReason) data.ReadInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

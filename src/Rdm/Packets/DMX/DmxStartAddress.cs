@@ -59,7 +59,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                DmxAddress = data.ReadHiLoInt16();
+                DmxAddress = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
@@ -90,7 +90,7 @@ namespace Haukcode.Rdm.Packets.DMX
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                DmxAddress = data.ReadHiLoInt16();
+                DmxAddress = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)

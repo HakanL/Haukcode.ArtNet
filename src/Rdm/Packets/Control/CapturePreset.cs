@@ -40,10 +40,10 @@ namespace Haukcode.Rdm.Packets.Control
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                SceneNumber = data.ReadHiLoInt16();
-                UpFadeTime = data.ReadHiLoInt16();
-                DownFadeTime = data.ReadHiLoInt16();
-                WaitTime = data.ReadHiLoInt16();
+                SceneNumber = data.ReadInt16();
+                UpFadeTime = data.ReadInt16();
+                DownFadeTime = data.ReadInt16();
+                WaitTime = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)

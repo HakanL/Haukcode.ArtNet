@@ -140,9 +140,9 @@ namespace Haukcode.Rdm.Packets.DMX
                 for (int n = 0; n < Header.ParameterDataLength / 5; n++)
                 {
                     SlotInformation slot = new SlotInformation();
-                    slot.Offset = data.ReadHiLoInt16();
+                    slot.Offset = data.ReadInt16();
                     slot.Type = (SlotTypes) data.ReadByte();
-                    slot.SlotLink = (int)data.ReadHiLoInt16();
+                    slot.SlotLink = (int)data.ReadInt16();
                     Slots.Add(slot);
                 }
             }

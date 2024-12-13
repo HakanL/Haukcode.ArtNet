@@ -15,13 +15,6 @@ public class ArtTodRequestPacket : ArtNetPacket
         RequestedUniverses = new List<byte>();
     }
 
-    public ArtTodRequestPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-    }
-
-    #region Packet Properties
-
     public byte Net { get; set; }
 
     public byte Command { get; set; }
@@ -30,30 +23,29 @@ public class ArtTodRequestPacket : ArtNetPacket
 
     protected override int DataLength => 12 + RequestedUniverses.Count;
 
-
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtTodRequestPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        reader.SkipBytes(9);
 
-        data.BaseStream.Seek(9, System.IO.SeekOrigin.Current);
-        Net = data.ReadByte();
-        Command = data.ReadByte();
-        int count = data.ReadByte();
-        RequestedUniverses = new List<byte>(data.ReadBytes(count));
+        var target = new ArtTodRequestPacket
+        {
+            Net = reader.ReadByte(),
+            Command = reader.ReadByte()
+        };
+
+        int count = reader.ReadByte();
+
+        target.RequestedUniverses = new List<byte>(reader.ReadBytes(count));
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteZeros(9);
         writer.WriteByte(Net);
         writer.WriteByte(Command);
         writer.WriteByte((byte)RequestedUniverses.Count);
         writer.WriteBytes(RequestedUniverses.ToArray());
     }
-
-
 }

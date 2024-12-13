@@ -16,13 +16,6 @@ public class ArtRdmSubPacket : ArtNetPacket
         RdmVersion = 1;
     }
 
-    public ArtRdmSubPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-    }
-
-    #region Packet Properties
-
     public byte RdmVersion { get; set; }
 
     public UId DeviceId { get; set; }
@@ -39,30 +32,29 @@ public class ArtRdmSubPacket : ArtNetPacket
 
     protected override int DataLength => 20 + RdmData.Length;
 
-
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtRdmSubPacket Parse(BigEndianBinaryReader reader)
     {
-        var reader = new RdmBinaryReader(data.BaseStream);
-        
-        base.ReadData(data);            
+        var target = new ArtRdmSubPacket
+        {
+            RdmVersion = reader.ReadByte()
+        };
 
-        RdmVersion = data.ReadByte();
-        data.BaseStream.Seek(1, System.IO.SeekOrigin.Current);
-        DeviceId = reader.ReadUId();
-        data.BaseStream.Seek(1, System.IO.SeekOrigin.Current);
-        Command = (RdmCommands) data.ReadByte();
-        ParameterId = (RdmParameters) reader.ReadHiLoInt16();
-        SubDevice = reader.ReadHiLoInt16();
-        SubCount = reader.ReadHiLoInt16();
-        data.BaseStream.Seek(4, System.IO.SeekOrigin.Current);
+        reader.SkipBytes(1);
+        target.DeviceId = ReadUId(reader);
+        reader.SkipBytes(1);
+        target.Command = (RdmCommands)reader.ReadByte();
+        target.ParameterId = (RdmParameters)reader.ReadInt16();
+        target.SubDevice = reader.ReadInt16();
+        target.SubCount = reader.ReadInt16();
+        reader.SkipBytes(4);
+
+        target.RdmData = reader.ReadBytes();
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteByte(RdmVersion);
         writer.WriteByte(0x00);
         WriteUid(writer, DeviceId);
@@ -74,6 +66,4 @@ public class ArtRdmSubPacket : ArtNetPacket
         writer.WriteZeros(4);
         writer.WriteBytes(RdmData);
     }
-
-
 }

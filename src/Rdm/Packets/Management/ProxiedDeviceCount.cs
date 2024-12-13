@@ -85,7 +85,7 @@ namespace Haukcode.Rdm.Packets.Management
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                DeviceCount = data.ReadHiLoInt16();
+                DeviceCount = data.ReadInt16();
                 ListChanged = data.ReadBool();
             }
 

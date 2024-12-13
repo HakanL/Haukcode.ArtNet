@@ -23,7 +23,7 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadHiLoInt16();
+                EndpointID = data.ReadInt16();
                 TargetUID = data.ReadUId();
                 StatusType = (StatusTypes) data.ReadByte();
             }

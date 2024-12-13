@@ -29,24 +29,22 @@ public class ArtInputPacket : ArtNetPacket
     {
     }
 
-    public ArtInputPacket(ArtNetReceiveData data) : base(data)
+    internal static ArtInputPacket Parse(BigEndianBinaryReader reader)
     {
+        reader.SkipBytes(1);
+
+        var target = new ArtInputPacket
+        {
+            BindIndex = reader.ReadByte(),
+            NumPorts = reader.ReadInt16(),
+            Inputs = reader.ReadBytes(4)
+        };
+
+        return target;
     }
 
-    public override void ReadData(ArtNetBinaryReader data)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.ReadData(data);
-
-        data.ReadByte();
-        BindIndex = data.ReadByte();
-        NumPorts = data.ReadHiLoInt16();
-        Inputs = data.ReadBytes(4);
-    }
-
-    public override void WriteData(BigEndianBinaryWriter writer)
-    {
-        base.WriteData(writer);
-
         writer.WriteByte((byte)0);
         writer.WriteByte(BindIndex);
         writer.WriteInt16(NumPorts);

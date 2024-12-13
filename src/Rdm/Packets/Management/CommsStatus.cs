@@ -98,9 +98,9 @@ namespace Haukcode.Rdm.Packets.Management
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ShortMessage = data.ReadHiLoInt16();
-                LengthMismatch = data.ReadHiLoInt16();
-                ChecksumFail = data.ReadHiLoInt16();
+                ShortMessage = data.ReadInt16();
+                LengthMismatch = data.ReadInt16();
+                ChecksumFail = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)

@@ -11,11 +11,6 @@ public class ArtTriggerPacket : ArtNetPacket
     {
     }
 
-    public ArtTriggerPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-    }
-
     public byte Filler1 { get; set; }
 
     public byte Filler2 { get; set; }
@@ -30,22 +25,23 @@ public class ArtTriggerPacket : ArtNetPacket
 
     protected override int DataLength => 6 + Data.Length;
 
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtTriggerPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        var target = new ArtTriggerPacket
+        {
+            Filler1 = reader.ReadByte(),
+            Filler2 = reader.ReadByte(),
+            OemCode = reader.ReadInt16(),
+            Key = reader.ReadByte(),
+            SubKey = reader.ReadByte(),
+            Data = reader.ReadBytes(512)
+        };
 
-        Filler1 = data.ReadByte();
-        Filler2 = data.ReadByte();
-        OemCode = data.ReadHiLoInt16();
-        Key = data.ReadByte();
-        SubKey = data.ReadByte();
-        Data = data.ReadBytes(512);
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteByte(Filler1);
         writer.WriteByte(Filler2);
         writer.WriteInt16(OemCode);

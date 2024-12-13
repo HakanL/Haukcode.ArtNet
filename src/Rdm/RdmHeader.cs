@@ -49,9 +49,9 @@ namespace Haukcode.Rdm
             TransactionNumber = data.ReadByte();
             PortOrResponseType = data.ReadByte();
             MessageCount = data.ReadByte();
-            SubDevice = data.ReadHiLoInt16();
+            SubDevice = data.ReadInt16();
             Command = (RdmCommands)data.ReadByte();
-            ParameterId = (RdmParameters)data.ReadHiLoInt16();
+            ParameterId = (RdmParameters)data.ReadInt16();
             ParameterDataLength = data.ReadByte();
         }
 

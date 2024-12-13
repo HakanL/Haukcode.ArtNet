@@ -16,7 +16,7 @@ namespace Haukcode.ArtNet.IO
 
         public Stream BaseStream => this.reader.BaseStream;
 
-        public short ReadHiLoInt16()
+        public short ReadInt16()
         {
             // Read the bytes individually
             byte highByte = this.reader.ReadByte();
@@ -41,7 +41,7 @@ namespace Haukcode.ArtNet.IO
             return this.reader.ReadBytes(count);
         }
 
-        public short ReadLoHiInt16()
+        public short ReadInt16Reverse()
         {
             return this.reader.ReadInt16();
         }

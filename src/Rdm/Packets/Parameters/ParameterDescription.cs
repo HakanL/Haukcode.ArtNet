@@ -23,7 +23,7 @@ namespace Haukcode.Rdm.Packets.Parameters
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ParameterId = (RdmParameters)((ushort)data.ReadHiLoInt16());
+                ParameterId = (RdmParameters)((ushort)data.ReadInt16());
             }
 
             protected override void WriteData(RdmBinaryWriter data)
@@ -117,7 +117,7 @@ namespace Haukcode.Rdm.Packets.Parameters
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ParameterId = (RdmParameters)((ushort)data.ReadHiLoInt16());
+                ParameterId = (RdmParameters)((ushort)data.ReadInt16());
                 PDLSize = data.ReadByte();
                 DataType = data.ReadByte();
                 CommandClass = data.ReadByte();

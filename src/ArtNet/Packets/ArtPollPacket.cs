@@ -14,40 +14,25 @@ public class ArtPollPacket : ArtNetPacket
     {
     }
 
-    public ArtPollPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-
-    }
-
-    #region Packet Properties
-
-    private byte talkToMe = 0;
-
-    public byte TalkToMe
-    {
-        get { return talkToMe; }
-        set { talkToMe = value; }
-    }
-
     protected override int DataLength => 2;
 
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtPollPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        var target = new ArtPollPacket
+        {
+            TalkToMe = reader.ReadByte()
+        };
 
-        TalkToMe = data.ReadByte();
-        data.ReadByte();
+        reader.SkipBytes(1);
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
-    {
-        base.WriteData(writer);
+    public byte TalkToMe { get; set; }
 
+    protected override void WriteData(BigEndianBinaryWriter writer)
+    {
         writer.WriteByte(TalkToMe);
         writer.WriteByte((byte)0);
     }
-
 }

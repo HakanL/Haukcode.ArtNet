@@ -14,78 +14,37 @@ public class ArtNetDmxPacket : ArtNetPacket
     {
     }
 
-    public ArtNetDmxPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-    }
+    public byte Sequence { get; set; }
 
-    #region Packet Properties
+    public byte Physical { get; set; }
 
-    private byte sequence = 0;
+    public short Universe { get; set; }
 
-    public byte Sequence
-    {
-        get { return sequence; }
-        set { sequence = value; }
-    }
-
-    private byte physical = 0;
-
-    public byte Physical
-    {
-        get { return physical; }
-        set { physical = value; }
-    }
-
-    private short universe = 0;
-
-    public short Universe
-    {
-        get { return universe; }
-        set { universe = value; }
-    }
-
-    public short Length
-    {
-        get
-        {
-            if (dmxData == null)
-                return 0;
-            return (short)dmxData.Length;
-        }
-    }
-
-    private byte[] dmxData = null!;
-
-    public byte[] DmxData
-    {
-        get { return dmxData; }
-        set { dmxData = value; }
-    }
+    public byte[] DmxData { get; set; } = null!;
 
     protected override int DataLength => 6 + DmxData.Length;
 
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtNetDmxPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        var target = new ArtNetDmxPacket
+        {
+            Sequence = reader.ReadByte(),
+            Physical = reader.ReadByte(),
+            Universe = reader.ReadInt16Reverse()
+        };
 
-        Sequence = data.ReadByte();
-        Physical = data.ReadByte();
-        Universe = data.ReadLoHiInt16();
-        int length = data.ReadHiLoInt16();
-        DmxData = data.ReadBytes(length);
+        int length = reader.ReadInt16();
+        target.DmxData = reader.ReadBytes(length);
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteByte(Sequence);
         writer.WriteByte(Physical);
         writer.WriteInt16Reverse(Universe);
-        writer.WriteInt16(Length);
+        writer.WriteInt16((short)DmxData.Length);
         writer.WriteBytes(DmxData);
     }
 }

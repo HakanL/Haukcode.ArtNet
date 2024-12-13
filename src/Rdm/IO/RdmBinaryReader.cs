@@ -14,7 +14,7 @@ namespace Haukcode.Rdm
             this.reader = new BinaryReader(input);
         }
 
-        public short ReadHiLoInt16()
+        public short ReadInt16()
         {
             // Read the bytes individually
             byte highByte = this.reader.ReadByte();
@@ -43,7 +43,7 @@ namespace Haukcode.Rdm
 
         public UId ReadUId()
         {
-            return new UId((ushort)ReadHiLoInt16(), (uint)ReadHiLoInt32());
+            return new UId((ushort)ReadInt16(), (uint)ReadHiLoInt32());
         }
 
         public bool ReadBool()

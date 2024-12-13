@@ -11,26 +11,22 @@ public class ArtNetUnknownPacket : ArtNetPacket
     {
     }
 
-    public ArtNetUnknownPacket(ArtNetReceiveData data)
-        : base(data)
+    protected override int DataLength => Data.Length;
+
+    internal static ArtNetUnknownPacket Parse(short opCode, BigEndianBinaryReader reader)
     {
+        var target = new ArtNetUnknownPacket(opCode)
+        {
+            Data = reader.ReadBytes()
+        };
+
+        return target;
     }
 
     public byte[] Data { get; set; } = null!;
 
-    protected override int DataLength => Data.Length;
-
-    public override void ReadData(ArtNetBinaryReader data)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.ReadData(data);
-
-        Data = data.ReadBytes(DataLength);
-    }
-
-    public override void WriteData(BigEndianBinaryWriter writer)
-    {
-        base.WriteData(writer);
-
         writer.WriteBytes(Data);
     }
 }

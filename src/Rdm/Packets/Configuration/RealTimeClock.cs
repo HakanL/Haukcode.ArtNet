@@ -44,7 +44,7 @@ namespace Haukcode.Rdm.Packets.Configuration
             protected override void ReadData(RdmBinaryReader data)
             {
                 ClockTime = new DateTime(
-                    data.ReadHiLoInt16(),   //Year    
+                    data.ReadInt16(),   //Year    
                     data.ReadByte(),        //Month
                     data.ReadByte(),        //Day
                     data.ReadByte(),        //Hour
@@ -80,7 +80,7 @@ namespace Haukcode.Rdm.Packets.Configuration
             protected override void ReadData(RdmBinaryReader data)
             {
                 ClockTime = new DateTime(
-                    data.ReadHiLoInt16(),   //Year    
+                    data.ReadInt16(),   //Year    
                     data.ReadByte(),        //Month
                     data.ReadByte(),        //Day
                     data.ReadByte(),        //Hour

@@ -59,7 +59,7 @@ namespace Haukcode.Rdm.Packets.Net
                 List<short> endpoints = new List<short>();
                 for (int n = 0; n < ((Header.ParameterDataLength-4)/2); n++)
                 {
-                    endpoints.Add(data.ReadHiLoInt16());
+                    endpoints.Add(data.ReadInt16());
                 }
 
                 EndpointIDs = endpoints;

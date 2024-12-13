@@ -43,7 +43,7 @@ namespace Haukcode.Rdm.Packets.Parameters
             {
                 for (int n = 0; n < base.Header.ParameterDataLength / 2; n++)
                 {
-                    ParameterIds.Add((RdmParameters)data.ReadHiLoInt16());
+                    ParameterIds.Add((RdmParameters)data.ReadInt16());
                 }
             }
 

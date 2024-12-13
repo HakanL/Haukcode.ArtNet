@@ -16,14 +16,6 @@ public class ArtRdmPacket : ArtNetPacket
         SubStartCode = 1;
     }
 
-    public ArtRdmPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-        
-    }
-
-    #region Packet Properties
-
     public byte RdmVersion { get; set; }
 
     public byte Net { get; set; }
@@ -37,25 +29,26 @@ public class ArtRdmPacket : ArtNetPacket
     public byte[] RdmData { get; set; } = null!;
 
     protected override int DataLength => 13 + RdmData.Length;
-    #endregion
 
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtRdmPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        var target = new ArtRdmPacket
+        {
+            RdmVersion = reader.ReadByte()
+        };
 
-        RdmVersion = data.ReadByte();
-        data.BaseStream.Seek(8, System.IO.SeekOrigin.Current);
-        Net = data.ReadByte();
-        Command = data.ReadByte();
-        Address = data.ReadByte();
-        SubStartCode = data.ReadByte();
-        RdmData = data.ReadBytes((int) (data.BaseStream.Length - data.BaseStream.Position));
+        reader.SkipBytes(8);
+        target.Net = reader.ReadByte();
+        target.Command = reader.ReadByte();
+        target.Address = reader.ReadByte();
+        target.SubStartCode = reader.ReadByte();
+        target.RdmData = reader.ReadBytes();
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteByte(RdmVersion);
         writer.WriteZeros(8);
         writer.WriteByte(Net);
@@ -64,6 +57,4 @@ public class ArtRdmPacket : ArtNetPacket
         writer.WriteByte(SubStartCode);
         writer.WriteBytes(RdmData);
     }
-	
-
 }

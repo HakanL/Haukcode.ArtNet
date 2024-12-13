@@ -23,7 +23,7 @@ namespace Haukcode.Rdm.Packets.Management
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EstimatedResponseTime = data.ReadHiLoInt16();
+            EstimatedResponseTime = data.ReadInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

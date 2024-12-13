@@ -165,10 +165,10 @@ namespace Haukcode.Rdm.Packets.Sensors
                 Type = (SensorTypes) data.ReadByte();
                 Unit = (SensorUnit)data.ReadByte();
                 Prefix = (SensorPrefix)data.ReadByte();
-                RangeMinValue = data.ReadHiLoInt16();
-                RangeMaxValue = data.ReadHiLoInt16();
-                NormalMinValue = data.ReadHiLoInt16();
-                NormalMaxValue = data.ReadHiLoInt16();
+                RangeMinValue = data.ReadInt16();
+                RangeMaxValue = data.ReadInt16();
+                NormalMinValue = data.ReadInt16();
+                NormalMaxValue = data.ReadInt16();
                 RecordValueSupport = data.ReadByte();
                 Description = data.ReadString(Header.ParameterDataLength-13);
             }

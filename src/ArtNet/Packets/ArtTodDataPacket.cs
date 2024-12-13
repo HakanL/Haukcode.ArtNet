@@ -14,14 +14,6 @@ public class ArtTodDataPacket : ArtNetPacket
         Devices = new List<UId>();
     }
 
-    public ArtTodDataPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-
-    }
-
-    #region Packet Properties
-
     public byte RdmVersion { get; set; }
 
     public byte Port { get; set; }
@@ -42,35 +34,33 @@ public class ArtTodDataPacket : ArtNetPacket
 
     protected override int DataLength => 16 + Devices.Count * 6;
 
-
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtTodDataPacket Parse(BigEndianBinaryReader reader)
     {
-        var rdmReader = new RdmBinaryReader(data.BaseStream);
+        var target = new ArtTodDataPacket
+        {
+            RdmVersion = reader.ReadByte(),
+            Port = reader.ReadByte()
+        };
 
-        base.ReadData(data);
+        reader.SkipBytes(6);
 
-        RdmVersion = data.ReadByte();
-        Port = data.ReadByte();
-        data.BaseStream.Seek(6, System.IO.SeekOrigin.Current);
-        BindIndex = data.ReadByte();
-        Net = data.ReadByte();
-        CommandResponse = data.ReadByte();
-        Universe = data.ReadByte();
-        UIdTotal = rdmReader.ReadHiLoInt16();
-        BlockCount = data.ReadByte();
+        target.BindIndex = reader.ReadByte();
+        target.Net = reader.ReadByte();
+        target.CommandResponse = reader.ReadByte();
+        target.Universe = reader.ReadByte();
+        target.UIdTotal = reader.ReadInt16();
+        target.BlockCount = reader.ReadByte();
 
-        Devices = new List<UId>();
-        int count = data.ReadByte();
+        int count = reader.ReadByte();
+        target.Devices = [];
         for (int n = 0; n < count; n++)
-            Devices.Add(rdmReader.ReadUId());
+            target.Devices.Add(ReadUId(reader));
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteByte(RdmVersion);
         writer.WriteByte(Port);
         writer.WriteZeros(6);

@@ -53,10 +53,10 @@ namespace Haukcode.Rdm.Packets.Sensors
             protected override void ReadData(RdmBinaryReader data)
             {
                 SensorNumber = data.ReadByte();
-                PresentValue = data.ReadHiLoInt16();
-                MinValue = data.ReadHiLoInt16();
-                MaxValue = data.ReadHiLoInt16();
-                RecordedValue = data.ReadHiLoInt16();
+                PresentValue = data.ReadInt16();
+                MinValue = data.ReadInt16();
+                MaxValue = data.ReadInt16();
+                RecordedValue = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
@@ -117,10 +117,10 @@ namespace Haukcode.Rdm.Packets.Sensors
             protected override void ReadData(RdmBinaryReader data)
             {
                 SensorNumber = data.ReadByte();
-                PresentValue = data.ReadHiLoInt16();
-                MinValue = data.ReadHiLoInt16();
-                MaxValue = data.ReadHiLoInt16();
-                RecordedValue = data.ReadHiLoInt16();
+                PresentValue = data.ReadInt16();
+                MinValue = data.ReadInt16();
+                MaxValue = data.ReadInt16();
+                RecordedValue = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)

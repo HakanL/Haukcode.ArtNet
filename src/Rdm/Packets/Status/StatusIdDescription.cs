@@ -53,7 +53,7 @@ namespace Haukcode.Rdm.Packets.Status
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                StatusId = data.ReadHiLoInt16();
+                StatusId = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)

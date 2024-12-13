@@ -62,7 +62,7 @@ namespace Haukcode.Rdm.Packets.DMX
                 for (int n = 0; n < Header.ParameterDataLength / 3; n++)
                 {
                     SlotValue slot = new SlotValue();
-                    slot.Offset = data.ReadHiLoInt16();
+                    slot.Offset = data.ReadInt16();
                     slot.Value = data.ReadByte();
                     DefaultValues.Add(slot);
                 }

@@ -42,8 +42,8 @@ namespace Haukcode.Rdm.Packets.Net
             protected override void ReadData(RdmBinaryReader data)
             {
                 CurrentConnectionIP = new IPAddress(data.ReadBytes(4));
-                UnhealthyTCPEvents = data.ReadHiLoInt16();
-                TCPConnectEvents = data.ReadHiLoInt16();
+                UnhealthyTCPEvents = data.ReadInt16();
+                TCPConnectEvents = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)

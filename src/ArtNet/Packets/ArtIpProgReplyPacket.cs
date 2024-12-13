@@ -39,7 +39,8 @@ public class ArtIpProgReplyPacket : ArtNetPacket
     public byte[] DefaultGateway
     {
         get => defaultGateway;
-        set {
+        set
+        {
             if (value.Length != 4)
                 throw new ArgumentException("The default gateway must be an array of 4 bytes.");
 
@@ -49,30 +50,26 @@ public class ArtIpProgReplyPacket : ArtNetPacket
 
     protected override int DataLength => 19;
 
-    public ArtIpProgReplyPacket() : base(ArtNetOpCodes.IpProgReply) 
+    public ArtIpProgReplyPacket() : base(ArtNetOpCodes.IpProgReply)
     {
     }
 
-    public ArtIpProgReplyPacket(ArtNetReceiveData data) : base(data)
+    internal static ArtIpProgReplyPacket Parse(BigEndianBinaryReader reader)
     {
+        var target = new ArtIpProgReplyPacket();
+
+        reader.SkipBytes(4);
+        target.IpAddress = reader.ReadBytes(4);
+        target.Netmask = reader.ReadBytes(4);
+        reader.SkipBytes(2);
+        target.DhcpEnabled = (reader.ReadByte() & (1 << 6)) != 0;
+        target.DefaultGateway = reader.ReadBytes(4);
+
+        return target;
     }
 
-    public override void ReadData(ArtNetBinaryReader data)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.ReadData(data);
-
-        data.ReadBytes(4);
-        IpAddress = data.ReadBytes(4);
-        Netmask = data.ReadBytes(4);
-        data.ReadBytes(2);
-        DhcpEnabled = (data.ReadByte() & (1 << 6)) != 0;
-        DefaultGateway = data.ReadBytes(4);
-    }
-
-    public override void WriteData(BigEndianBinaryWriter writer)
-    {
-        base.WriteData(writer);
-
         writer.WriteZeros(4);
         writer.WriteBytes(IpAddress);
         writer.WriteBytes(Netmask);

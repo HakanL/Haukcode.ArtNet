@@ -99,11 +99,11 @@ namespace Haukcode.Rdm.Packets.Status
                 for (int n = 0; n < (Header.ParameterDataLength / 9); n++)
                 {
                     Status subDeviceStatus = new Status();
-                    subDeviceStatus.SubDeviceId = data.ReadHiLoInt16();
+                    subDeviceStatus.SubDeviceId = data.ReadInt16();
                     subDeviceStatus.StatusType = (StatusTypes) data.ReadByte();
-                    subDeviceStatus.StatusMessageId = data.ReadHiLoInt16();
-                    subDeviceStatus.DataValue1 = data.ReadHiLoInt16();
-                    subDeviceStatus.DataValue2 = data.ReadHiLoInt16();
+                    subDeviceStatus.StatusMessageId = data.ReadInt16();
+                    subDeviceStatus.DataValue1 = data.ReadInt16();
+                    subDeviceStatus.DataValue2 = data.ReadInt16();
 
                     StatusMessages.Add(subDeviceStatus);
                 }

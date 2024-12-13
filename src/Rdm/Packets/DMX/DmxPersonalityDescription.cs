@@ -49,7 +49,7 @@ namespace Haukcode.Rdm.Packets.DMX
             protected override void ReadData(RdmBinaryReader data)
             {
                 PersonalityIndex = data.ReadByte();
-                DmxSlotsRequired = data.ReadHiLoInt16();
+                DmxSlotsRequired = data.ReadInt16();
                 if(Header.ParameterDataLength > 3)
                     Description = data.ReadString(Header.ParameterDataLength - 3);
             }

@@ -62,15 +62,15 @@ namespace Haukcode.Rdm.Packets.Product
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                RdmProtocolVersion = data.ReadHiLoInt16();
-                DeviceModelId = data.ReadHiLoInt16();
-                ProductCategory = (ProductCategories) data.ReadHiLoInt16();
+                RdmProtocolVersion = data.ReadInt16();
+                DeviceModelId = data.ReadInt16();
+                ProductCategory = (ProductCategories) data.ReadInt16();
                 SoftwareVersionId = data.ReadHiLoInt32();
-                DmxFootprint = data.ReadHiLoInt16();
+                DmxFootprint = data.ReadInt16();
                 DmxPersonality = data.ReadByte();
                 DmxPersonalityCount = data.ReadByte();
-                DmxStartAddress = data.ReadHiLoInt16();
-                SubDeviceCount = data.ReadHiLoInt16();
+                DmxStartAddress = data.ReadInt16();
+                SubDeviceCount = data.ReadInt16();
                 SensorCount = data.ReadByte();
             }
 

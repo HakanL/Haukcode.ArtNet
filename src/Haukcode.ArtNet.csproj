@@ -48,6 +48,6 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Haukcode.Network" Version="1.0.18" />
+    <PackageReference Include="Haukcode.Network" Version="1.0.22" />
   </ItemGroup>
 </Project>

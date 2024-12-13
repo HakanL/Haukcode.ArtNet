@@ -110,7 +110,7 @@ namespace Haukcode.Rdm.Packets.Product
             protected override void ReadData(RdmBinaryReader data)
             {
                 for (int n = 0; n < Header.ParameterDataLength / 2; n++)
-                    Details.Add((DetailId)data.ReadHiLoInt16());
+                    Details.Add((DetailId)data.ReadInt16());
             }
 
             protected override void WriteData(RdmBinaryWriter data)

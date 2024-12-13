@@ -14,13 +14,6 @@ public class ArtPollReplyPacket : ArtNetPacket
     {
     }
 
-    public ArtPollReplyPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-    }
-
-    #region Packet Properties
-
     private byte[] ipAddress = new byte[4];
 
     public byte[] IpAddress
@@ -295,10 +288,6 @@ public class ArtPollReplyPacket : ArtNetPacket
 
     protected override int DataLength => 219;
 
-    #endregion
-
-    #region Packet Helpers
-
     /// <summary>
     /// Interprets the universe address to ensure compatibility with ArtNet I, II and III devices.
     /// </summary>
@@ -323,47 +312,47 @@ public class ArtPollReplyPacket : ArtNetPacket
         return universe;
     }
 
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtPollReplyPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        var target = new ArtPollReplyPacket
+        {
+            IpAddress = reader.ReadBytes(4),
+            Port = reader.ReadInt16Reverse(),
+            FirmwareVersion = reader.ReadInt16(),
+            SubSwitch = reader.ReadInt16(),
+            Oem = reader.ReadInt16(),
+            UbeaVersion = reader.ReadByte(),
+            Status = reader.ReadByte(),
+            EstaCode = reader.ReadInt16Reverse(),
+            ShortName = reader.ReadString(18),
+            LongName = reader.ReadString(64),
+            NodeReport = reader.ReadString(64),
+            PortCount = reader.ReadInt16(),
+            PortTypes = reader.ReadBytes(4),
+            GoodInput = reader.ReadBytes(4),
+            GoodOutputA = reader.ReadBytes(4),
+            SwIn = reader.ReadBytes(4),
+            SwOut = reader.ReadBytes(4),
+            AcnPriority = reader.ReadByte(),
+            SwMacro = reader.ReadByte(),
+            SwRemote = reader.ReadByte()
+        };
 
-        IpAddress = data.ReadBytes(4);
-        Port = data.ReadLoHiInt16();
-        FirmwareVersion = data.ReadHiLoInt16();
-        SubSwitch = data.ReadHiLoInt16();
-        Oem = data.ReadHiLoInt16();
-        UbeaVersion = data.ReadByte();
-        Status = data.ReadByte();
-        EstaCode = data.ReadLoHiInt16();
-        ShortName = data.ReadString(18).TrimEnd('\0');
-        LongName = data.ReadString(64).TrimEnd('\0');
-        NodeReport = data.ReadString(64).TrimEnd('\0');
-        PortCount = data.ReadHiLoInt16();
-        PortTypes = data.ReadBytes(4);
-        GoodInput = data.ReadBytes(4);
-        GoodOutputA = data.ReadBytes(4);
-        SwIn = data.ReadBytes(4);
-        SwOut = data.ReadBytes(4);
-        AcnPriority = data.ReadByte();
-        SwMacro = data.ReadByte();
-        SwRemote = data.ReadByte();
-        data.ReadBytes(3);
-        Style = data.ReadByte();
-        MacAddress = data.ReadBytes(6);
-        BindIpAddress = data.ReadBytes(4);
-        BindIndex = data.ReadByte();
-        Status2 = data.ReadByte();
-        GoodOutputB = data.ReadBytes(4);
-        Status3 = data.ReadByte();
-        RespUID = data.ReadBytes(6);
+        reader.SkipBytes(3);
+        target.Style = reader.ReadByte();
+        target.MacAddress = reader.ReadBytes(6);
+        target.BindIpAddress = reader.ReadBytes(4);
+        target.BindIndex = reader.ReadByte();
+        target.Status2 = reader.ReadByte();
+        target.GoodOutputB = reader.ReadBytes(4);
+        target.Status3 = reader.ReadByte();
+        target.RespUID = reader.ReadBytes(6);
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteBytes(IpAddress);
         writer.WriteInt16Reverse(Port);
         writer.WriteInt16(FirmwareVersion);

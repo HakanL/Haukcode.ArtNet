@@ -25,7 +25,7 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadHiLoInt16();
+                EndpointID = data.ReadInt16();
             }
 
             protected override void WriteData(RdmBinaryWriter data)
@@ -47,7 +47,7 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadHiLoInt16();
+                EndpointID = data.ReadInt16();
                 EndpointMode = (EndpointModes) data.ReadByte();
             }
 
@@ -71,7 +71,7 @@ namespace Haukcode.Rdm.Packets.Net
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                EndpointID = data.ReadHiLoInt16();
+                EndpointID = data.ReadInt16();
                 EndpointMode = (EndpointModes) data.ReadByte();
             }
 

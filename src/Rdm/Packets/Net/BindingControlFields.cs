@@ -45,8 +45,8 @@ namespace Haukcode.Rdm.Packets.Net
             protected override void ReadData(RdmBinaryReader data)
             {
                 Id = data.ReadUId();
-                EndpointID = data.ReadHiLoInt16();
-                ControlFields = data.ReadHiLoInt16();
+                EndpointID = data.ReadInt16();
+                ControlFields = data.ReadInt16();
                 BindingId = data.ReadUId();
             }
 

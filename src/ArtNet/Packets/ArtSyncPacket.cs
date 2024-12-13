@@ -14,36 +14,22 @@ public class ArtSyncPacket : ArtNetPacket
     {
     }
 
-    public ArtSyncPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-    }
-
-    #region Packet Properties
-
-    private short aux = 0;
-
-    public short Aux
-    {
-        get { return aux; }
-        set { aux = value; }
-    }
+    public short Aux { get; set; }
 
     protected override int DataLength => 2;
 
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtSyncPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        var target = new ArtSyncPacket
+        {
+            Aux = reader.ReadInt16Reverse()
+        };
 
-        Aux = data.ReadLoHiInt16();
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-        
         writer.WriteInt16(Aux);
     }
 }

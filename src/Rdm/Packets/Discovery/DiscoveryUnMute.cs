@@ -76,7 +76,7 @@ namespace Haukcode.Rdm.Packets.Discovery
 
             protected override void ReadData(RdmBinaryReader data)
             {
-                ControlField = data.ReadHiLoInt16();
+                ControlField = data.ReadInt16();
                 if (Header.ParameterDataLength > 2)
                     BindingId = data.ReadUId();
             }

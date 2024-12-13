@@ -20,13 +20,6 @@ public class ArtTodControlPacket : ArtNetPacket
     {
     }
 
-    public ArtTodControlPacket(ArtNetReceiveData data)
-        : base(data)
-    {
-    }
-
-    #region Packet Properties
-
     public byte Net { get; set; }
 
     public ArtTodControlCommand Command { get; set; }
@@ -35,28 +28,25 @@ public class ArtTodControlPacket : ArtNetPacket
 
     protected override int DataLength => 12;
 
-
-    #endregion
-
-    public override void ReadData(ArtNetBinaryReader data)
+    internal static ArtTodControlPacket Parse(BigEndianBinaryReader reader)
     {
-        base.ReadData(data);
+        reader.SkipBytes(9);
 
-        data.BaseStream.Seek(9, System.IO.SeekOrigin.Current);
-        Net = data.ReadByte();
-        Command = (ArtTodControlCommand)data.ReadByte();
-        Address = data.ReadByte();
+        var target = new ArtTodControlPacket
+        {
+            Net = reader.ReadByte(),
+            Command = (ArtTodControlCommand)reader.ReadByte(),
+            Address = reader.ReadByte()
+        };
+
+        return target;
     }
 
-    public override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(BigEndianBinaryWriter writer)
     {
-        base.WriteData(writer);
-
         writer.WriteZeros(9);
         writer.WriteByte(Net);
         writer.WriteByte((byte)Command);
         writer.WriteByte(Address);
     }
-
-
 }

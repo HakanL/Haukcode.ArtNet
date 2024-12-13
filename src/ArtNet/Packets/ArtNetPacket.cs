@@ -1,6 +1,7 @@
 using Haukcode.ArtNet.IO;
 using Haukcode.Network;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 
@@ -15,20 +16,40 @@ public abstract class ArtNetPacket
         OpCode = opCode;
     }
 
-    public ArtNetPacket(ArtNetReceiveData data)
-    {
-        //DataLength = data.DataLength - 12;  // Subtract ArtNet header
-        var packetReader = new ArtNetBinaryReader(new MemoryStream(data.buffer));
-        ReadData(packetReader);
-    }
-
     public int PacketLength => (OpCode == ArtNetOpCodes.PollReply ? 10 : 12) + DataLength;
 
     protected abstract int DataLength { get; }
 
+    public static ArtNetPacket Parse(ReadOnlyMemory<byte> inputBuffer)
+    {
+        var reader = new BigEndianBinaryReader(inputBuffer);
+
+        string protocol = reader.ReadString(8);
+        var opCode = (ArtNetOpCodes)reader.ReadInt16Reverse();
+
+        short version = 14;
+
+        // For some reason the poll packet header does not include the version
+        if (opCode != ArtNetOpCodes.PollReply)
+            version = reader.ReadInt16();
+
+        var target = Create(opCode, reader);
+
+        Debug.Assert(target.PacketLength == inputBuffer.Length);
+
+        return target;
+    }
+
     public int WriteToBuffer(Memory<byte> buffer)
     {
         var writer = new Network.BigEndianBinaryWriter(buffer);
+
+        writer.WriteString(Protocol, 8);
+        writer.WriteUInt16Reverse((ushort)OpCode);
+
+        // For some reason the poll reply packet header does not include the version
+        if (OpCode != ArtNetOpCodes.PollReply)
+            writer.WriteInt16(Version);
 
         WriteData(writer);
 
@@ -43,8 +64,11 @@ public abstract class ArtNetPacket
         writer.WriteUInt32(value.DeviceId);
     }
 
+    protected static Rdm.UId ReadUId(BigEndianBinaryReader reader)
+    {
+        return new Rdm.UId(reader.ReadUInt16(), reader.ReadUInt32());
+    }
 
-    #region Packet Properties
     private string protocol = "Art-Net";
 
     public string Protocol
@@ -59,107 +83,60 @@ public abstract class ArtNetPacket
         }
     }
 
+    public short Version { get; protected set; } = 14;
 
-    private short version = 14;
+    public virtual ArtNetOpCodes OpCode { get; protected set; } = ArtNetOpCodes.None;
 
-    public short Version
+    protected abstract void WriteData(BigEndianBinaryWriter writer);
+
+    internal static ArtNetPacket Create(ArtNetOpCodes opCode, BigEndianBinaryReader reader)
     {
-        get { return this.version; }
-        protected set { this.version = value; }
-    }
-
-    private ArtNetOpCodes opCode = ArtNetOpCodes.None;
-
-    public virtual ArtNetOpCodes OpCode
-    {
-        get { return this.opCode; }
-        protected set { this.opCode = value; }
-    }
-
-    #endregion
-
-    public virtual void ReadData(ArtNetBinaryReader data)
-    {
-        Protocol = data.ReadString(8);
-        OpCode = (ArtNetOpCodes)data.ReadLoHiInt16();
-
-        // For some reason the poll packet header does not include the version
-        if (OpCode != ArtNetOpCodes.PollReply)
-            Version = data.ReadHiLoInt16();
-    }
-
-    public virtual void WriteData(BigEndianBinaryWriter writer)
-    {
-        writer.WriteString(Protocol, 8);
-        writer.WriteUInt16Reverse((ushort)OpCode);
-
-        // For some reason the poll reply packet header does not include the version
-        if (OpCode != ArtNetOpCodes.PollReply)
-            writer.WriteInt16(Version);
-    }
-
-    public static ArtNetPacket Parse(ReadOnlyMemory<byte> buffer)
-    {
-        var data = new ArtNetReceiveData();
-        buffer.Span.CopyTo(data.buffer);
-
-        return Create(data, null);
-    }
-
-    public static ArtNetPacket Create(ArtNetReceiveData data, Func<ushort, ArtNetReceiveData, ArtNetPacket>? customPacketCreator)
-    {
-        switch ((ArtNetOpCodes)data.OpCode)
+        switch (opCode)
         {
             case ArtNetOpCodes.Poll:
-                return new ArtPollPacket(data);
+                return ArtPollPacket.Parse(reader);
 
             case ArtNetOpCodes.PollReply:
-                return new ArtPollReplyPacket(data);
+                return ArtPollReplyPacket.Parse(reader);
 
             case ArtNetOpCodes.Output:
-                return new ArtNetDmxPacket(data);
+                return ArtNetDmxPacket.Parse(reader);
 
             case ArtNetOpCodes.Sync:
-                return new ArtSyncPacket(data);
+                return ArtSyncPacket.Parse(reader);
 
             case ArtNetOpCodes.TodRequest:
-                return new ArtTodRequestPacket(data);
+                return ArtTodRequestPacket.Parse(reader);
 
             case ArtNetOpCodes.TodData:
-                return new ArtTodDataPacket(data);
+                return ArtTodDataPacket.Parse(reader);
 
             case ArtNetOpCodes.TodControl:
-                return new ArtTodControlPacket(data);
+                return ArtTodControlPacket.Parse(reader);
 
             case ArtNetOpCodes.Rdm:
-                return new ArtRdmPacket(data);
+                return ArtRdmPacket.Parse(reader);
 
             case ArtNetOpCodes.RdmSub:
-                return new ArtRdmSubPacket(data);
+                return ArtRdmSubPacket.Parse(reader);
 
             case ArtNetOpCodes.Trigger:
-                return new ArtTriggerPacket(data);
+                return ArtTriggerPacket.Parse(reader);
 
             case ArtNetOpCodes.IpProg:
-                return new ArtIpProgPacket(data);
+                return ArtIpProgPacket.Parse(reader);
 
             case ArtNetOpCodes.IpProgReply:
-                return new ArtIpProgReplyPacket(data);
+                return ArtIpProgReplyPacket.Parse(reader);
 
             case ArtNetOpCodes.Address:
-                return new ArtAddressPacket(data);
+                return ArtAddressPacket.Parse(reader);
+
             case ArtNetOpCodes.Input:
-                return new ArtInputPacket(data);
+                return ArtInputPacket.Parse(reader);
 
             default:
-                if (customPacketCreator != null)
-                {
-                    var customPacket = customPacketCreator(data.OpCode, data);
-                    if (customPacket != null)
-                        return customPacket;
-                }
-
-                return new ArtNetUnknownPacket(data);
+                return ArtNetUnknownPacket.Parse((short)opCode, reader);
         }
     }
 }
