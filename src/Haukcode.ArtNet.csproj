@@ -15,12 +15,13 @@
     <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>ArtNet</PackageTags>
-    <PackageReleaseNotes>1.2.2 - Bug fixes
-1.1.0 - Implemented ArtSync
-1.0.18 - Fixed bug in RdmPacketFactory
-1.0.17 - Fixed bug in ArtNetReplyPacket
-1.0.0 - Initial release
-</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      1.2.2 - Bug fixes
+      1.1.0 - Implemented ArtSync
+      1.0.18 - Fixed bug in RdmPacketFactory
+      1.0.17 - Fixed bug in ArtNetReplyPacket
+      1.0.0 - Initial release
+    </PackageReleaseNotes>
     <AssemblyVersion>1.0.18.0</AssemblyVersion>
     <FileVersion>1.0.18.0</FileVersion>
     <Version>1.2.2</Version>
@@ -28,18 +29,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <Choose>
-    <When Condition="'$(Configuration)' == 'Debug'">
-      <ItemGroup>
-        <ProjectReference Include="..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.13" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
+  <PropertyGroup>
+    <UseProjectReference>true</UseProjectReference>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <UseProjectReference>true</UseProjectReference>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseProjectReference)' == 'true'">
+    <ProjectReference Include="..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseProjectReference)' != 'true'">
+    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.15" />
+  </ItemGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
     <ItemGroup>
