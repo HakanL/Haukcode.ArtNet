@@ -29,10 +29,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <UseProjectReference>true</UseProjectReference>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <UseProjectReference>true</UseProjectReference>
   </PropertyGroup>
