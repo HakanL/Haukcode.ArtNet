@@ -37,7 +37,7 @@
     <ProjectReference Include="..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectReference)' != 'true'">
-    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.16" />
+    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.17" />
   </ItemGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
