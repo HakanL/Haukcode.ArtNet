@@ -62,6 +62,9 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
         this.sendSocket.DontFragment = true;
         this.sendSocket.EnableBroadcast = true;
 
+        // Bind to the local interface
+        this.sendSocket.Bind(new IPEndPoint(localAddress, 0));
+
         this.sendSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
     }
 
