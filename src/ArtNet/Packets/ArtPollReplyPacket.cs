@@ -286,7 +286,7 @@ public class ArtPollReplyPacket : ArtNetPacket
         set { status3 = value; }
     }
 
-    protected override int DataLength => 219;
+    protected override int DataLength => 229;
 
     /// <summary>
     /// Interprets the universe address to ensure compatibility with ArtNet I, II and III devices.
@@ -347,6 +347,8 @@ public class ArtPollReplyPacket : ArtNetPacket
         target.GoodOutputB = reader.ReadBytes(4);
         target.Status3 = reader.ReadByte();
         target.RespUID = reader.ReadBytes(6);
+
+        reader.SkipBytes(15);
 
         return target;
     }
