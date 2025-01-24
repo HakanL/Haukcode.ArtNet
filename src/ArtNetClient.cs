@@ -46,8 +46,14 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     //public event EventHandler<NewPacketEventArgs<RdmPacket>> NewRdmPacket;
     //public event EventHandler<NewPacketEventArgs<RdmPacket>> RdmPacketSent;
 
-    public ArtNetClient(IPAddress localAddress, IPAddress localSubnetMask, int port = DefaultPort, UId? rdmId = null)
-            : base(ArtNetPacket.MAX_PACKET_SIZE)
+    public ArtNetClient(
+        IPAddress localAddress,
+        IPAddress localSubnetMask,
+        Func<ReceiveDataPacket, Task>? channelWriter = null,
+        Action? channelWriterComplete = null,
+        int port = DefaultPort,
+        UId? rdmId = null)
+            : base(ArtNetPacket.MAX_PACKET_SIZE, channelWriter, channelWriterComplete)
     {
         RdmId = rdmId ?? UId.Empty;
 
@@ -66,6 +72,8 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
         this.sendSocket.Bind(new IPEndPoint(localAddress, 0));
 
         this.sendSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+
+        StartReceive();
     }
 
     /// <summary>
