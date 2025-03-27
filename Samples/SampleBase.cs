@@ -15,17 +15,17 @@ public abstract class SampleBase : IDisposable
 
     public SampleBase(IPAddress localIp, IPAddress localSubnetMask)
     {
-        this.client = new ArtNetClient(
-            localAddress: localIp,
-            localSubnetMask: localSubnetMask);
-
         var channel = Channel.CreateUnbounded<ReceiveDataPacket>();
 
-        this.client.StartRecordPipeline(p => WritePacket(channel, p), () => channel.Writer.Complete());
+        this.client = new ArtNetClient(
+            localAddress: localIp,
+            localSubnetMask: localSubnetMask,
+            channelWriter: p => WritePacket(channel, p),
+            channelWriterComplete: () => channel.Writer.Complete());
 
         this.writerTask = Task.Factory.StartNew(async () =>
         {
-            await WriteToDiskAsync(channel, CancellationToken.None);
+            await WriteToWriterAsync(channel, CancellationToken.None);
         }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
     }
 
@@ -49,7 +49,7 @@ public abstract class SampleBase : IDisposable
         return receiveData;
     }
 
-    private async Task WriteToDiskAsync(Channel<ReceiveDataPacket> inputChannel, CancellationToken cancellationToken)
+    private async Task WriteToWriterAsync(Channel<ReceiveDataPacket> inputChannel, CancellationToken cancellationToken)
     {
         await foreach (var dmxData in inputChannel.Reader.ReadAllAsync(cancellationToken))
         {
