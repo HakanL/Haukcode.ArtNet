@@ -1,9 +1,7 @@
-﻿using Haukcode.ArtNet;
-using Haukcode.ArtNet.Packets;
-using Haukcode.Sockets;
-using System;
+﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Haukcode.ArtNet.Packets;
 
 namespace Haukcode.ArtNet.Samples;
 

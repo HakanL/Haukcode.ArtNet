@@ -1,8 +1,7 @@
-﻿using Haukcode.Rdm;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
+using Haukcode.Rdm;
 
-namespace Haukcode.Sockets
+namespace Haukcode.ArtNet.Rdm
 {
     public class RdmEndPoint : IPEndPoint
     {
@@ -34,7 +33,7 @@ namespace Haukcode.Sockets
 
         private IPAddress ipAddress = IPAddress.Any;
 
-        public IPAddress IpAddress
+        public IPAddress? IpAddress
         {
             get { return ipAddress; }
             set { ipAddress = value; }

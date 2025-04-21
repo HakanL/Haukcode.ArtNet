@@ -1,19 +1,16 @@
-using Haukcode.ArtNet.IO;
 using Haukcode.ArtNet.Packets;
 using Haukcode.HighPerfComm;
 using Haukcode.Rdm;
-using Haukcode.Sockets;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Haukcode.ArtNet.Rdm;
 
 namespace Haukcode.ArtNet;
 
@@ -42,10 +39,6 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     private readonly object lockObject = new();
     private readonly Dictionary<IPAddress, IPEndPoint> endPointCache = [];
 
-
-    //public event EventHandler<NewPacketEventArgs<RdmPacket>> NewRdmPacket;
-    //public event EventHandler<NewPacketEventArgs<RdmPacket>> RdmPacketSent;
-
     public ArtNetClient(
         IPAddress localAddress,
         IPAddress localSubnetMask,
@@ -53,12 +46,13 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
         Action? channelWriterComplete = null,
         int port = DefaultPort,
         UId? rdmId = null)
-            : base(ArtNetPacket.MAX_PACKET_SIZE, channelWriter, channelWriterComplete)
+        : base(ArtNetPacket.MAX_PACKET_SIZE, channelWriter, channelWriterComplete)
     {
         RdmId = rdmId ?? UId.Empty;
 
         this.localEndPoint = new IPEndPoint(localAddress, port);
-        this.broadcastEndPoint = new IPEndPoint(Haukcode.Network.Utils.GetBroadcastAddress(localAddress, localSubnetMask), port);
+        this.broadcastEndPoint =
+            new IPEndPoint(Haukcode.Network.Utils.GetBroadcastAddress(localAddress, localSubnetMask), port);
 
         this.sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         this.sendSocket.SendBufferSize = SendBufferSize;
@@ -85,74 +79,45 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
 
     public IPAddress BroadcastAddress => this.broadcastEndPoint.Address;
 
-    /*    TODO
-     *    public void SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId)
+
+    public Task SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId)
+    {
+        return SendRdm(packet, targetAddress, targetId, RdmId);
+    }
+
+    public Task SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId, UId sourceId)
+    {
+        //Fill in addition details
+        packet.Header.SourceId = sourceId;
+        packet.Header.DestinationId = targetId;
+
+        //Sub Devices
+        if (targetId is SubDeviceUId)
+            packet.Header.SubDevice = ((SubDeviceUId)targetId).SubDeviceId;
+
+        //Create Rdm Packet
+        using (var rdmData = new MemoryStream())
         {
-            SendRdm(packet, targetAddress, targetId, RdmId);
-        }
+            var rdmWriter = new RdmBinaryWriter(rdmData);
 
-        public void SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId, UId sourceId)
-        {
-            //Fill in addition details
-            packet.Header.SourceId = sourceId;
-            packet.Header.DestinationId = targetId;
+            //Write the RDM packet
+            RdmPacket.WritePacket(packet, rdmWriter);
 
-            //Sub Devices
-            if (targetId is SubDeviceUId)
-                packet.Header.SubDevice = ((SubDeviceUId)targetId).SubDeviceId;
-
-            //Create Rdm Packet
-            using (var rdmData = new MemoryStream())
-            {
-                var rdmWriter = new RdmBinaryWriter(rdmData);
-
-                //Write the RDM packet
-                RdmPacket.WritePacket(packet, rdmWriter);
-
-                //Write the checksum
-                rdmWriter.WriteUInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) + (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
-
-                //Create sACN Packet
-                var rdmPacket = new ArtRdmPacket();
-                rdmPacket.Address = (byte)(targetAddress.Universe & 0x00FF);
-                rdmPacket.Net = (byte)(targetAddress.Universe >> 8);
-                rdmPacket.SubStartCode = (byte)RdmVersions.SubMessage;
-                rdmPacket.RdmData = rdmData.ToArray();
-
-                Send(rdmPacket, targetAddress);
-
-                RdmPacketSent?.Invoke(this, new NewPacketEventArgs<RdmPacket>((IPEndPoint)LocalEndPoint, new IPEndPoint(targetAddress.IpAddress, Port), packet));
-            }
-        }
-
-        public void SendRdm(List<RdmPacket> packets, RdmEndPoint targetAddress, UId targetId)
-        {
-            if (packets.Count < 1)
-                throw new ArgumentException("Rdm packets list is empty.");
-
-            RdmPacket primaryPacket = packets[0];
+            //Write the checksum
+            rdmWriter.WriteUInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) +
+                                          (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
 
             //Create sACN Packet
-            var rdmPacket = new ArtRdmSubPacket();
-            rdmPacket.DeviceId = targetId;
-            rdmPacket.RdmVersion = (byte)RdmVersions.SubMessage;
-            rdmPacket.Command = primaryPacket.Header.Command;
-            rdmPacket.ParameterId = primaryPacket.Header.ParameterId;
-            rdmPacket.SubDevice = (short)primaryPacket.Header.SubDevice;
-            rdmPacket.SubCount = (short)packets.Count;
+            var rdmPacket = new ArtRdmPacket();
+            rdmPacket.Address = (byte)(targetAddress.Universe & 0x00FF);
+            rdmPacket.Net = (byte)(targetAddress.Universe >> 8);
+            rdmPacket.SubStartCode = (byte)RdmVersions.SubMessage;
+            rdmPacket.RdmData = rdmData.ToArray();
 
-            using (var rdmData = new MemoryStream())
-            {
-                var dataWriter = new RdmBinaryWriter(rdmData);
+            return QueuePacketForSending(targetAddress.IpAddress, rdmPacket);
+        }
+    }
 
-                foreach (RdmPacket item in packets)
-                    RdmPacket.WritePacket(item, dataWriter, true);
-
-                rdmPacket.RdmData = rdmData.ToArray();
-
-                Send(rdmPacket, targetAddress);
-            }
-        }*/
 
     /// <summary>
     /// Send data
@@ -258,9 +223,11 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
         return this.sendSocket.SendToAsync(payload, SocketFlags.None, sendData.Destination!);
     }
 
-    protected async override ValueTask<(int ReceivedBytes, SocketReceiveMessageFromResult Result)> ReceiveData(Memory<byte> memory, CancellationToken cancelToken)
+    protected async override ValueTask<(int ReceivedBytes, SocketReceiveMessageFromResult Result)> ReceiveData(
+        Memory<byte> memory, CancellationToken cancelToken)
     {
-        var result = await this.listenSocket!.ReceiveMessageFromAsync(memory, SocketFlags.None, _blankEndpoint, cancelToken);
+        var result =
+            await this.listenSocket!.ReceiveMessageFromAsync(memory, SocketFlags.None, _blankEndpoint, cancelToken);
 
         return (result.ReceivedBytes, result);
     }
@@ -303,7 +270,8 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
         this.listenSocket = null;
     }
 
-    protected override ReceiveDataPacket? TryParseObject(ReadOnlyMemory<byte> buffer, double timestampMS, IPEndPoint sourceIP, IPAddress destinationIP)
+    protected override ReceiveDataPacket? TryParseObject(ReadOnlyMemory<byte> buffer, double timestampMS,
+        IPEndPoint sourceIP, IPAddress destinationIP)
     {
         var packet = ArtNetPacket.Parse(buffer);
 
@@ -350,6 +318,7 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
             catch
             {
             }
+
             this.sendSocket.Close();
             this.sendSocket.Dispose();
         }
