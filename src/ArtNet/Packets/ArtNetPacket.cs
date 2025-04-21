@@ -1,9 +1,9 @@
 using Haukcode.ArtNet.IO;
 using Haukcode.Network;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.IO;
+using Haukcode.Rdm;
+
 
 namespace Haukcode.ArtNet.Packets;
 
@@ -58,15 +58,15 @@ public abstract class ArtNetPacket
         return writer.BytesWritten;
     }
 
-    protected static void WriteUid(BigEndianBinaryWriter writer, Rdm.UId value)
+    protected static void WriteUid(BigEndianBinaryWriter writer, UId value)
     {
         writer.WriteUInt16(value.ManufacturerId);
         writer.WriteUInt32(value.DeviceId);
     }
 
-    protected static Rdm.UId ReadUId(BigEndianBinaryReader reader)
+    protected static UId ReadUId(BigEndianBinaryReader reader)
     {
-        return new Rdm.UId(reader.ReadUInt16(), reader.ReadUInt32());
+        return new UId(reader.ReadUInt16(), reader.ReadUInt32());
     }
 
     private string protocol = "Art-Net";

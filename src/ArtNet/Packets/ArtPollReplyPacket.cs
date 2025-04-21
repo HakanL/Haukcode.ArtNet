@@ -1,11 +1,20 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using Haukcode.ArtNet.IO;
 using Haukcode.Network;
 
 namespace Haukcode.ArtNet.Packets;
+
+public enum PollReplyPortTypes
+{
+    DMX512 = 0,
+    Midi = 1,
+    Avab = 2,
+    ColortranCmx = 3,
+    Adb62_5 = 4,
+    ArtNet = 5,
+
+    IsInputPort = 64,
+    IsOutputPort = 128,
+}
 
 public class ArtPollReplyPacket : ArtNetPacket
 {
@@ -42,93 +51,29 @@ public class ArtPollReplyPacket : ArtNetPacket
         }
     }
 
-    private short port = ArtNetClient.DefaultPort;
+    public short Port { get; set; } = ArtNetClient.DefaultPort;
 
-    public short Port
-    {
-        get { return port; }
-        set { port = value; }
-    }
+    public short FirmwareVersion { get; set; }
 
-    private short firmwareVersion = 0;
+    public byte NetSwitch { get; set; }
+    
+    public byte SubSwitch { get; set; }
+    
+    public short Oem { get; set; } = 0xff;
 
-    public short FirmwareVersion
-    {
-        get { return firmwareVersion; }
-        set { firmwareVersion = value; }
-    }
+    public byte UbeaVersion { get; set; }
 
-    private short subSwitch = 0;
+    public byte Status { get; set; }
 
-    public short SubSwitch
-    {
-        get { return subSwitch; }
-        set { subSwitch = value; }
-    }
+    public short EstaCode { get; set; }
 
-    private short oem = 0xff;
+    public string ShortName { get; set; } = string.Empty;
 
-    public short Oem
-    {
-        get { return oem; }
-        set { oem = value; }
-    }
+    public string LongName { get; set; } = string.Empty;
 
-    private byte ubeaVersion = 0;
+    public string NodeReport { get; set; } = string.Empty;
 
-    public byte UbeaVersion
-    {
-        get { return ubeaVersion; }
-        set { ubeaVersion = value; }
-    }
-
-    private byte status = 0;
-
-    public byte Status
-    {
-        get { return status; }
-        set { status = value; }
-    }
-
-    private short estaCode = 0;
-
-    public short EstaCode
-    {
-        get { return estaCode; }
-        set { estaCode = value; }
-    }
-
-    private string shortName = string.Empty;
-
-    public string ShortName
-    {
-        get { return shortName; }
-        set { shortName = value; }
-    }
-
-    private string longName = string.Empty;
-
-    public string LongName
-    {
-        get { return longName; }
-        set { longName = value; }
-    }
-
-    private string nodeReport = string.Empty;
-
-    public string NodeReport
-    {
-        get { return nodeReport; }
-        set { nodeReport = value; }
-    }
-
-    private short portCount = 0;
-
-    public short PortCount
-    {
-        get { return portCount; }
-        set { portCount = value; }
-    }
+    public short PortCount { get; set; }
 
     private byte[] portTypes = new byte[4];
 
@@ -186,53 +131,17 @@ public class ArtPollReplyPacket : ArtNetPacket
         }
     }
 
-    private byte[] swIn = new byte[4];
+    public byte[] SwIn { get; set; } = new byte[4];
 
-    public byte[] SwIn
-    {
-        get { return swIn; }
-        set { swIn = value; }
-    }
+    public byte[] SwOut { get; set; } = new byte[4];
 
-    private byte[] swOut = new byte[4];
+    public byte AcnPriority { get; set; }
 
-    public byte[] SwOut
-    {
-        get { return swOut; }
-        set { swOut = value; }
-    }
+    public byte SwMacro { get; set; }
 
-    private byte _acnPriority = 0;
+    public byte SwRemote { get; set; }
 
-    public byte AcnPriority
-    {
-        get { return _acnPriority; }
-        set { _acnPriority = value; }
-    }
-
-    private byte swMacro = 0;
-
-    public byte SwMacro
-    {
-        get { return swMacro; }
-        set { swMacro = value; }
-    }
-
-    private byte swRemote = 0;
-
-    public byte SwRemote
-    {
-        get { return swRemote; }
-        set { swRemote = value; }
-    }
-
-    private byte style = 0;
-
-    public byte Style
-    {
-        get { return style; }
-        set { style = value; }
-    }
+    public byte Style { get; set; }
 
     private byte[] macAddress = new byte[6];
 
@@ -262,29 +171,11 @@ public class ArtPollReplyPacket : ArtNetPacket
         }
     }
 
-    private byte bindIndex = 0;
+    public byte BindIndex { get; set; }
 
-    public byte BindIndex
-    {
-        get { return bindIndex; }
-        set { bindIndex = value; }
-    }
+    public byte Status2 { get; set; }
 
-    private byte status2 = 0;
-
-    public byte Status2
-    {
-        get { return status2; }
-        set { status2 = value; }
-    }
-
-    private byte status3 = 0;
-
-    public byte Status3
-    {
-        get { return status3; }
-        set { status3 = value; }
-    }
+    public byte Status3 { get; set; }
 
     protected override int DataLength => 229;
 
@@ -298,10 +189,14 @@ public class ArtPollReplyPacket : ArtNetPacket
     {
         int universe;
 
-        if (SubSwitch > 0)
+        if (NetSwitch > 0 || SubSwitch > 0)
         {
-            universe = (SubSwitch & 0x7F00);
+            universe = (NetSwitch & 0x7F00);
+            universe += (NetSwitch & 0xFF) << 8;
+
+            universe += (SubSwitch & 0x7F00);
             universe += (SubSwitch & 0x0F) << 4;
+
             universe += (outPorts ? SwOut[portIndex] : SwIn[portIndex]) & 0xF;
         }
         else
@@ -314,31 +209,32 @@ public class ArtPollReplyPacket : ArtNetPacket
 
     internal static ArtPollReplyPacket Parse(BigEndianBinaryReader reader)
     {
-        var target = new ArtPollReplyPacket
-        {
-            IpAddress = reader.ReadBytes(4),
-            Port = reader.ReadInt16Reverse(),
-            FirmwareVersion = reader.ReadInt16(),
-            SubSwitch = reader.ReadInt16(),
-            Oem = reader.ReadInt16(),
-            UbeaVersion = reader.ReadByte(),
-            Status = reader.ReadByte(),
-            EstaCode = reader.ReadInt16Reverse(),
-            ShortName = reader.ReadString(18),
-            LongName = reader.ReadString(64),
-            NodeReport = reader.ReadString(64),
-            PortCount = reader.ReadInt16(),
-            PortTypes = reader.ReadBytes(4),
-            GoodInput = reader.ReadBytes(4),
-            GoodOutputA = reader.ReadBytes(4),
-            SwIn = reader.ReadBytes(4),
-            SwOut = reader.ReadBytes(4),
-            AcnPriority = reader.ReadByte(),
-            SwMacro = reader.ReadByte(),
-            SwRemote = reader.ReadByte()
-        };
+        var target = new ArtPollReplyPacket();
 
+        target.IpAddress = reader.ReadBytes(4);
+        target.Port = reader.ReadInt16Reverse();
+        target.FirmwareVersion = reader.ReadInt16();
+        target.NetSwitch = reader.ReadByte();
+        target.SubSwitch = reader.ReadByte();
+        target.Oem = reader.ReadInt16();
+        target.UbeaVersion = reader.ReadByte();
+        target.Status = reader.ReadByte();
+        target.EstaCode = reader.ReadInt16Reverse();
+        target.ShortName = reader.ReadString(18);
+        target.LongName = reader.ReadString(64);
+        target.NodeReport = reader.ReadString(64);
+        target.PortCount = reader.ReadInt16();
+        target.PortTypes = reader.ReadBytes(4);
+        target.GoodInput = reader.ReadBytes(4);
+        target.GoodOutputA = reader.ReadBytes(4);
+        target.SwIn = reader.ReadBytes(4);
+        target.SwOut = reader.ReadBytes(4);
+        target.AcnPriority = reader.ReadByte();
+        target.SwMacro = reader.ReadByte();
+        target.SwRemote = reader.ReadByte();
+        
         reader.SkipBytes(3);
+        
         target.Style = reader.ReadByte();
         target.MacAddress = reader.ReadBytes(6);
         target.BindIpAddress = reader.ReadBytes(4);
@@ -358,7 +254,8 @@ public class ArtPollReplyPacket : ArtNetPacket
         writer.WriteBytes(IpAddress);
         writer.WriteInt16Reverse(Port);
         writer.WriteInt16(FirmwareVersion);
-        writer.WriteInt16(SubSwitch);
+        writer.WriteByte(NetSwitch);
+        writer.WriteByte(SubSwitch);
         writer.WriteInt16(Oem);
         writer.WriteByte(UbeaVersion);
         writer.WriteByte((byte)Status);
