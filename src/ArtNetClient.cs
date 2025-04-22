@@ -77,8 +77,75 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     public IPEndPoint LocalEndPoint => this.localEndPoint;
 
     public IPAddress BroadcastAddress => this.broadcastEndPoint.Address;
-   
 
+    /*    TODO
+     *    public void SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId)
+        {
+            SendRdm(packet, targetAddress, targetId, RdmId);
+        }
+
+        public void SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId, UId sourceId)
+        {
+            //Fill in addition details
+            packet.Header.SourceId = sourceId;
+            packet.Header.DestinationId = targetId;
+
+            //Sub Devices
+            if (targetId is SubDeviceUId)
+                packet.Header.SubDevice = ((SubDeviceUId)targetId).SubDeviceId;
+
+            //Create Rdm Packet
+            using (var rdmData = new MemoryStream())
+            {
+                var rdmWriter = new RdmBinaryWriter(rdmData);
+
+                //Write the RDM packet
+                RdmPacket.WritePacket(packet, rdmWriter);
+
+                //Write the checksum
+                rdmWriter.WriteUInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) + (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
+
+                //Create sACN Packet
+                var rdmPacket = new ArtRdmPacket();
+                rdmPacket.Address = (byte)(targetAddress.Universe & 0x00FF);
+                rdmPacket.Net = (byte)(targetAddress.Universe >> 8);
+                rdmPacket.SubStartCode = (byte)RdmVersions.SubMessage;
+                rdmPacket.RdmData = rdmData.ToArray();
+
+                Send(rdmPacket, targetAddress);
+
+                RdmPacketSent?.Invoke(this, new NewPacketEventArgs<RdmPacket>((IPEndPoint)LocalEndPoint, new IPEndPoint(targetAddress.IpAddress, Port), packet));
+            }
+        }
+
+        public void SendRdm(List<RdmPacket> packets, RdmEndPoint targetAddress, UId targetId)
+        {
+            if (packets.Count < 1)
+                throw new ArgumentException("Rdm packets list is empty.");
+
+            RdmPacket primaryPacket = packets[0];
+
+            //Create sACN Packet
+            var rdmPacket = new ArtRdmSubPacket();
+            rdmPacket.DeviceId = targetId;
+            rdmPacket.RdmVersion = (byte)RdmVersions.SubMessage;
+            rdmPacket.Command = primaryPacket.Header.Command;
+            rdmPacket.ParameterId = primaryPacket.Header.ParameterId;
+            rdmPacket.SubDevice = (short)primaryPacket.Header.SubDevice;
+            rdmPacket.SubCount = (short)packets.Count;
+
+            using (var rdmData = new MemoryStream())
+            {
+                var dataWriter = new RdmBinaryWriter(rdmData);
+
+                foreach (RdmPacket item in packets)
+                    RdmPacket.WritePacket(item, dataWriter, true);
+
+                rdmPacket.RdmData = rdmData.ToArray();
+
+                Send(rdmPacket, targetAddress);
+            }
+        }*/
 
     /// <summary>
     /// Send data
