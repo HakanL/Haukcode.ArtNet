@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Haukcode.Rdm;
-using Haukcode.ArtNet.IO;
+﻿using Haukcode.Rdm;
 using Haukcode.Network;
 
 namespace Haukcode.ArtNet.Packets;
@@ -20,9 +15,9 @@ public class ArtRdmSubPacket : ArtNetPacket
 
     public UId DeviceId { get; set; }
 
-    public RdmCommands Command { get; set; }
+    public byte Command { get; set; }
 
-    public RdmParameters ParameterId { get; set; }
+    public short ParameterId { get; set; }
 
     public short SubDevice { get; set; }
 
@@ -42,8 +37,8 @@ public class ArtRdmSubPacket : ArtNetPacket
         reader.SkipBytes(1);
         target.DeviceId = ReadUId(reader);
         reader.SkipBytes(1);
-        target.Command = (RdmCommands)reader.ReadByte();
-        target.ParameterId = (RdmParameters)reader.ReadInt16();
+        target.Command = reader.ReadByte();
+        target.ParameterId = reader.ReadInt16();
         target.SubDevice = reader.ReadInt16();
         target.SubCount = reader.ReadInt16();
         reader.SkipBytes(4);

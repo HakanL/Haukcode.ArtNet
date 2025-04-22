@@ -5,14 +5,16 @@ using System.Net;
 using System.Threading.Tasks;
 using Haukcode.ArtNet.Packets;
 using Haukcode.Rdm;
+using Haukcode.Rdm.IO;
 using Haukcode.Rdm.Packets.Product;
+
 
 namespace Haukcode.ArtNet.Samples;
 
 /// <summary>
 /// Discovery all rdm devices and request DeviceLabels
 /// </summary>
-public class RdmSample : SampleCapture
+public class RdmSample : SampleRdmBase
 {
     
     private readonly List<(UId uid, short universe, IPEndPoint ip)> devices = new();
