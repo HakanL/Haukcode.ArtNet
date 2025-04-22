@@ -90,7 +90,7 @@ public class RdmSample : SampleCapture
         }
         catch (Exception e)
         {
-            throw; // TODO handle exception
+            Console.WriteLine(e.Message);
         }
     }
 
@@ -106,35 +106,21 @@ public class RdmSample : SampleCapture
 
     public async void GetDeviceLabels()
     {
-        Console.WriteLine($"Total devices: {devices.Count}");
-        deviceCount = devices.Count;
-        
-        foreach (var dev in devices)
+        try
         {
-            RdmPacket packet = new DeviceLabel.Get();
-            packet.Header.SourceId = client.RdmId;
-            packet.Header.DestinationId = dev.uid;
-            
-            var rdmData = new MemoryStream();
-            var rdmWriter = new RdmBinaryWriter(rdmData);
-
-            //Write the RDM packet
-            RdmPacket.WritePacket(packet, rdmWriter);
-
-            //Write the checksum
-            rdmWriter.WriteUInt16((short)(RdmPacket.CalculateChecksum(rdmData.ToArray()) +
-                                             (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
-            
-            var rdmPacket = new ArtRdmPacket
+            Console.WriteLine($"Total devices: {devices.Count}");
+            deviceCount = devices.Count;
+        
+            foreach (var dev in devices)
             {
-                Address = (byte)(dev.universe & 0x00FF),
-                Net = (byte)(dev.universe >> 8),
-                SubStartCode = (byte)RdmVersions.SubMessage,
-                RdmData = rdmData.ToArray()
-                
-            };
-            await Task.Delay(10);
-            await this.client.QueuePacketForSending(dev.ip, rdmPacket);
+                RdmPacket packet = new DeviceLabel.Get();
+                await this.client.SendRdm(packet, dev.ip, dev.universe, dev.uid);
+                await Task.Delay(10);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
         }
     }
 }

@@ -10,7 +10,6 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Haukcode.ArtNet.Rdm;
 
 namespace Haukcode.ArtNet;
 
@@ -80,20 +79,20 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     public IPAddress BroadcastAddress => this.broadcastEndPoint.Address;
 
 
-    public Task SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId)
+    public Task SendRdm(RdmPacket packet, IPEndPoint targetAddress, short targetUniverse, UId targetId)
     {
-        return SendRdm(packet, targetAddress, targetId, RdmId);
+        return SendRdm(packet, targetAddress, targetUniverse, targetId, RdmId);
     }
 
-    public Task SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId, UId sourceId)
+    public Task SendRdm(RdmPacket packet, IPEndPoint targetAddress, short targetUniverse, UId targetId, UId sourceId)
     {
         //Fill in addition details
         packet.Header.SourceId = sourceId;
         packet.Header.DestinationId = targetId;
 
         //Sub Devices
-        if (targetId is SubDeviceUId)
-            packet.Header.SubDevice = ((SubDeviceUId)targetId).SubDeviceId;
+        if (targetId is SubDeviceUId subDevice)
+            packet.Header.SubDevice = subDevice.SubDeviceId;
 
         //Create Rdm Packet
         using (var rdmData = new MemoryStream())
@@ -108,13 +107,15 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
                                           (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
 
             //Create sACN Packet
-            var rdmPacket = new ArtRdmPacket();
-            rdmPacket.Address = (byte)(targetAddress.Universe & 0x00FF);
-            rdmPacket.Net = (byte)(targetAddress.Universe >> 8);
-            rdmPacket.SubStartCode = (byte)RdmVersions.SubMessage;
-            rdmPacket.RdmData = rdmData.ToArray();
+            var rdmPacket = new ArtRdmPacket
+            {
+                Address = (byte)(targetUniverse & 0x00FF),
+                Net = (byte)(targetUniverse >> 8),
+                SubStartCode = (byte)RdmVersions.SubMessage,
+                RdmData = rdmData.ToArray()
+            };
 
-            return QueuePacketForSending(targetAddress.IpAddress, rdmPacket);
+            return QueuePacketForSending(targetAddress, rdmPacket);
         }
     }
 
