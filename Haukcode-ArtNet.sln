@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "Samples\Samples.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.HighPerfComm", "..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj", "{21476F46-49AB-4252-9DD1-8858238711CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.Rdm", "Rdm\Haukcode.Rdm\Haukcode.Rdm.csproj", "{F2D54411-DC01-4D93-8D14-4F97D918EC42}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{21476F46-49AB-4252-9DD1-8858238711CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21476F46-49AB-4252-9DD1-8858238711CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21476F46-49AB-4252-9DD1-8858238711CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

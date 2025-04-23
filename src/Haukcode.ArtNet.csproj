@@ -50,18 +50,4 @@
     <PackageReference Include="Haukcode.Network" Version="1.0.22" />
   </ItemGroup>
 
-<!--  <ItemGroup>-->
-<!--    <Compile Remove="Rdm\Haukcode.Rdm\**" />-->
-<!--    <Compile Remove="Rdm\**" />-->
-<!--  </ItemGroup>-->
-
-<!--  <ItemGroup>-->
-<!--    <EmbeddedResource Remove="Rdm\Haukcode.Rdm\**" />-->
-<!--    <EmbeddedResource Remove="Rdm\**" />-->
-<!--  </ItemGroup>-->
-
-<!--  <ItemGroup>-->
-<!--    <None Remove="Rdm\Haukcode.Rdm\**" />-->
-<!--    <None Remove="Rdm\**" />-->
-<!--  </ItemGroup>-->
 </Project>
