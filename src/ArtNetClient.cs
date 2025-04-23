@@ -3,7 +3,6 @@ using Haukcode.HighPerfComm;
 using Haukcode.Rdm;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -49,22 +48,22 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     {
         RdmId = rdmId ?? UId.Empty;
 
-        this.localEndPoint = new IPEndPoint(localAddress, port);
-        this.broadcastEndPoint =
-            new IPEndPoint(Haukcode.Network.Utils.GetBroadcastAddress(localAddress, localSubnetMask), port);
+        localEndPoint = new IPEndPoint(localAddress, port);
+        broadcastEndPoint =
+            new IPEndPoint(Network.Utils.GetBroadcastAddress(localAddress, localSubnetMask), port);
 
-        this.sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        this.sendSocket.SendBufferSize = SendBufferSize;
+        sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        sendSocket.SendBufferSize = SendBufferSize;
 
-        Haukcode.Network.Utils.SetSocketOptions(this.sendSocket);
+        Network.Utils.SetSocketOptions(sendSocket);
 
-        this.sendSocket.DontFragment = true;
-        this.sendSocket.EnableBroadcast = true;
+        sendSocket.DontFragment = true;
+        sendSocket.EnableBroadcast = true;
 
         // Bind to the local interface
-        this.sendSocket.Bind(new IPEndPoint(localAddress, 0));
+        sendSocket.Bind(new IPEndPoint(localAddress, 0));
 
-        this.sendSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+        sendSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
 
         StartReceive();
     }
@@ -74,79 +73,11 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     /// </summary>
     public UId RdmId { get; protected set; }
 
-    public IPEndPoint LocalEndPoint => this.localEndPoint;
+    public IPEndPoint LocalEndPoint => localEndPoint;
 
-    public IPAddress BroadcastAddress => this.broadcastEndPoint.Address;
+    public IPAddress BroadcastAddress => broadcastEndPoint.Address;
 
-    /*    TODO
-     *    public void SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId)
-        {
-            SendRdm(packet, targetAddress, targetId, RdmId);
-        }
-
-        public void SendRdm(RdmPacket packet, RdmEndPoint targetAddress, UId targetId, UId sourceId)
-        {
-            //Fill in addition details
-            packet.Header.SourceId = sourceId;
-            packet.Header.DestinationId = targetId;
-
-            //Sub Devices
-            if (targetId is SubDeviceUId)
-                packet.Header.SubDevice = ((SubDeviceUId)targetId).SubDeviceId;
-
-            //Create Rdm Packet
-            using (var rdmData = new MemoryStream())
-            {
-                var rdmWriter = new RdmBinaryWriter(rdmData);
-
-                //Write the RDM packet
-                RdmPacket.WritePacket(packet, rdmWriter);
-
-                //Write the checksum
-                rdmWriter.WriteUInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) + (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
-
-                //Create sACN Packet
-                var rdmPacket = new ArtRdmPacket();
-                rdmPacket.Address = (byte)(targetAddress.Universe & 0x00FF);
-                rdmPacket.Net = (byte)(targetAddress.Universe >> 8);
-                rdmPacket.SubStartCode = (byte)RdmVersions.SubMessage;
-                rdmPacket.RdmData = rdmData.ToArray();
-
-                Send(rdmPacket, targetAddress);
-
-                RdmPacketSent?.Invoke(this, new NewPacketEventArgs<RdmPacket>((IPEndPoint)LocalEndPoint, new IPEndPoint(targetAddress.IpAddress, Port), packet));
-            }
-        }
-
-        public void SendRdm(List<RdmPacket> packets, RdmEndPoint targetAddress, UId targetId)
-        {
-            if (packets.Count < 1)
-                throw new ArgumentException("Rdm packets list is empty.");
-
-            RdmPacket primaryPacket = packets[0];
-
-            //Create sACN Packet
-            var rdmPacket = new ArtRdmSubPacket();
-            rdmPacket.DeviceId = targetId;
-            rdmPacket.RdmVersion = (byte)RdmVersions.SubMessage;
-            rdmPacket.Command = primaryPacket.Header.Command;
-            rdmPacket.ParameterId = primaryPacket.Header.ParameterId;
-            rdmPacket.SubDevice = (short)primaryPacket.Header.SubDevice;
-            rdmPacket.SubCount = (short)packets.Count;
-
-            using (var rdmData = new MemoryStream())
-            {
-                var dataWriter = new RdmBinaryWriter(rdmData);
-
-                foreach (RdmPacket item in packets)
-                    RdmPacket.WritePacket(item, dataWriter, true);
-
-                rdmPacket.RdmData = rdmData.ToArray();
-
-                Send(rdmPacket, targetAddress);
-            }
-        }*/
-
+   
     /// <summary>
     /// Send data
     /// </summary>
@@ -191,13 +122,13 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
 
     private byte GetNewSequenceId(ushort universeId)
     {
-        lock (this.lockObject)
+        lock (lockObject)
         {
-            this.sequenceIds.TryGetValue(universeId, out byte sequenceId);
+            sequenceIds.TryGetValue(universeId, out byte sequenceId);
 
             sequenceId++;
 
-            this.sequenceIds[universeId] = sequenceId;
+            sequenceIds[universeId] = sequenceId;
 
             return sequenceId;
         }
@@ -215,10 +146,10 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
 
         if (destination != null)
         {
-            if (!this.endPointCache.TryGetValue(destination, out var ipEndPoint))
+            if (!endPointCache.TryGetValue(destination, out var ipEndPoint))
             {
-                ipEndPoint = new IPEndPoint(destination, this.localEndPoint.Port);
-                this.endPointCache.Add(destination, ipEndPoint);
+                ipEndPoint = new IPEndPoint(destination, localEndPoint.Port);
+                endPointCache.Add(destination, ipEndPoint);
             }
 
             // Only works for when subnet mask is /24 or less
@@ -228,7 +159,7 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
                 sendDataDestination = ipEndPoint;
         }
 
-        return QueuePacketForSending(sendDataDestination ?? this.broadcastEndPoint, packet, important);
+        return QueuePacketForSending(sendDataDestination ?? broadcastEndPoint, packet, important);
     }
 
     /// <summary>
@@ -239,7 +170,7 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
     /// <param name="important">Important</param>
     public async Task QueuePacketForSending(IPEndPoint destination, ArtNetPacket packet, bool important = false)
     {
-        await base.QueuePacket(
+        await QueuePacket(
             allocatePacketLength: packet.PacketLength,
             important: important,
             sendDataFactory: () => new SendData(destination),
@@ -248,14 +179,14 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
 
     protected override ValueTask<int> SendPacketAsync(SendData sendData, ReadOnlyMemory<byte> payload)
     {
-        return this.sendSocket.SendToAsync(payload, SocketFlags.None, sendData.Destination!);
+        return sendSocket.SendToAsync(payload, SocketFlags.None, sendData.Destination!);
     }
 
-    protected async override ValueTask<(int ReceivedBytes, SocketReceiveMessageFromResult Result)> ReceiveData(
+    protected override async ValueTask<(int ReceivedBytes, SocketReceiveMessageFromResult Result)> ReceiveData(
         Memory<byte> memory, CancellationToken cancelToken)
     {
         var result =
-            await this.listenSocket!.ReceiveMessageFromAsync(memory, SocketFlags.None, _blankEndpoint, cancelToken);
+            await listenSocket!.ReceiveMessageFromAsync(memory, SocketFlags.None, _blankEndpoint, cancelToken);
 
         return (result.ReceivedBytes, result);
     }
@@ -266,36 +197,36 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 // Linux reports the internal buffer size, which is double the requested size
-                return this.listenSocket?.ReceiveBufferSize / 2;
+                return listenSocket?.ReceiveBufferSize / 2;
             else
-                return this.listenSocket?.ReceiveBufferSize;
+                return listenSocket?.ReceiveBufferSize;
         }
     }
 
     protected override void InitializeReceiveSocket()
     {
-        this.listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        this.listenSocket.ReceiveBufferSize = ReceiveBufferSize;
+        listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        listenSocket.ReceiveBufferSize = ReceiveBufferSize;
 
-        Haukcode.Network.Utils.SetSocketOptions(this.listenSocket);
+        Network.Utils.SetSocketOptions(listenSocket);
 
         // Linux wants IPAddress.Any to get all types of packets (unicast/multicast/broadcast)
-        this.listenSocket.Bind(new IPEndPoint(IPAddress.Any, this.localEndPoint.Port));
+        listenSocket.Bind(new IPEndPoint(IPAddress.Any, localEndPoint.Port));
     }
 
     protected override void DisposeReceiveSocket()
     {
         try
         {
-            this.listenSocket?.Shutdown(SocketShutdown.Both);
+            listenSocket?.Shutdown(SocketShutdown.Both);
         }
         catch
         {
         }
 
-        this.listenSocket?.Close();
-        this.listenSocket?.Dispose();
-        this.listenSocket = null;
+        listenSocket?.Close();
+        listenSocket?.Dispose();
+        listenSocket = null;
     }
 
     protected override ReceiveDataPacket? TryParseObject(ReadOnlyMemory<byte> buffer, double timestampMS,
@@ -318,13 +249,13 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
                     Packet = packet
                 };
 
-                if (!this.endPointCache.TryGetValue(destinationIP, out var ipEndPoint))
+                if (!endPointCache.TryGetValue(destinationIP, out var ipEndPoint))
                 {
-                    ipEndPoint = new IPEndPoint(destinationIP, this.localEndPoint.Port);
-                    this.endPointCache.Add(destinationIP, ipEndPoint);
+                    ipEndPoint = new IPEndPoint(destinationIP, localEndPoint.Port);
+                    endPointCache.Add(destinationIP, ipEndPoint);
                 }
 
-                parsedObject.Destination = ipEndPoint ?? this.broadcastEndPoint;
+                parsedObject.Destination = ipEndPoint ?? broadcastEndPoint;
 
                 return parsedObject;
             }
@@ -341,14 +272,14 @@ public class ArtNetClient : Client<ArtNetClient.SendData, ReceiveDataPacket>
         {
             try
             {
-                this.sendSocket.Shutdown(SocketShutdown.Both);
+                sendSocket.Shutdown(SocketShutdown.Both);
             }
             catch
             {
             }
 
-            this.sendSocket.Close();
-            this.sendSocket.Dispose();
+            sendSocket.Close();
+            sendSocket.Dispose();
         }
     }
 }
