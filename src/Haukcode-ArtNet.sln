@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Core", "Art
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Rdm", "Rdm\Haukcode.ArtNet.Rdm.csproj", "{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Package", "Package\Haukcode.ArtNet.Package\Haukcode.ArtNet.Package.csproj", "{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Package", "Package\Haukcode.ArtNet.Package.csproj", "{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
