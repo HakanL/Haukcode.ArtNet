@@ -8,7 +8,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Hakan Lindestaf</Authors>
     <Product>Haukcode ArtNet Library</Product>
-    <Description>ArtNet library for .NET Core (.NET Standard 2.0)</Description>
+    <Description>ArtNet library for .NET Core (.NET8+)</Description>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/HakanL/Haukcode.ArtNet</PackageProjectUrl>
     <Copyright>(C) Copyright 2024 Hakan Lindestaf</Copyright>
@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.csproj" />
+    <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\Rdm\Haukcode.ArtNet.Rdm.csproj" PrivateAssets="All" />
   </ItemGroup>
 
