@@ -41,8 +41,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 9.0.100
-    - name: Install dependencies
-      run: dotnet restore /p:Configuration=Release **/*.csproj
+    - name: Install dependencies Core
+      run: dotnet restore /p:Configuration=Release ArtNet/Haukcode.ArtNet.Core.csproj
+      env:
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    - name: Install dependencies RDM
+      run: dotnet restore /p:Configuration=Release Rdm/Haukcode.ArtNet.Rdm.csproj
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
     - name: Build
