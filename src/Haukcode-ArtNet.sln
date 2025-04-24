@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35521.163
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "Samples\Samples.csproj", "{695B172A-8C82-4B7F-9C67-D2BB195CF024}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "..\Samples\Samples.csproj", "{695B172A-8C82-4B7F-9C67-D2BB195CF024}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.HighPerfComm", "..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj", "{21476F46-49AB-4252-9DD1-8858238711CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.HighPerfComm", "..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj", "{21476F46-49AB-4252-9DD1-8858238711CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Core", "src\ArtNet\Haukcode.ArtNet.Core.csproj", "{72E56FCB-7581-2FFE-8499-7F1F90ED8452}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Core", "ArtNet\Haukcode.ArtNet.Core.csproj", "{72E56FCB-7581-2FFE-8499-7F1F90ED8452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Rdm", "src\Rdm\Haukcode.ArtNet.Rdm.csproj", "{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Rdm", "Rdm\Haukcode.ArtNet.Rdm.csproj", "{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Package", "src\Package\Haukcode.ArtNet.Package\Haukcode.ArtNet.Package.csproj", "{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Package", "Package\Haukcode.ArtNet.Package\Haukcode.ArtNet.Package.csproj", "{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
