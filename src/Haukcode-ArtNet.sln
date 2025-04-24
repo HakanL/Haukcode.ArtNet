@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "..\Samples\Sampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.HighPerfComm", "..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj", "{21476F46-49AB-4252-9DD1-8858238711CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Core", "ArtNet\Haukcode.ArtNet.Core.csproj", "{72E56FCB-7581-2FFE-8499-7F1F90ED8452}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet", "ArtNet\Haukcode.ArtNet.csproj", "{72E56FCB-7581-2FFE-8499-7F1F90ED8452}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Rdm", "Rdm\Haukcode.ArtNet.Rdm.csproj", "{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}"
 EndProject

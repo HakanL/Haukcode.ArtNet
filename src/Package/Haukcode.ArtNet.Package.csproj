@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.Core.csproj" />
+    <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.csproj" />
     <ProjectReference Include="..\Rdm\Haukcode.ArtNet.Rdm.csproj" />
   </ItemGroup>
 
