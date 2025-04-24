@@ -27,8 +27,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ArtNet\Haukcode.ArtNet.Core.csproj" />
-    <ProjectReference Include="..\..\Rdm\Haukcode.ArtNet.Rdm.csproj" />
+    <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.Core.csproj" />
+    <ProjectReference Include="..\Rdm\Haukcode.ArtNet.Rdm.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
