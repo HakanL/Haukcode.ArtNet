@@ -49,6 +49,10 @@ jobs:
       run: dotnet restore /p:Configuration=Release Rdm/Haukcode.ArtNet.Rdm.csproj
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    - name: Install dependencies Package
+      run: dotnet restore /p:Configuration=Release Package/Haukcode.ArtNet.Package.csproj
+      env:
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
     - name: Build
       run: dotnet build --configuration Release --no-restore /p:Version="${PACKAGE_VERSION}" Package/Haukcode.ArtNet.Package.csproj
     - name: Test
