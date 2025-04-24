@@ -58,7 +58,7 @@ jobs:
 
     ## Publish and Tag
     - name: Publish NuGet
-      run: dotnet nuget push bin/Release/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
+      run: dotnet nuget push Package/bin/Release/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
       if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     - name: Tag
       run: |
