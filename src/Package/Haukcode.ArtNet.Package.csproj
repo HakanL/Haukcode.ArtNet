@@ -28,6 +28,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Haukcode.Network" Version="1.0.22" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\Rdm\Haukcode.ArtNet.Rdm.csproj" PrivateAssets="All" />
   </ItemGroup>
