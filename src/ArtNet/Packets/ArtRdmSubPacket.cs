@@ -1,7 +1,4 @@
-﻿using Haukcode.Rdm;
-using Haukcode.Network;
-
-namespace Haukcode.ArtNet.Packets;
+﻿namespace Haukcode.ArtNet.Packets;
 
 public class ArtRdmSubPacket : ArtNetPacket
 {
@@ -13,7 +10,7 @@ public class ArtRdmSubPacket : ArtNetPacket
 
     public byte RdmVersion { get; set; }
 
-    public UId DeviceId { get; set; }
+    public UId DeviceId { get; set; } = null!;
 
     public byte Command { get; set; }
 

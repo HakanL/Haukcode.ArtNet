@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Haukcode.ArtNet.Internal;
 using Haukcode.ArtNet.Packets;
-using Haukcode.Rdm;
-using Haukcode.Rdm.IO;
-using Haukcode.Rdm.Packets.Product;
+using Haukcode.ArtNet.Rdm;
+using Haukcode.ArtNet.Rdm.IO;
+using Haukcode.ArtNet.Rdm.Packets.Product;
 
 
 namespace Haukcode.ArtNet.Samples;
@@ -19,7 +20,9 @@ public class RdmSample : SampleRdmBase
     
     private readonly List<(UId uid, short universe, IPEndPoint ip)> devices = new();
     private int deviceCount;
-    public RdmSample(IPAddress localIp, IPAddress localSubnetMask) : base(localIp, localSubnetMask)
+
+    public RdmSample(IPAddress localIp, IPAddress localSubnetMask)
+        : base(localIp, localSubnetMask)
     {
     }
 

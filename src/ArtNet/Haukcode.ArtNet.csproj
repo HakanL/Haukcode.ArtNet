@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <RootNamespace>Haukcode.ArtNet</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Haukcode.ArtNet</PackageId>
+    <Authors>Hakan Lindestaf</Authors>
+    <Product>Haukcode ArtNet Library</Product>
+    <Description>ArtNet library for .NET Core (.NET Standard 2.0)</Description>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/HakanL/Haukcode.ArtNet</PackageProjectUrl>
+    <Copyright>(C) Copyright 2024 Hakan Lindestaf</Copyright>
+    <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>ArtNet</PackageTags>
+    <PackageReleaseNotes>
+      1.2.2 - Bug fixes
+      1.1.0 - Implemented ArtSync
+      1.0.18 - Fixed bug in RdmPacketFactory
+      1.0.17 - Fixed bug in ArtNetReplyPacket
+      1.0.0 - Initial release
+    </PackageReleaseNotes>
+    <AssemblyVersion>1.0.18.0</AssemblyVersion>
+    <FileVersion>1.0.18.0</FileVersion>
+    <Version>1.2.2</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <UseProjectReference>true</UseProjectReference>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseProjectReference)' == 'true'">
+    <ProjectReference Include="..\..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseProjectReference)' != 'true'">
+    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.22" />
+  </ItemGroup>
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Haukcode.Network" Version="1.0.22" />
+  </ItemGroup>
+</Project>

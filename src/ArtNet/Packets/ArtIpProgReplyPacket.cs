@@ -1,8 +1,4 @@
-﻿using Haukcode.ArtNet.IO;
-using Haukcode.Network;
-using System;
-
-namespace Haukcode.ArtNet.Packets;
+﻿namespace Haukcode.ArtNet.Packets;
 
 public class ArtIpProgReplyPacket : ArtNetPacket
 {
@@ -50,7 +46,8 @@ public class ArtIpProgReplyPacket : ArtNetPacket
 
     protected override int DataLength => 19;
 
-    public ArtIpProgReplyPacket() : base(ArtNetOpCodes.IpProgReply)
+    public ArtIpProgReplyPacket()
+        : base(ArtNetOpCodes.IpProgReply)
     {
     }
 

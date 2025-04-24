@@ -1,15 +1,14 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35521.163
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Haukcode.ArtNet", "src\Haukcode.ArtNet.csproj", "{FE79213B-0C06-4AFA-8BD7-23200879BC9A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "Samples\Samples.csproj", "{695B172A-8C82-4B7F-9C67-D2BB195CF024}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.HighPerfComm", "..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj", "{21476F46-49AB-4252-9DD1-8858238711CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.Rdm", "Rdm\Haukcode.Rdm\Haukcode.Rdm.csproj", "{F2D54411-DC01-4D93-8D14-4F97D918EC42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet", "src\ArtNet\Haukcode.ArtNet.csproj", "{72E56FCB-7581-2FFE-8499-7F1F90ED8452}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Rdm", "src\Rdm\Haukcode.ArtNet.Rdm.csproj", "{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +16,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FE79213B-0C06-4AFA-8BD7-23200879BC9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE79213B-0C06-4AFA-8BD7-23200879BC9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE79213B-0C06-4AFA-8BD7-23200879BC9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE79213B-0C06-4AFA-8BD7-23200879BC9A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{695B172A-8C82-4B7F-9C67-D2BB195CF024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{695B172A-8C82-4B7F-9C67-D2BB195CF024}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{695B172A-8C82-4B7F-9C67-D2BB195CF024}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,10 +24,14 @@ Global
 		{21476F46-49AB-4252-9DD1-8858238711CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21476F46-49AB-4252-9DD1-8858238711CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21476F46-49AB-4252-9DD1-8858238711CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2D54411-DC01-4D93-8D14-4F97D918EC42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72E56FCB-7581-2FFE-8499-7F1F90ED8452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E56FCB-7581-2FFE-8499-7F1F90ED8452}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E56FCB-7581-2FFE-8499-7F1F90ED8452}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E56FCB-7581-2FFE-8499-7F1F90ED8452}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

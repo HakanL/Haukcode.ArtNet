@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Haukcode.ArtNet;
+using Haukcode.ArtNet.Internal;
 using Haukcode.ArtNet.Packets;
 
 namespace Haukcode.ArtNet.Samples;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using Haukcode.Network;
-
-namespace Haukcode.ArtNet.Packets;
+﻿namespace Haukcode.ArtNet.Packets;
 
 public class ArtAddressPacket : ArtNetPacket
 {
@@ -20,7 +16,7 @@ public class ArtAddressPacket : ArtNetPacket
         {
             if (value.Length != 4)
                 throw new ArgumentException("The SwIn must be an array of 4 bytes.");
-            
+
             swIn = value;
         }
     }
@@ -32,7 +28,7 @@ public class ArtAddressPacket : ArtNetPacket
         {
             if (value.Length != 4)
                 throw new ArgumentException("The SwOut must be an array of 4 bytes.");
-            
+
             swOut = value;
         }
     }
@@ -43,11 +39,13 @@ public class ArtAddressPacket : ArtNetPacket
 
     protected override int DataLength => 95;
 
-    public ArtAddressPacket() : base(ArtNetOpCodes.Address)
+    public ArtAddressPacket()
+        : base(ArtNetOpCodes.Address)
     {
     }
 
-    public ArtAddressPacket(ArtPollReplyPacket src) : base(ArtNetOpCodes.Address)
+    public ArtAddressPacket(ArtPollReplyPacket src)
+        : base(ArtNetOpCodes.Address)
     {
         // Not all devices will be on code and set the address regardless of Bit 7. So better provide all the default values.
         BindIndex = src.BindIndex;

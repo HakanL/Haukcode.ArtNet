@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace Haukcode.ArtNet;
 
-namespace Haukcode.Rdm
+public enum DmxStartCodes
 {
-    public enum DmxStartCodes
-    {
-        DMX512 = 0,
-        RDM = 204,
-        MergePriority = 221
-
-    }
-
-    public enum RdmVersions
-    {
-        SubMessage = 0x1
-    }
+    DMX512 = 0,
+    RDM = 204,
+    MergePriority = 221
 }

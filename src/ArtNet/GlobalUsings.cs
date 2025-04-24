@@ -1,0 +1,12 @@
+﻿global using System;
+global using System.Collections.Generic;
+global using System.Diagnostics;
+global using System.IO;
+global using System.Linq;
+global using System.Threading.Tasks;
+global using System.Net;
+global using System.Text;
+global using Haukcode.Network;
+global using System.Net.Sockets;
+global using System.Runtime.InteropServices;
+global using System.Threading;

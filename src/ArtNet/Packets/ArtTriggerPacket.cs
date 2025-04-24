@@ -1,7 +1,3 @@
-using Haukcode.ArtNet.IO;
-using Haukcode.Network;
-using System;
-
 namespace Haukcode.ArtNet.Packets;
 
 public class ArtTriggerPacket : ArtNetPacket

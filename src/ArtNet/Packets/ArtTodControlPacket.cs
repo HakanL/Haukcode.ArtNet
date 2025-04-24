@@ -1,17 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using Haukcode.ArtNet.IO;
-using Haukcode.Network;
-
 namespace Haukcode.ArtNet.Packets;
-
-public enum ArtTodControlCommand
-{
-    AtcNone = 0,
-    AtcFlush = 1
-}
 
 public class ArtTodControlPacket : ArtNetPacket
 {

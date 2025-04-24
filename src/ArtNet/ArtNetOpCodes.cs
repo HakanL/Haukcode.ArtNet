@@ -1,5 +1,3 @@
-using System;
-
 namespace Haukcode.ArtNet;
 
 public enum ArtNetOpCodes : ushort
@@ -69,7 +67,6 @@ public enum ArtIpProgCommand : byte
     EnableDHCP = (1 << 6),
     EnableProgramming = (1 << 7),
 }
-
 
 public enum ArtAddressCommand : byte
 {

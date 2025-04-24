@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Haukcode.Rdm;
+﻿namespace Haukcode.ArtNet;
 
 public class UId : IComparable
 {
@@ -35,8 +33,6 @@ public class UId : IComparable
     public ushort ManufacturerId { get; protected set; }
 
     public uint DeviceId { get; protected set; }
-
-    #region Predefined Values
 
     private static readonly UId broadcast = new UId(0xFFFF, 0xFFFFFFFF);
 
@@ -76,9 +72,6 @@ public class UId : IComparable
     {
         get { return maxValue; }
     }
-
-    #endregion
-
 
     public override string ToString() => $"{ManufacturerId:X4}:{DeviceId:X8}";
 
@@ -131,8 +124,6 @@ public class UId : IComparable
         return base.Equals(obj);
     }
 
-    #region IComparable Members
-
     public int CompareTo(object? obj)
     {
         if (obj is UId id)
@@ -140,6 +131,4 @@ public class UId : IComparable
 
         return -1;
     }
-
-    #endregion
 }

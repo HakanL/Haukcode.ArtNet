@@ -1,8 +1,3 @@
-using Haukcode.ArtNet.IO;
-using Haukcode.Network;
-using Haukcode.Rdm;
-using System.Collections.Generic;
-
 namespace Haukcode.ArtNet.Packets;
 
 public class ArtTodDataPacket : ArtNetPacket

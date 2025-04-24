@@ -1,8 +1,4 @@
-﻿using System;
-using Haukcode.ArtNet.IO;
-using Haukcode.Network;
-
-namespace Haukcode.ArtNet.Packets;
+﻿namespace Haukcode.ArtNet.Packets;
 
 public class ArtInputPacket : ArtNetPacket
 {
@@ -25,7 +21,8 @@ public class ArtInputPacket : ArtNetPacket
 
     protected override int DataLength => 8;
 
-    public ArtInputPacket() : base(ArtNetOpCodes.Input)
+    public ArtInputPacket()
+        : base(ArtNetOpCodes.Input)
     {
     }
 

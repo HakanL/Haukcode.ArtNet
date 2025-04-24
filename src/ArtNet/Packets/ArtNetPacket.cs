@@ -1,10 +1,3 @@
-using Haukcode.ArtNet.IO;
-using Haukcode.Network;
-using System;
-using System.Diagnostics;
-using Haukcode.Rdm;
-
-
 namespace Haukcode.ArtNet.Packets;
 
 public abstract class ArtNetPacket

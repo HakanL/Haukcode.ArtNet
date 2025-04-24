@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Haukcode.ArtNet.Internal;
 using Haukcode.ArtNet.Packets;
 
 namespace Haukcode.ArtNet.Samples;

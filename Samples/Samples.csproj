@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rdm\Haukcode.Rdm\Haukcode.Rdm.csproj" />
-    <ProjectReference Include="..\src\Haukcode.ArtNet.csproj" />
+    <ProjectReference Include="..\src\Rdm\Haukcode.ArtNet.Rdm.csproj" />
+    <ProjectReference Include="..\src\ArtNet\Haukcode.ArtNet.csproj" />
   </ItemGroup>
 
 </Project>
