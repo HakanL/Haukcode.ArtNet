@@ -2,9 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-    <RootNamespace>Haukcode.ArtNet</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <PackageId>Haukcode.ArtNet</PackageId>
     <Authors>Hakan Lindestaf</Authors>
     <Product>Haukcode ArtNet Library</Product>
@@ -16,18 +15,21 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>ArtNet</PackageTags>
     <PackageReleaseNotes>
+      3.0.0 - Split RDM into a separate project
+      2.0.0 - Rewrite to use HighPerfComm library
       1.2.2 - Bug fixes
       1.1.0 - Implemented ArtSync
       1.0.18 - Fixed bug in RdmPacketFactory
       1.0.17 - Fixed bug in ArtNetReplyPacket
       1.0.0 - Initial release
     </PackageReleaseNotes>
-    <AssemblyVersion>1.0.18.0</AssemblyVersion>
-    <FileVersion>1.0.18.0</FileVersion>
-    <Version>1.2.2</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ArtNet\Haukcode.ArtNet.Core.csproj" />
+    <ProjectReference Include="..\..\Rdm\Haukcode.ArtNet.Rdm.csproj" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <UseProjectReference>true</UseProjectReference>
@@ -46,7 +48,4 @@
     </ItemGroup>
   </Target>
 
-  <ItemGroup>
-    <PackageReference Include="Haukcode.Network" Version="1.0.22" />
-  </ItemGroup>
 </Project>

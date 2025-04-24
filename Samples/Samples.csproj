@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\Rdm\Haukcode.ArtNet.Rdm.csproj" />
-    <ProjectReference Include="..\src\ArtNet\Haukcode.ArtNet.csproj" />
   </ItemGroup>
 
 </Project>

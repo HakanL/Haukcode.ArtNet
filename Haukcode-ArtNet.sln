@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35521.163
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -6,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "Samples\Samples.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.HighPerfComm", "..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj", "{21476F46-49AB-4252-9DD1-8858238711CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet", "src\ArtNet\Haukcode.ArtNet.csproj", "{72E56FCB-7581-2FFE-8499-7F1F90ED8452}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Core", "src\ArtNet\Haukcode.ArtNet.Core.csproj", "{72E56FCB-7581-2FFE-8499-7F1F90ED8452}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Rdm", "src\Rdm\Haukcode.ArtNet.Rdm.csproj", "{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Package", "src\Package\Haukcode.ArtNet.Package\Haukcode.ArtNet.Package.csproj", "{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +35,10 @@ Global
 		{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF3913FA-AFF0-C634-90E2-0B3CB79A7019}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
