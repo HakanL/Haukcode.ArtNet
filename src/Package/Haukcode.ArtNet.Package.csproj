@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Haukcode.ArtNet</PackageId>
     <Authors>Hakan Lindestaf</Authors>
     <Product>Haukcode ArtNet Library</Product>
     <Description>ArtNet library for .NET Core (.NET Standard 2.0)</Description>
