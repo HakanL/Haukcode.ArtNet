@@ -10,16 +10,18 @@
     <AssemblyName>Haukcode.ArtNet</AssemblyName>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <UseProjectReference>true</UseProjectReference>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(UseProjectReference)' == 'true'">
-    <ProjectReference Include="..\..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(UseProjectReference)' != 'true'">
-    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.22" />
-  </ItemGroup>
+  <Choose>
+    <When Condition="'$(Configuration)' == 'Debug'">
+      <ItemGroup>
+        <ProjectReference Include="..\..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.22" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
 
   <ItemGroup>
     <PackageReference Include="Haukcode.Network" Version="1.0.22" />
