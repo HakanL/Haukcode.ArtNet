@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.22" />
+    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.23" />
     <PackageReference Include="Haukcode.Network" Version="1.0.22" />
   </ItemGroup>
 </Project>
