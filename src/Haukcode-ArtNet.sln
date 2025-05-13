@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Rdm", "Rdm\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Package", "Package\Haukcode.ArtNet.Package.csproj", "{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet-Debug", "ArtNet\Haukcode.ArtNet-Debug.csproj", "{63A4E08C-79A7-E9FA-3DC3-C6A88CEF595D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63A4E08C-79A7-E9FA-3DC3-C6A88CEF595D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63A4E08C-79A7-E9FA-3DC3-C6A88CEF595D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63A4E08C-79A7-E9FA-3DC3-C6A88CEF595D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63A4E08C-79A7-E9FA-3DC3-C6A88CEF595D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

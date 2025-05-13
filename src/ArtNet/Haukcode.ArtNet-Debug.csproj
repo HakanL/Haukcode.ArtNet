@@ -11,7 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.22" />
+    <ProjectReference Include="..\..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Haukcode.Network" Version="1.0.22" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "Haukcode-ArtNet.sln",
+    "projects": [
+      "..\\Samples\\Samples.csproj",
+      "ArtNet\\Haukcode.ArtNet.csproj",
+      "Package\\Haukcode.ArtNet.Package.csproj",
+      "Rdm\\Haukcode.ArtNet.Rdm.csproj"
+    ]
+  }
+}

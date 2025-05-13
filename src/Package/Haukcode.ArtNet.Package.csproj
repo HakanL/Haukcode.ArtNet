@@ -29,22 +29,12 @@
 
   <ItemGroup>
     <PackageReference Include="Haukcode.Network" Version="1.0.22" />
+    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.22" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\Rdm\Haukcode.ArtNet.Rdm.csproj" PrivateAssets="All" />
-  </ItemGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <UseProjectReference>true</UseProjectReference>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(UseProjectReference)' == 'true'">
-    <ProjectReference Include="..\..\..\Haukcode.HighPerfComm\src\Haukcode.HighPerfComm.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(UseProjectReference)' != 'true'">
-    <PackageReference Include="Haukcode.HighPerfComm" Version="1.0.22" />
   </ItemGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
