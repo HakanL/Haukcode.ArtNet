@@ -161,11 +161,49 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// <param name="important">Important</param>
     public async Task QueuePacketForSending(IPEndPoint destination, ArtNetPacket packet, bool important = false)
     {
-        await base.QueuePacket(
+        await QueuePacket(
             allocatePacketLength: packet.PacketLength,
             important: important,
             sendDataFactory: () => new SendData(destination),
             packetWriter: packet.WriteToBuffer);
+    }
+
+    /// <summary>
+    /// Send packet immediately, bypassing the send queue
+    /// </summary>
+    /// <param name="destination">Destination</param>
+    /// <param name="packet">Packet</param>
+    /// <param name="important">Important</param>
+    public Task SendPacketImmediately(IPAddress? destination, ArtNetPacket packet, bool important = false)
+    {
+        IPEndPoint? sendDataDestination = null;
+
+        if (destination != null)
+        {
+            if (!this.endPointCache.TryGetValue(destination, out var ipEndPoint))
+            {
+                ipEndPoint = new IPEndPoint(destination, this.localEndPoint.Port);
+                this.endPointCache.Add(destination, ipEndPoint);
+            }
+
+            // Only works for when subnet mask is /24 or less
+            if (ipEndPoint.Address.GetAddressBytes().Last() == 255)
+                sendDataDestination = null;
+            else
+                sendDataDestination = ipEndPoint;
+        }
+
+        return SendPacketImmediately(sendDataDestination ?? this.broadcastEndPoint, packet, important);
+    }
+
+    public async Task SendPacketImmediately(IPEndPoint destination, ArtNetPacket packet, bool important = false)
+    {
+        await SendImmediateAsync(
+            allocatePacketLength: packet.PacketLength,
+            important: important,
+            sendDataFactory: () => new SendData(destination),
+            packetWriter: packet.WriteToBuffer);
+
     }
 
     protected override ValueTask<int> SendPacketAsync(SendData sendData, ReadOnlyMemory<byte> payload)
