@@ -13,17 +13,21 @@ public abstract class ArtNetPacket
 
     protected abstract int DataLength { get; }
 
-    public static ArtNetPacket Parse(ReadOnlyMemory<byte> inputBuffer)
+    public static ArtNetPacket? Parse(ReadOnlyMemory<byte> inputBuffer)
     {
         var reader = new BigEndianBinaryReader(inputBuffer);
 
         string protocol = reader.ReadString(8);
         var opCode = (ArtNetOpCodes)reader.ReadInt16Reverse();
 
+        if ((int)opCode == 0x5090)
+            // DMX4ALL custom packet, ignore
+            return null;
+
         short version = 14;
 
         // For some reason the poll packet header does not include the version
-        if (opCode != ArtNetOpCodes.PollReply)
+        if (opCode != ArtNetOpCodes.PollReply && reader.BytesLeft >= 2)
             version = reader.ReadInt16();
 
         var target = Create(opCode, reader);
