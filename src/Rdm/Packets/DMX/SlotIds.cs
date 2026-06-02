@@ -12,17 +12,17 @@ public enum SlotIds
     Pan = 0x101,
     Tilt = 0x102,
 
-    //Colour Functions
-    ColourWheel = 0x0201,
-    ColourSubCyan = 0x0202,
-    ColourSubYellow = 0x0203,
-    ColourSubMagenta = 0x0204,
-    ColourAddRed = 0x0205,
-    ColourAddGreen = 0x0206,
-    ColourAddBlue = 0x0207,
-    ColourCorrection = 0x0208,
-    ColourScroll = 0x0209,
-    ColourSemaphore = 0x0210,
+    //Color Functions
+    ColorWheel = 0x0201,
+    ColorSubCyan = 0x0202,
+    ColorSubYellow = 0x0203,
+    ColorSubMagenta = 0x0204,
+    ColorAddRed = 0x0205,
+    ColorAddGreen = 0x0206,
+    ColorAddBlue = 0x0207,
+    ColorCorrection = 0x0208,
+    ColorScroll = 0x0209,
+    ColorSemaphore = 0x020A,
 
     //Image Functions
     StaticGoboWheel = 0x0301,

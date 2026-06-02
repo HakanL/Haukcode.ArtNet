@@ -1,5 +1,6 @@
 ﻿using Haukcode.ArtNet.Rdm.Packets.Net;
 using Haukcode.ArtNet.Rdm.Packets.DMX;
+using Haukcode.ArtNet.Rdm.Packets.Dimmer;
 using Haukcode.ArtNet.Rdm.Packets.Product;
 using Haukcode.ArtNet.Rdm.Packets.Parameters;
 using Haukcode.ArtNet.Rdm.Packets.Control;
@@ -8,6 +9,7 @@ using Haukcode.ArtNet.Rdm.Packets.Power;
 using Haukcode.ArtNet.Rdm.Packets.Management;
 using Haukcode.ArtNet.Rdm.Packets.Discovery;
 using Haukcode.ArtNet.Rdm.Packets.Configuration;
+using Haukcode.ArtNet.Rdm.Packets.Sensors;
 
 namespace Haukcode.ArtNet.Rdm;
 
@@ -25,6 +27,20 @@ public static class RdmPacketFactory
         RegisterPowerMessages();
         RegisterConfigurationMessages();
         RegisterControlMessages();
+        RegisterSensorMessages();
+    }
+
+    private static void RegisterSensorMessages()
+    {
+        //SensorDefinition
+        RegisterPacketType(RdmCommands.Get, RdmParameters.SensorDefinition, typeof(SensorDefinition.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SensorDefinition, typeof(SensorDefinition.GetReply));
+
+        //SensorValue
+        RegisterPacketType(RdmCommands.Get, RdmParameters.SensorValue, typeof(SensorValue.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SensorValue, typeof(SensorValue.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.SensorValue, typeof(SensorValue.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.SensorValue, typeof(SensorValue.SetReply));
     }
 
     private static void RegisterDiscoveryMessages()
@@ -518,7 +534,7 @@ public static class RdmPacketFactory
 
     public static bool IsResponse(RdmHeader header)
     {
-        return header.Command == RdmCommands.GetResponse || header.Command != RdmCommands.SetResponse;
+        return header.Command == RdmCommands.GetResponse || header.Command == RdmCommands.SetResponse;
     }
 
     public static RdmPacket? BuildErrorResponse(RdmHeader header)

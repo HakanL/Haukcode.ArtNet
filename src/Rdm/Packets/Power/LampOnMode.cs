@@ -7,7 +7,7 @@
 public class LampOnMode
 {
     /// <summary>
-    /// A list of behaviours for turning the lamp on when the fixture starts.
+    /// A list of behaviors for turning the lamp on when the fixture starts.
     /// </summary>
     public enum LampOnModes
     {

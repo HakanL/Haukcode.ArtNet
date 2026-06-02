@@ -22,7 +22,7 @@ public enum ArtNetOpCodes : ushort
     Rdm = 0x8300,
     RdmSub = 0x8400,
     VideoSetup = 0xa010,
-    Videalette = 0xa020,
+    VideoPalette = 0xa020,
     VideoData = 0xa040,
     MacMaster = 0xf000,
     MacSlave = 0xf100,
@@ -36,7 +36,7 @@ public enum ArtNetOpCodes : ushort
     Media = 0x9000,
     MediaPatch = 0x9100,
     MediaControl = 0x9200,
-    MediaContrlReply = 0x9300,
+    MediaControlReply = 0x9300,
     TimeCode = 0x9700,
     TimeSync = 0x9800,
     [Obsolete("Use Trigger instead of ArtTrigger to match the standard")]

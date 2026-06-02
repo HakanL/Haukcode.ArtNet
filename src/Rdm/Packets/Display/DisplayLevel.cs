@@ -1,4 +1,4 @@
-﻿namespace Haukcode.ArtNet.Rdm.Packets.Configuration;
+namespace Haukcode.ArtNet.Rdm.Packets.Display;
 
 /// <summary>
 /// This parameter is used to retrieve or change the Display Intensity setting.

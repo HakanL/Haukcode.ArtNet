@@ -48,7 +48,7 @@ public class UId : IComparable
         get { return empty; }
     }
 
-    public static UId ManfacturerBroadcast(ushort manufacturerId)
+    public static UId ManufacturerBroadcast(ushort manufacturerId)
     {
         return new UId(manufacturerId, 0xFFFFFFFF);
     }

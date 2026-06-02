@@ -61,7 +61,7 @@ public enum ProductCategories
     //Data
     Data = 0x0800,
     DataDistribution = 0x0801,
-    DataConcersion = 0x0802,
+    DataConversion = 0x0802,
     DataOther = 0x08FF,
 
     //Audio-Visual
@@ -74,14 +74,14 @@ public enum ProductCategories
     Monitor = 0x0A00,
     MonitorACLinePower = 0x0A01,
     MonitorDCLinePower = 0x0A02,
-    MonitorEnviromental = 0x0A03,
+    MonitorEnvironmental = 0x0A03,
     MonitorOther = 0x0AFF,
 
     //Controller / Backup
-    Control = 0x0700,
-    ControlController = 0x0701,
-    ControlBackupDevice = 0x0702,
-    ControlOther = 0x07FF,
+    Control = 0x7000,
+    ControlController = 0x7001,
+    ControlBackupDevice = 0x7002,
+    ControlOther = 0x70FF,
 
     //Test Equipment
     Test = 0x7100,

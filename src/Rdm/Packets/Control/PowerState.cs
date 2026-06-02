@@ -11,7 +11,7 @@ public class PowerState
         Off = 0x0,
         Shutdown = 0x1,
         Standby = 0x2,
-        Normal = 0xffff
+        Normal = 0xFF
     }
 
     public class Get : RdmRequestPacket

@@ -1,4 +1,4 @@
-﻿namespace Haukcode.ArtNet.Rdm.Packets.DMX;
+namespace Haukcode.ArtNet.Rdm.Packets.Control;
 
 public class PresetMergeMode
 {

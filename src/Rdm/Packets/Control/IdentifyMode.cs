@@ -5,7 +5,7 @@
 /// </summary>
 public enum IdentifyModes
 {
-    Quit = 0x0,
+    Quiet = 0x0,
     Loud = 0xFF
 }
 

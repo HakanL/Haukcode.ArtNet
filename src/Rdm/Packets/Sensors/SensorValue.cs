@@ -1,6 +1,6 @@
 ﻿namespace Haukcode.ArtNet.Rdm.Packets.Sensors;
 
-public class SensoreValue
+public class SensorValue
 {
     public class Get : RdmRequestPacket
     {
