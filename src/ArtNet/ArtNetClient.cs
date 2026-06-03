@@ -211,6 +211,26 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         return this.sendSocket.SendToAsync(payload, SocketFlags.None, sendData.Destination!);
     }
 
+    /// <summary>
+    /// Send a packet from the receive (listen) socket, so the datagram's source
+    /// port is the Art-Net port rather than the ephemeral send-socket port.
+    /// Required for vendor request/reply exchanges where the responder replies
+    /// to the request's source port instead of a fixed :6454 (e.g. the DMXking
+    /// LeDMX settings opcode) — otherwise the reply lands on the ephemeral
+    /// socket and is never received. Normal output keeps using the send socket.
+    /// </summary>
+    public async Task SendFromListenSocketAsync(IPEndPoint destination, ArtNetPacket packet)
+    {
+        var socket = this.listenSocket;
+        if (socket == null)
+            return;
+
+        var buffer = new byte[packet.PacketLength];
+        int length = packet.WriteToBuffer(buffer);
+
+        await socket.SendToAsync(new ArraySegment<byte>(buffer, 0, length), SocketFlags.None, destination);
+    }
+
     protected async override ValueTask<(int ReceivedBytes, SocketReceiveMessageFromResult Result)> ReceiveData(
         Memory<byte> memory, CancellationToken cancelToken)
     {
