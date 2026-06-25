@@ -25,7 +25,7 @@ public class DiscoveryUniqueBranch
         /// Lower Bound UID and less than or equal to the Upper Bound UID included in the message‘s parameter 
         /// data, and if it has not been muted through the DISC_MUTE message.
         /// </remarks>
-        public UId LowerBoundId { get; set; }
+        public UId LowerBoundId { get; set; } = null!;
 
         /// <summary>
         /// The end ID for devices uncluded in this discovery.
@@ -35,7 +35,7 @@ public class DiscoveryUniqueBranch
         /// Lower Bound UID and less than or equal to the Upper Bound UID included in the message‘s parameter 
         /// data, and if it has not been muted through the DISC_MUTE message.
         /// </remarks>
-        public UId UpperBoundId { get; set; }
+        public UId UpperBoundId { get; set; } = null!;
 
         #region Read and Write
 
@@ -61,7 +61,7 @@ public class DiscoveryUniqueBranch
         {
         }
 
-        public UId DeviceId { get; set; }
+        public UId DeviceId { get; set; } = null!;
 
         #region Read and Write
 

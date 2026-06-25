@@ -65,7 +65,7 @@ public class DiscoveryMute
         /// 
         /// This Binding UID field allows the controller to associate multiple responder ports discovered within a single physical device.
         /// </remarks>
-        public UId BindingId { get; set; }
+        public UId BindingId { get; set; } = null!;
 
         #region Read and Write
 

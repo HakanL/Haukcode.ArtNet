@@ -33,7 +33,7 @@ public class DeviceLabel
         {
         }
 
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -53,7 +53,7 @@ public class DeviceLabel
         {
         }
 
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         #region Read and Write
 

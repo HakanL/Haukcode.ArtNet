@@ -38,7 +38,7 @@ public class Language
         {
         }       
 
-        public CultureInfo Language { get; set; }
+        public CultureInfo Language { get; set; } = null!;
 
         #region Read and Write
 
@@ -62,7 +62,7 @@ public class Language
         {
         }
 
-        public CultureInfo Language { get; set; }
+        public CultureInfo Language { get; set; } = null!;
 
         #region Read and Write
 

@@ -44,7 +44,7 @@ public class StatusIdDescription
         /// <summary>
         /// The description for the requested status.
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         #region Read and Write
 

@@ -150,7 +150,7 @@ public class SensorDefinition
 
         public byte RecordValueSupport { get; set; }
 
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         #region Read and Write
 

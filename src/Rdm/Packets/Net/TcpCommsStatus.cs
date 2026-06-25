@@ -27,7 +27,7 @@ public class TcpCommsStatus
         {
         }
 
-        public IPAddress CurrentConnectionIP { get; set; }
+        public IPAddress CurrentConnectionIP { get; set; } = null!;
 
         public short UnhealthyTCPEvents { get; set; }
 

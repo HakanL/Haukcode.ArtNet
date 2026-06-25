@@ -498,7 +498,7 @@ public static class RdmPacketFactory
         packetStore[key] = packetType;
     }
 
-    public static RdmPacket Build(RdmHeader header)
+    public static RdmPacket? Build(RdmHeader header)
     {
         if (IsErrorResponse(header))
         {
@@ -507,8 +507,7 @@ public static class RdmPacketFactory
         }
         else
         {
-            Type packetType;
-            if (packetStore.TryGetValue(new PacketKey(header.Command, header.ParameterId), out packetType))
+            if (packetStore.TryGetValue(new PacketKey(header.Command, header.ParameterId), out Type? packetType))
             {
                 return RdmPacket.Create(header, packetType);
             }

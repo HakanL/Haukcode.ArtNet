@@ -31,7 +31,7 @@ public class EndpointLabel
 
         public short EndpointID { get; set; }
 
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -55,7 +55,7 @@ public class EndpointLabel
 
         public short EndpointID { get; set; }
 
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {

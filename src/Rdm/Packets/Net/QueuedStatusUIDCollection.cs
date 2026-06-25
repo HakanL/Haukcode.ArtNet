@@ -13,7 +13,7 @@ public class QueuedStatusUIDCollection
 
         public short EndpointID { get; set; }
 
-        public UId TargetUID { get; set; }
+        public UId TargetUID { get; set; } = null!;
 
         public StatusTypes StatusType { get; set; }
 

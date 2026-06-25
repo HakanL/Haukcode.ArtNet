@@ -34,7 +34,7 @@ public class ManufacturerLabel
         {
         }
 
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         #region Read and Write
         

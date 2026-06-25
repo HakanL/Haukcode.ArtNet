@@ -34,7 +34,7 @@ public class BootSoftwareVersionLabel
         {
         }
 
-        public string VersionLabel { get; set; }
+        public string VersionLabel { get; set; } = null!;
 
         #region Read and Write
 

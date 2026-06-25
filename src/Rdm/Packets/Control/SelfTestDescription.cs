@@ -39,7 +39,7 @@ public class SelfTestDescription
 
         public byte TestNumber { get; set; }
 
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         #region Read and Write
 

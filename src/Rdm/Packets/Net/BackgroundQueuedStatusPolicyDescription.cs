@@ -31,7 +31,7 @@ public class BackgroundQueuedStatusPolicyDescription
 
         public byte PolicyID { get; set; }
 
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {

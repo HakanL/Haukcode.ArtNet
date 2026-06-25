@@ -13,7 +13,7 @@ public class RdmRawPacket : RdmPacket
     }
 
 
-    public byte[] Data { get; set; }
+    public byte[] Data { get; set; } = null!;
 
     #region Read and Write
 

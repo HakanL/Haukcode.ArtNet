@@ -108,7 +108,7 @@ public class ParameterDescription
         /// The Description field is used to describe the function of the specified PID. This text field shall be
         /// variable up to 32 characters in length.
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {
