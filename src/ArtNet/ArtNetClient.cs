@@ -231,13 +231,19 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         await socket.SendToAsync(new ArraySegment<byte>(buffer, 0, length), SocketFlags.None, destination);
     }
 
-    protected async override ValueTask<(int ReceivedBytes, SocketReceiveMessageFromResult Result)> ReceiveData(
-        Memory<byte> memory, CancellationToken cancelToken)
+    protected override int ReceiveData(Memory<byte> memory, out IPEndPoint? remoteEndPoint, out IPAddress? destinationAddress)
     {
-        var result =
-            await this.listenSocket!.ReceiveMessageFromAsync(memory, SocketFlags.None, _blankEndpoint, cancelToken);
+        if (!System.Runtime.InteropServices.MemoryMarshal.TryGetArray<byte>(memory, out var segment))
+            throw new InvalidOperationException("Expected an array-backed receive buffer");
 
-        return (result.ReceivedBytes, result);
+        var socketFlags = SocketFlags.None;
+        EndPoint endPoint = _blankEndpoint;
+        int receivedBytes = this.listenSocket!.ReceiveMessageFrom(segment.Array!, segment.Offset, segment.Count, ref socketFlags, ref endPoint, out IPPacketInformation packetInformation);
+
+        remoteEndPoint = endPoint as IPEndPoint;
+        destinationAddress = packetInformation.Address;
+
+        return receivedBytes;
     }
 
     public int? ActualReceiveBufferSize
