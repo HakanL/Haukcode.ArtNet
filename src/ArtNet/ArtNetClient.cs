@@ -206,9 +206,12 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     }
 
-    protected override ValueTask<int> SendPacketAsync(SendData sendData, ReadOnlyMemory<byte> payload)
+    protected override int SendPacket(SendData sendData, ReadOnlyMemory<byte> payload)
     {
-        return this.sendSocket.SendToAsync(payload, SocketFlags.None, sendData.Destination!);
+        if (!System.Runtime.InteropServices.MemoryMarshal.TryGetArray(payload, out var segment))
+            throw new InvalidOperationException("Expected an array-backed send buffer");
+
+        return this.sendSocket.SendTo(segment.Array!, segment.Offset, segment.Count, SocketFlags.None, sendData.Destination!);
     }
 
     /// <summary>
