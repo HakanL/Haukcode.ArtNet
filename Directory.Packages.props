@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
-	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-	<PackageVersion Include="Haukcode.HighPerfComm" Version="1.0.34" />
-	<PackageVersion Include="Haukcode.Network" Version="1.0.27" />
+    <PackageVersion Include="Haukcode.HighPerfComm" Version="1.0.37" />
+    <PackageVersion Include="Haukcode.Network" Version="1.0.29" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35521.163
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11925.98 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "..\Samples\Samples.csproj", "{695B172A-8C82-4B7F-9C67-D2BB195CF024}"
 EndProject
@@ -14,6 +14,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet.Package", "Package\Haukcode.ArtNet.Package.csproj", "{A8CDD1B6-D1C3-416F-94B5-16E9E98E8038}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Haukcode.ArtNet-Debug", "ArtNet\Haukcode.ArtNet-Debug.csproj", "{63A4E08C-79A7-E9FA-3DC3-C6A88CEF595D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2AF32FAD-A49E-4486-A4A9-7A6DC8BAD512}"
+	ProjectSection(SolutionItems) = preProject
+		..\Directory.Packages.props = ..\Directory.Packages.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
