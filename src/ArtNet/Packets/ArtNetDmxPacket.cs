@@ -13,7 +13,7 @@ public class ArtNetDmxPacket : ArtNetPacket
 
     public short Universe { get; set; }
 
-    public byte[] DmxData { get; set; } = null!;
+    public ReadOnlyMemory<byte> DmxData { get; set; }
 
     protected override int DataLength => 6 + DmxData.Length;
 
@@ -27,7 +27,9 @@ public class ArtNetDmxPacket : ArtNetPacket
         };
 
         int length = reader.ReadInt16();
-        target.DmxData = reader.ReadBytes(length);
+        // Zero-copy slice over the receive buffer instead of ReadBytes().ToArray(); the
+        // consumer copies it into a pooled buffer synchronously before the buffer is reused.
+        target.DmxData = reader.ReadSlice(length);
 
         return target;
     }
