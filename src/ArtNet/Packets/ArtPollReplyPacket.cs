@@ -216,19 +216,28 @@ public class ArtPollReplyPacket : ArtNetPacket
         target.AcnPriority = reader.ReadByte();
         target.SwMacro = reader.ReadByte();
         target.SwRemote = reader.ReadByte();
-        
-        reader.SkipBytes(3);
-        
-        target.Style = reader.ReadByte();
-        target.MacAddress = reader.ReadBytes(6);
-        target.BindIpAddress = reader.ReadBytes(4);
-        target.BindIndex = reader.ReadByte();
-        target.Status2 = reader.ReadByte();
-        target.GoodOutputB = reader.ReadBytes(4);
-        target.Status3 = reader.ReadByte();
-        target.RespUID = reader.ReadBytes(6);
 
-        reader.SkipBytes(15);
+        reader.SkipBytes(3);
+
+        // The fields below were added over successive revisions of the Art-Net spec
+        // (BindIp/Status2 in Art-Net 3, GoodOutputB/Status3/RespUID in Art-Net 4).
+        // Legacy nodes send shorter replies, so stop cleanly when the packet ends.
+        if (reader.BytesLeft >= 1)
+            target.Style = reader.ReadByte();
+        if (reader.BytesLeft >= 6)
+            target.MacAddress = reader.ReadBytes(6);
+        if (reader.BytesLeft >= 4)
+            target.BindIpAddress = reader.ReadBytes(4);
+        if (reader.BytesLeft >= 1)
+            target.BindIndex = reader.ReadByte();
+        if (reader.BytesLeft >= 1)
+            target.Status2 = reader.ReadByte();
+        if (reader.BytesLeft >= 4)
+            target.GoodOutputB = reader.ReadBytes(4);
+        if (reader.BytesLeft >= 1)
+            target.Status3 = reader.ReadByte();
+        if (reader.BytesLeft >= 6)
+            target.RespUID = reader.ReadBytes(6);
 
         return target;
     }
