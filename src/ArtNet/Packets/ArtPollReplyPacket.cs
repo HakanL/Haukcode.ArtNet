@@ -239,6 +239,10 @@ public class ArtPollReplyPacket : ArtNetPacket
         if (reader.BytesLeft >= 6)
             target.RespUID = reader.ReadBytes(6);
 
+        // Consume the trailing filler (15 spare bytes in a full-length packet, or
+        // whatever a nonstandard node appended) so the datagram is fully read.
+        reader.SkipBytes(reader.BytesLeft);
+
         return target;
     }
 

@@ -32,7 +32,11 @@ public abstract class ArtNetPacket
 
         var target = Create(opCode, reader);
 
-        Debug.Assert(target.PacketLength == reader.BytesRead);
+        // ArtPollReply is allowed to be shorter than the current-spec PacketLength
+        // (legacy nodes omit the newer trailing fields); it consumes the whole
+        // datagram instead, so full consumption is the check there.
+        Debug.Assert(target.PacketLength == reader.BytesRead ||
+            (target is ArtPollReplyPacket && reader.BytesLeft == 0));
 
         return target;
     }
