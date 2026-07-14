@@ -164,7 +164,20 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         await QueuePacket(
             allocatePacketLength: packet.PacketLength,
             important: important,
-            sendDataFactory: () => new SendData(destination),
+            sendDataFactory: () =>
+            {
+                // Reuse a spent send-data object returned by the sender instead of allocating a
+                // new one for every queued packet. Every field is rewritten before use.
+                var pooledSendData = RentSendData();
+                if (pooledSendData != null)
+                {
+                    pooledSendData.Destination = destination;
+
+                    return pooledSendData;
+                }
+
+                return new SendData(destination);
+            },
             packetWriter: packet.WriteToBuffer);
     }
 
