@@ -8,8 +8,9 @@ public class ArtNetRdmClient : ArtNetClient
         Func<Haukcode.ArtNet.Internal.ReceiveDataPacket, Task>? channelWriter = null,
         Action? channelWriterComplete = null,
         int port = DefaultPort,
-        UId? rdmId = null)
-        : base(localAddress, localSubnetMask, channelWriter, channelWriterComplete, port, rdmId)
+        UId? rdmId = null,
+        int senderCount = 1)
+        : base(localAddress, localSubnetMask, channelWriter, channelWriterComplete, port, rdmId, senderCount)
     {
     }
 

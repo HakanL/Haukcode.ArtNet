@@ -1,4 +1,4 @@
-using Haukcode.ArtNet.Packets;
+﻿using Haukcode.ArtNet.Packets;
 
 namespace Haukcode.ArtNet;
 
@@ -8,9 +8,17 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     {
         public IPEndPoint? Destination { get; set; }
 
+        /// <summary>
+        /// The destination pre-serialized once. Socket.SendTo(..., EndPoint) re-serializes the
+        /// EndPoint into a fresh SocketAddress on every call; handing it an already-serialized one
+        /// removes that work and the last per-packet allocations.
+        /// </summary>
+        public SocketAddress? DestinationAddress { get; set; }
+
         public SendData(IPEndPoint destination)
         {
             Destination = destination;
+            DestinationAddress = destination.Serialize();
         }
     }
 
@@ -20,21 +28,36 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     private static readonly IPEndPoint _blankEndpoint = new(IPAddress.Any, 0);
 
     private Socket? listenSocket;
-    private readonly Socket sendSocket;
+
+    // One send socket per sender shard. Several threads sharing one UDP socket serialize on the
+    // kernel's socket lock, which gives back most of the gain from sharding.
+    private readonly Socket[] sendSockets;
+
     private readonly IPEndPoint localEndPoint;
     private readonly IPEndPoint broadcastEndPoint;
     private readonly Dictionary<ushort, byte> sequenceIds = [];
     private readonly object lockObject = new();
     private readonly Dictionary<IPAddress, IPEndPoint> endPointCache = [];
 
+    // Serialized destinations, so the hot path never re-serializes an IPEndPoint. Only touched from
+    // the single queue-writer thread (the send-data factory).
+    private readonly Dictionary<IPEndPoint, SocketAddress> socketAddressCache = [];
+
+    /// <param name="senderCount">
+    /// Number of sender threads/sockets, sharded by universe id. Art-Net is per-universe just like
+    /// sACN — 600 universes is 600 packets a frame whether they are unicast, broadcast or
+    /// multicast — and a single sender thread saturates a core at roughly 24,000 packets/sec.
+    /// Default 1 = the original behavior.
+    /// </param>
     public ArtNetClient(
         IPAddress localAddress,
         IPAddress localSubnetMask,
         Func<Internal.ReceiveDataPacket, Task>? channelWriter = null,
         Action? channelWriterComplete = null,
         int port = DefaultPort,
-        UId? rdmId = null)
-        : base(ArtNetPacket.MAX_PACKET_SIZE, channelWriter, channelWriterComplete)
+        UId? rdmId = null,
+        int senderCount = 1)
+        : base(ArtNetPacket.MAX_PACKET_SIZE, channelWriter, channelWriterComplete, senderCount)
     {
         RdmId = rdmId ?? UId.Empty;
 
@@ -42,20 +65,41 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         this.broadcastEndPoint =
             new IPEndPoint(Haukcode.Network.Utils.GetBroadcastAddress(localAddress, localSubnetMask), port);
 
-        this.sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        this.sendSocket.SendBufferSize = SendBufferSize;
+        this.sendSockets = new Socket[SenderCount];
+        for (int i = 0; i < SenderCount; i++)
+        {
+            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.SendBufferSize = SendBufferSize;
 
-        Haukcode.Network.Utils.SetSocketOptions(this.sendSocket);
+            Haukcode.Network.Utils.SetSocketOptions(socket);
 
-        this.sendSocket.DontFragment = true;
-        this.sendSocket.EnableBroadcast = true;
+            socket.DontFragment = true;
+            socket.EnableBroadcast = true;
 
-        // Bind to the local interface
-        this.sendSocket.Bind(new IPEndPoint(localAddress, 0));
+            // Bind to the local interface (ephemeral port)
+            socket.Bind(new IPEndPoint(localAddress, 0));
 
-        this.sendSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+
+            this.sendSockets[i] = socket;
+        }
 
         StartReceive();
+    }
+
+    /// <summary>
+    /// Serialized form of a destination, cached. Called from the send-data factory on the single
+    /// queue-writer thread.
+    /// </summary>
+    private SocketAddress GetSocketAddress(IPEndPoint endPoint)
+    {
+        if (!this.socketAddressCache.TryGetValue(endPoint, out var socketAddress))
+        {
+            socketAddress = endPoint.Serialize();
+            this.socketAddressCache.Add(endPoint, socketAddress);
+        }
+
+        return socketAddress;
     }
 
     /// <summary>
@@ -94,7 +138,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
             Sequence = sequenceId
         };
 
-        return QueuePacketForSending(address, packet, important);
+        return QueuePacketForSending(address, packet, important, shardKey: universeId);
     }
 
     /// <summary>
@@ -108,7 +152,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
         var packet = new ArtSyncPacket();
 
-        return QueuePacketForSending(address, packet, true);
+        return QueueSyncPacketForSending(ResolveDestination(address), packet);
     }
 
     private byte GetNewSequenceId(ushort universeId)
@@ -131,7 +175,12 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// <param name="destination">Destination</param>
     /// <param name="packet">Packet</param>
     /// <param name="important">Important</param>
-    public Task QueuePacketForSending(IPAddress? destination, ArtNetPacket packet, bool important = false)
+    public Task QueuePacketForSending(IPAddress? destination, ArtNetPacket packet, bool important = false, int shardKey = 0)
+    {
+        return QueuePacketForSending(ResolveDestination(destination), packet, important, shardKey);
+    }
+
+    private IPEndPoint ResolveDestination(IPAddress? destination)
     {
         IPEndPoint? sendDataDestination = null;
 
@@ -150,7 +199,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
                 sendDataDestination = ipEndPoint;
         }
 
-        return QueuePacketForSending(sendDataDestination ?? this.broadcastEndPoint, packet, important);
+        return sendDataDestination ?? this.broadcastEndPoint;
     }
 
     /// <summary>
@@ -159,26 +208,49 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// <param name="destination">Destination</param>
     /// <param name="packet">Packet</param>
     /// <param name="important">Important</param>
-    public async Task QueuePacketForSending(IPEndPoint destination, ArtNetPacket packet, bool important = false)
+    public async Task QueuePacketForSending(IPEndPoint destination, ArtNetPacket packet, bool important = false, int shardKey = 0)
     {
         await QueuePacket(
             allocatePacketLength: packet.PacketLength,
             important: important,
-            sendDataFactory: () =>
-            {
-                // Reuse a spent send-data object returned by the sender instead of allocating a
-                // new one for every queued packet. Every field is rewritten before use.
-                var pooledSendData = RentSendData();
-                if (pooledSendData != null)
-                {
-                    pooledSendData.Destination = destination;
+            sendDataFactory: CreateSendData(destination),
+            packetWriter: packet.WriteToBuffer,
+            // Shard by universe: every packet for a universe goes out on the same thread and
+            // socket, so its Art-Net sequence numbers stay ordered on the wire.
+            shardKey: shardKey);
+    }
 
-                    return pooledSendData;
-                }
-
-                return new SendData(destination);
-            },
+    /// <summary>
+    /// Queue an ArtSync. It must follow every DMX frame it synchronizes, so with more than one
+    /// sender shard it goes out as an ordering barrier — otherwise it could be transmitted while a
+    /// slower shard still had that frame's DMX pending, silently breaking synchronization.
+    /// </summary>
+    private async Task QueueSyncPacketForSending(IPEndPoint destination, ArtNetPacket packet)
+    {
+        await QueueBarrierPacket(
+            allocatePacketLength: packet.PacketLength,
+            sendDataFactory: CreateSendData(destination),
             packetWriter: packet.WriteToBuffer);
+    }
+
+    private Func<SendData> CreateSendData(IPEndPoint destination)
+    {
+        return () =>
+        {
+            // Reuse a spent send-data object returned by the sender instead of allocating a
+            // new one for every queued packet. Every field is rewritten before use.
+            var pooledSendData = RentSendData();
+            if (pooledSendData != null)
+            {
+                pooledSendData.Destination = destination;
+                pooledSendData.DestinationAddress = GetSocketAddress(destination);
+
+                return pooledSendData;
+            }
+
+            // Pool empty (startup only) — the constructor serializes the destination itself.
+            return new SendData(destination);
+        };
     }
 
     /// <summary>
@@ -224,10 +296,9 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     // per-universe fan-out that makes sharding pay off for sACN.
     protected override int SendPacket(SendData sendData, ReadOnlyMemory<byte> payload, int senderIndex)
     {
-        if (!System.Runtime.InteropServices.MemoryMarshal.TryGetArray(payload, out var segment))
-            throw new InvalidOperationException("Expected an array-backed send buffer");
-
-        return this.sendSocket.SendTo(segment.Array!, segment.Offset, segment.Count, SocketFlags.None, sendData.Destination!);
+        // SendTo(..., SocketAddress) with a pre-serialized destination: the EndPoint overload
+        // re-serializes into a fresh SocketAddress on every call.
+        return this.sendSockets[senderIndex].SendTo(payload.Span, SocketFlags.None, sendData.DestinationAddress!);
     }
 
     /// <summary>
@@ -344,16 +415,19 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
         if (disposing)
         {
-            try
+            foreach (var socket in this.sendSockets)
             {
-                this.sendSocket.Shutdown(SocketShutdown.Both);
-            }
-            catch
-            {
-            }
+                try
+                {
+                    socket.Shutdown(SocketShutdown.Both);
+                }
+                catch
+                {
+                }
 
-            this.sendSocket.Close();
-            this.sendSocket.Dispose();
+                socket.Close();
+                socket.Dispose();
+            }
         }
     }
 }
