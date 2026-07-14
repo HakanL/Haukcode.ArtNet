@@ -219,7 +219,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     }
 
-    protected override int SendPacket(SendData sendData, ReadOnlyMemory<byte> payload)
+    // Single sender shard (the base class default), so senderIndex is always 0. Art-Net is
+    // unicast/broadcast rather than a multicast group per universe, so it has none of the
+    // per-universe fan-out that makes sharding pay off for sACN.
+    protected override int SendPacket(SendData sendData, ReadOnlyMemory<byte> payload, int senderIndex)
     {
         if (!System.Runtime.InteropServices.MemoryMarshal.TryGetArray(payload, out var segment))
             throw new InvalidOperationException("Expected an array-backed send buffer");
