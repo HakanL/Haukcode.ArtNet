@@ -35,9 +35,28 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     private readonly IPEndPoint localEndPoint;
     private readonly IPEndPoint broadcastEndPoint;
-    private readonly Dictionary<ushort, byte> sequenceIds = [];
-    private readonly object lockObject = new();
+
+    // Per-universe Art-Net sequence counters, indexed by universe id. Written only from the
+    // single send/scheduler thread on the hot path — one increment per universe per packet —
+    // so a plain array replaces the previous locked dictionary (the same lock + lookup was a
+    // measured hot spot on the sACN client at high universe counts). A receiver tolerates an
+    // occasional sequence discontinuity, so even a benign race here would be harmless.
+    private readonly byte[] sequenceIds = new byte[ushort.MaxValue + 1];
     private readonly Dictionary<IPAddress, IPEndPoint> endPointCache = [];
+
+    // Reused across SendDmxData calls instead of allocating a fresh ArtNetDmxPacket per packet.
+    // Reconfigured in place and serialized synchronously inside QueuePacket before the next
+    // call, so a single instance is safe on the single-threaded send path.
+    private readonly ArtNetDmxPacket scratchDmxPacket = new();
+    private readonly Func<Memory<byte>, int> scratchDmxPacketWriter;
+
+    // Argument for the cached send-data factory below. QueuePacket invokes the factory
+    // synchronously before its first await on the single queue-writer thread (the same
+    // assumption the non-locked caches here already rest on), so passing the per-packet
+    // destination through a field lets one cached delegate replace a fresh closure per packet
+    // on the DMX hot path. The general/sync paths keep their closures (rare).
+    private IPEndPoint? pendingDestination;
+    private readonly Func<SendData> pendingSendDataFactory;
 
     // Serialized destinations, so the hot path never re-serializes an IPEndPoint. Only touched from
     // the single queue-writer thread (the send-data factory).
@@ -60,6 +79,9 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         : base(ArtNetPacket.MAX_PACKET_SIZE, channelWriter, channelWriterComplete, senderCount)
     {
         RdmId = rdmId ?? UId.Empty;
+
+        this.scratchDmxPacketWriter = this.scratchDmxPacket.WriteToBuffer;
+        this.pendingSendDataFactory = BuildPendingSendData;
 
         this.localEndPoint = new IPEndPoint(localAddress, port);
         this.broadcastEndPoint =
@@ -131,15 +153,32 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
         byte sequenceId = GetNewSequenceId(universeId);
 
-        var packet = new ArtNetDmxPacket
-        {
-            DmxData = dmxData.ToArray(),
-            Universe = (short)(universeId - 1),
-            Sequence = sequenceId
-        };
+        // Reconfigure the reused scratch packet in place instead of allocating a packet per
+        // send. The DMX memory is referenced, not copied — QueuePacket serializes it into the
+        // send buffer synchronously, so the caller's buffer lifetime is honored (this used to
+        // be dmxData.ToArray(), a full per-packet copy on the hot path).
+        this.scratchDmxPacket.DmxData = dmxData;
+        this.scratchDmxPacket.Universe = (short)(universeId - 1);
+        this.scratchDmxPacket.Sequence = sequenceId;
 
-        return QueuePacketForSending(address, packet, important, shardKey: universeId);
+        return QueueScratchDmxPacket(address, important, shardKey: universeId);
     }
+
+    private async Task QueueScratchDmxPacket(IPAddress? destination, bool important, int shardKey)
+    {
+        this.pendingDestination = ResolveDestination(destination);
+
+        await QueuePacket(
+            allocatePacketLength: this.scratchDmxPacket.PacketLength,
+            important: important,
+            sendDataFactory: this.pendingSendDataFactory,
+            packetWriter: this.scratchDmxPacketWriter,
+            // Shard by universe: every packet for a universe goes out on the same thread and
+            // socket, so its Art-Net sequence numbers stay ordered on the wire.
+            shardKey: shardKey);
+    }
+
+    private SendData BuildPendingSendData() => BuildSendData(this.pendingDestination!);
 
     /// <summary>
     /// Send sync
@@ -157,16 +196,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     private byte GetNewSequenceId(ushort universeId)
     {
-        lock (this.lockObject)
-        {
-            this.sequenceIds.TryGetValue(universeId, out byte sequenceId);
-
-            sequenceId++;
-
-            this.sequenceIds[universeId] = sequenceId;
-
-            return sequenceId;
-        }
+        return unchecked(++this.sequenceIds[universeId]);
     }
 
     /// <summary>
@@ -235,22 +265,24 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     private Func<SendData> CreateSendData(IPEndPoint destination)
     {
-        return () =>
+        return () => BuildSendData(destination);
+    }
+
+    private SendData BuildSendData(IPEndPoint destination)
+    {
+        // Reuse a spent send-data object returned by the sender instead of allocating a
+        // new one for every queued packet. Every field is rewritten before use.
+        var pooledSendData = RentSendData();
+        if (pooledSendData != null)
         {
-            // Reuse a spent send-data object returned by the sender instead of allocating a
-            // new one for every queued packet. Every field is rewritten before use.
-            var pooledSendData = RentSendData();
-            if (pooledSendData != null)
-            {
-                pooledSendData.Destination = destination;
-                pooledSendData.DestinationAddress = GetSocketAddress(destination);
+            pooledSendData.Destination = destination;
+            pooledSendData.DestinationAddress = GetSocketAddress(destination);
 
-                return pooledSendData;
-            }
+            return pooledSendData;
+        }
 
-            // Pool empty (startup only) — the constructor serializes the destination itself.
-            return new SendData(destination);
-        };
+        // Pool empty (startup only) — the constructor serializes the destination itself.
+        return new SendData(destination);
     }
 
     /// <summary>
