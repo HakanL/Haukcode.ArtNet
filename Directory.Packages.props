@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Haukcode.HighPerfComm" Version="1.0.39" />
+    <PackageVersion Include="Haukcode.HighPerfComm" Version="1.0.40" />
     <PackageVersion Include="Haukcode.Network" Version="1.0.29" />
   </ItemGroup>
 </Project>
