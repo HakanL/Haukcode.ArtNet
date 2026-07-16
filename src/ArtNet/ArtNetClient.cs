@@ -29,15 +29,16 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     private Socket? listenSocket;
 
-    // Kernel receive timestamping (Linux): packets are stamped on arrival in the network
-    // stack instead of when user space reads them, so recorded timing stays wire-accurate
+    // Kernel receive timestamping: packets are stamped on arrival in the network stack
+    // instead of when user space reads them, so recorded timing stays wire-accurate
     // even when datagrams wait in the socket buffer. Null = portable path with user-space
     // timestamps.
-    private HighPerfComm.LinuxReceiveTimestamping? timestampedReceiver;
+    private HighPerfComm.IReceiveTimestamping? timestampedReceiver;
 
     /// <summary>
-    /// True when packets are being stamped by the kernel on arrival (Linux) rather than by
-    /// user space when the receive loop reads them.
+    /// True when packets are being stamped by the kernel on arrival (Linux SO_TIMESTAMPNS,
+    /// Windows SIO_TIMESTAMPING, macOS SO_TIMESTAMP) rather than by user space when the
+    /// receive loop reads them.
     /// </summary>
     public bool KernelReceiveTimestampsActive => this.timestampedReceiver != null;
 
@@ -410,9 +411,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         // Linux wants IPAddress.Any to get all types of packets (unicast/multicast/broadcast)
         this.listenSocket.Bind(new IPEndPoint(IPAddress.Any, this.localEndPoint.Port));
 
-        // Kernel arrival timestamps where the platform offers them (currently Linux); falls
-        // back to user-space timestamping in the receive loop everywhere else
-        this.timestampedReceiver = HighPerfComm.LinuxReceiveTimestamping.TryCreate(this.listenSocket);
+        // Kernel arrival timestamps where the platform offers them (Linux, Windows when the
+        // adapter has software timestamping enabled, macOS); falls back to user-space
+        // timestamping in the receive loop everywhere else
+        this.timestampedReceiver = HighPerfComm.ReceiveTimestamping.TryCreate(this.listenSocket);
     }
 
     protected override void DisposeReceiveSocket()
