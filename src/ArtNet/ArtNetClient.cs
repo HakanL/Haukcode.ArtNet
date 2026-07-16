@@ -29,6 +29,18 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     private Socket? listenSocket;
 
+    // Kernel receive timestamping (Linux): packets are stamped on arrival in the network
+    // stack instead of when user space reads them, so recorded timing stays wire-accurate
+    // even when datagrams wait in the socket buffer. Null = portable path with user-space
+    // timestamps.
+    private HighPerfComm.LinuxReceiveTimestamping? timestampedReceiver;
+
+    /// <summary>
+    /// True when packets are being stamped by the kernel on arrival (Linux) rather than by
+    /// user space when the receive loop reads them.
+    /// </summary>
+    public bool KernelReceiveTimestampsActive => this.timestampedReceiver != null;
+
     // One send socket per sender shard. Several threads sharing one UDP socket serialize on the
     // kernel's socket lock, which gives back most of the gain from sharding.
     private readonly Socket[] sendSockets;
@@ -358,6 +370,14 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         if (!System.Runtime.InteropServices.MemoryMarshal.TryGetArray<byte>(memory, out var segment))
             throw new InvalidOperationException("Expected an array-backed receive buffer");
 
+        if (this.timestampedReceiver != null)
+        {
+            int received = this.timestampedReceiver.Receive(segment, out remoteEndPoint, out destinationAddress, out long kernelTimestampNS);
+            KernelReceiveTimestampNS = kernelTimestampNS;
+
+            return received;
+        }
+
         var socketFlags = SocketFlags.None;
         EndPoint endPoint = _blankEndpoint;
         int receivedBytes = this.listenSocket!.ReceiveMessageFrom(segment.Array!, segment.Offset, segment.Count, ref socketFlags, ref endPoint, out IPPacketInformation packetInformation);
@@ -389,6 +409,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
         // Linux wants IPAddress.Any to get all types of packets (unicast/multicast/broadcast)
         this.listenSocket.Bind(new IPEndPoint(IPAddress.Any, this.localEndPoint.Port));
+
+        // Kernel arrival timestamps where the platform offers them (currently Linux); falls
+        // back to user-space timestamping in the receive loop everywhere else
+        this.timestampedReceiver = HighPerfComm.LinuxReceiveTimestamping.TryCreate(this.listenSocket);
     }
 
     protected override void DisposeReceiveSocket()
@@ -404,6 +428,8 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         this.listenSocket?.Close();
         this.listenSocket?.Dispose();
         this.listenSocket = null;
+
+        this.timestampedReceiver = null;
     }
 
     protected override Internal.ReceiveDataPacket? TryParseObject(ReadOnlyMemory<byte> buffer, double timestampMS,
