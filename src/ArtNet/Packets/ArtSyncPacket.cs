@@ -13,10 +13,15 @@ public class ArtSyncPacket : ArtNetPacket
 
     internal static ArtSyncPacket Parse(BigEndianBinaryReader reader)
     {
-        var target = new ArtSyncPacket
-        {
-            Aux = reader.ReadInt16Reverse()
-        };
+        var target = new ArtSyncPacket();
+
+        // The spec defines Aux1/Aux2 as "transmitted as zero" spare bytes, and some
+        // controllers omit them entirely (12-byte ArtSync). Treat them as optional
+        // instead of throwing on every sync frame from such a sender.
+        if (reader.BytesLeft >= 2)
+            target.Aux = reader.ReadInt16Reverse();
+        else
+            reader.SkipBytes(reader.BytesLeft);
 
         return target;
     }
