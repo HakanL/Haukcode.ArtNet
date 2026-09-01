@@ -33,11 +33,11 @@ public abstract class ArtNetPacket
         var target = Create(opCode, reader);
 
         // ArtPollReply is allowed to be shorter than the current-spec PacketLength
-        // (legacy nodes omit the newer trailing fields), and ArtSync may omit its
-        // spare Aux bytes; those consume the whole datagram instead, so full
-        // consumption is the check there.
+        // (legacy nodes omit the newer trailing fields), ArtSync may omit its
+        // spare Aux bytes, and ArtTimeCode senders may pad the datagram; those
+        // consume the whole datagram instead, so full consumption is the check there.
         Debug.Assert(target.PacketLength == reader.BytesRead ||
-            (target is ArtPollReplyPacket or ArtSyncPacket && reader.BytesLeft == 0));
+            (target is ArtPollReplyPacket or ArtSyncPacket or ArtTimeCodePacket && reader.BytesLeft == 0));
 
         return target;
     }
@@ -136,6 +136,9 @@ public abstract class ArtNetPacket
 
             case ArtNetOpCodes.Input:
                 return ArtInputPacket.Parse(reader);
+
+            case ArtNetOpCodes.TimeCode:
+                return ArtTimeCodePacket.Parse(reader);
 
             default:
                 return ArtNetUnknownPacket.Parse((short)opCode, reader);

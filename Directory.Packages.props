@@ -5,5 +5,8 @@
   <ItemGroup>
     <PackageVersion Include="Haukcode.HighPerfComm" Version="1.0.44" />
     <PackageVersion Include="Haukcode.Network" Version="1.0.29" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.3.3" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.3.3" />
   </ItemGroup>
 </Project>

@@ -46,6 +46,25 @@ public enum ArtNetOpCodes : ushort
     DirectoryReply = 0x9b00
 }
 
+/// <summary>
+/// ArtTimeCode <c>Type</c> field (Art-Net spec). Frame rate of the
+/// transported SMPTE time.
+/// </summary>
+public enum ArtTimeCodeTypes : byte
+{
+    /// <summary>Film — 24 fps.</summary>
+    Film = 0,
+
+    /// <summary>EBU — 25 fps.</summary>
+    Ebu = 1,
+
+    /// <summary>Drop frame — 29.97 fps.</summary>
+    DropFrame = 2,
+
+    /// <summary>SMPTE — 30 fps.</summary>
+    Smpte = 3
+}
+
 public enum ArtNetStyles
 {
     StNode = 0x00,
