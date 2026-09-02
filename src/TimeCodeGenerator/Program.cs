@@ -93,12 +93,34 @@ public static class Program
             socket.SendTo(buffer.AsSpan(0, length), SocketFlags.None, destination);
         }
 
+        IReadOnlyList<ScriptStep>? script = null;
+        if (options.Script != null)
+        {
+            try
+            {
+                script = GeneratorScript.Parse(options.Script, options.Type);
+            }
+            catch (OptionException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                return 2;
+            }
+        }
+
         using var generator = new ArtTimeCodeGenerator(start, options.StreamId, Send)
         {
             JitterMs = options.JitterMs,
             DropPercent = options.DropPercent,
-            Paused = options.Stopped
+            Paused = options.Stopped,
+            Hold = options.Hold
         };
+
+        ScriptRunner? scriptRunner = null;
+        if (script != null)
+        {
+            scriptRunner = new ScriptRunner(script);
+            scriptRunner.Start(generator);
+        }
 
         Console.WriteLine("Art-Net timecode generator");
         Console.WriteLine($"  Interface:   {localAddress} / {netMask} ({adapterName})");
@@ -108,6 +130,10 @@ public static class Program
             Console.WriteLine($"  Impairment:  jitter +/- {options.JitterMs} ms, drop {options.DropPercent}%");
         if (options.DurationSeconds > 0)
             Console.WriteLine($"  Duration:    {options.DurationSeconds} s");
+        if (script != null)
+            Console.WriteLine($"  Script:      {options.Script}");
+        else if (options.Hold)
+            Console.WriteLine("  Transport:   hold (repeating first frame)");
 
         bool interactive = !Console.IsInputRedirected;
         if (interactive)
@@ -115,7 +141,7 @@ public static class Program
             Console.WriteLine("  Transport:   Space/P play-pause   S stop   R rewind   L locate   C clock   H hold   Q quit");
             Console.WriteLine("               +/- jump 10 s   ./, step one frame   1-4 rate (24/25/29.97/30)");
         }
-        else if (options.Stopped)
+        else if (options.Stopped && script == null)
         {
             Console.WriteLine("  Warning:     --stopped with no interactive console; nothing will ever be sent");
         }
@@ -137,6 +163,9 @@ public static class Program
         while (!cancellation.IsCancellationRequested)
         {
             if (options.DurationSeconds > 0 && runClock.Elapsed.TotalSeconds >= options.DurationSeconds)
+                break;
+
+            if (scriptRunner != null && scriptRunner.Tick(generator, runClock.Elapsed.TotalSeconds))
                 break;
 
             if (interactive && Console.KeyAvailable && HandleKey(Console.ReadKey(intercept: true), generator, start))

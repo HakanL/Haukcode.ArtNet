@@ -249,6 +249,8 @@ With no options it plays 30 fps from `00:00:00:00`, StreamId 0, broadcast on the
 | `-p`, `--port <port>` | `6454` | UDP port |
 | `-t`, `--duration <sec>` | run until quit | Exit after this many seconds, for scripted runs |
 | `--stopped` | | Start parked on the start value; press `Space` to play |
+| `--hold` | | Start repeating the first frame (frozen clock, still sending) |
+| `--script <steps>` | | Non-interactive transport. Semicolon-separated `play`/`pause`/`hold`/`wait`/`stop`/`seek`. Durations: `14s`, `1.5`, `500ms`. Unbounded `play`/`pause`/`hold` (no duration) only as the last step |
 | `--jitter <ms>` | `0` | Randomize each frame's send moment by up to plus/minus this many ms |
 | `--drop <percent>` | `0` | Randomly skip this percentage of frames |
 | `--list-interfaces` | | Print the usable local adapters with their broadcast addresses and exit |
@@ -287,6 +289,12 @@ dotnet run --project src/TimeCodeGenerator -- --stream 1 --destination 192.168.1
 
 # Bad network: 5 ms jitter and 2% loss for a minute, no interaction
 dotnet run --project src/TimeCodeGenerator -- --jitter 5 --drop 2 --duration 60 --quiet
+
+# Pause dropout then locate (no keyboard): play, silence, jump, play
+dotnet run --project src/TimeCodeGenerator -- --fps 24 --start 00:59:50:00 --script "play 14s; pause 2s; seek 01:00:08:00; play 10s"
+
+# Frozen-frame hold (packets keep going, value stuck), then locate
+dotnet run --project src/TimeCodeGenerator -- --fps 24 --start 00:59:50:00 --script "play 12s; hold 2s; seek 01:00:08:00; play 6s"
 ```
 
 #### Things to know

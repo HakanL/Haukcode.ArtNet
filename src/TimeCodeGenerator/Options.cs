@@ -29,6 +29,12 @@ public sealed class Options
     /// <summary>Start parked on the start value instead of playing immediately.</summary>
     public bool Stopped { get; set; }
 
+    /// <summary>Start repeating the first frame (frozen clock, still sending).</summary>
+    public bool Hold { get; set; }
+
+    /// <summary>Semicolon-separated transport script, e.g. <c>play 14s; hold 3s; play 6s</c>.</summary>
+    public string? Script { get; set; }
+
     public bool ListInterfaces { get; set; }
 
     public bool Quiet { get; set; }
@@ -48,6 +54,10 @@ public sealed class Options
           -p, --port <port>       UDP port. Default 6454
           -t, --duration <sec>    Exit after this many seconds. Default: run until Q or Ctrl+C
               --stopped           Start parked on the start value; press Space/P to play
+              --hold              Start repeating the first frame (frozen clock, still sending)
+              --script <steps>    Non-interactive transport: play/pause/hold/wait/stop/seek
+                                  separated by ';'. Durations: 14s, 1.5, 500ms. Example:
+                                  play 14s; hold 3s; seek 01:00:08:00; play 6s
               --jitter <ms>       Randomize each frame's send moment by +/- ms (timing robustness test)
               --drop <percent>    Randomly skip this percentage of frames (packet loss test)
               --list-interfaces   Print the usable local interfaces and exit
@@ -69,6 +79,7 @@ public sealed class Options
           ArtNetTimeCodeGenerator --fps 25 --start 00:59:50:00
           ArtNetTimeCodeGenerator --fps 29.97 --start 01:00:00;02 --destination 192.168.240.196
           ArtNetTimeCodeGenerator --stream 3 --jitter 5 --drop 2 --duration 60
+          ArtNetTimeCodeGenerator --fps 24 --start 00:59:50:00 --script "play 14s; hold 3s; play 6s"
         """;
 
     public static Options Parse(string[] args)
@@ -148,6 +159,14 @@ public sealed class Options
                 case "--stopped":
                 case "--paused":
                     options.Stopped = true;
+                    break;
+
+                case "--hold":
+                    options.Hold = true;
+                    break;
+
+                case "--script":
+                    options.Script = options.Script == null ? Value() : options.Script + ";" + Value();
                     break;
 
                 case "--list-interfaces":
