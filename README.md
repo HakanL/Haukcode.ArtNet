@@ -218,16 +218,97 @@ dotnet run
 
 ### ArtTimeCode Generator (CLI)
 
-`src/TimeCodeGenerator` is a console tool that sends one `ArtTimeCode` packet per frame, for testing timecode receivers. It broadcasts on the first Ethernet/Wi-Fi adapter by default and supports all four frame-rate types, including correct 29.97 drop-frame counting.
+`src/TimeCodeGenerator` is a console tool for testing Art-Net timecode receivers. It sends one `ArtTimeCode` packet (OpTimeCode `0x9700`, UDP port 6454) per frame, like a lighting console or media server with timecode output would. All four Art-Net frame-rate types are supported, with correct SMPTE 29.97 drop-frame counting (frames 00 and 01 skipped at the start of every minute except every tenth).
+
+#### Running it
+
+Requires the .NET 10 SDK. From the repository root:
 
 ```bash
-cd src/TimeCodeGenerator
-dotnet run -- --fps 25 --start 00:59:50:00
-dotnet run -- --fps 29.97 --start 01:00:00;02 --destination 192.168.1.50 --stream 1
-dotnet run -- --jitter 5 --drop 2 --duration 60 --quiet
+dotnet run --project src/TimeCodeGenerator -- --fps 25 --start 00:59:50:00
 ```
 
-Transport keys while running: `Space`/`P` play or pause (pause stops sending), `S` stop (pause and rewind), `R` rewind, `L` locate to a typed timecode, `C` jump to the system clock, `H` hold (keeps repeating the same frame), `+`/`-` jump 10 s, `.`/`,` step one frame, `1`-`4` switch frame rate, `Q` quits. Add `--stopped` to start parked on the start value. `--help` lists all options and `--list-interfaces` shows the local adapters. The pacing engine (`ArtTimeCodeGenerator`) has no network dependency of its own, so it can be reused inside an application by handing it a send callback.
+Or build a standalone executable once and run it from anywhere:
+
+```bash
+dotnet publish src/TimeCodeGenerator -c Release -o ./tcgen
+./tcgen/ArtNetTimeCodeGenerator --fps 30 --start 01:00:00:00
+```
+
+With no options it plays 30 fps from `00:00:00:00`, StreamId 0, broadcast on the first Ethernet or Wi-Fi adapter. The header shows which interface and destination were picked, and a status line updates four times a second with the current timecode, transport state, packet count and scheduling accuracy. Press `Q` or Ctrl+C to exit; a summary of packets sent and timing lateness is printed.
+
+#### Options
+
+| Option | Default | Description |
+|---|---|---|
+| `-f`, `--fps <rate>` | `30` | `24`, `25`, `29.97` or `30` (aliases `film`, `ebu`, `df`, `smpte`) |
+| `-s`, `--start <timecode>` | `00:00:00:00` | Start value as `HH:MM:SS:FF`. Seconds and frames may be omitted. Use `;` before the frames for drop-frame if you like, e.g. `01:00:00;02` |
+| `--stream <id>` | `0` | ArtTimeCode StreamId, 0-255. Receivers usually listen to stream 0 |
+| `-d`, `--destination <ip>` | subnet broadcast | Unicast to one node instead of broadcasting |
+| `-l`, `--local <ip>` | first adapter | Local interface to send from, when the machine has several |
+| `-p`, `--port <port>` | `6454` | UDP port |
+| `-t`, `--duration <sec>` | run until quit | Exit after this many seconds, for scripted runs |
+| `--stopped` | | Start parked on the start value; press `Space` to play |
+| `--jitter <ms>` | `0` | Randomize each frame's send moment by up to plus/minus this many ms |
+| `--drop <percent>` | `0` | Randomly skip this percentage of frames |
+| `--list-interfaces` | | Print the usable local adapters with their broadcast addresses and exit |
+| `-q`, `--quiet` | | No live status line (the summary is still printed) |
+| `-h`, `--help` | | Full usage text |
+
+#### Transport keys
+
+The tool behaves like a hardware timecode generator with a transport bar:
+
+| Key | Action | What the receiver sees |
+|---|---|---|
+| `Space` or `P` | Play / pause | Pause stops sending completely and freezes the clock. Play continues from the same frame. Use it to test dropout, freewheel and re-sync handling |
+| `S` | Stop | Pause and rewind to the start value |
+| `R` or `Home` | Rewind | Jump back to the start value; keeps playing if playing |
+| `L` | Locate | Prompts for a timecode, then continues from there. Tests jumps and re-locate |
+| `C` | Clock | Jumps to the system time of day |
+| `H` | Hold | Keeps sending, but repeats the same frame. Tests "frozen clock" detection, which is different from a dropout |
+| `+` / `-` | Jump 10 s forward / back | Discontinuity while still running |
+| `.` / `,` | Step one frame forward / back | Fine offset checks |
+| `1` `2` `3` `4` | Switch to 24 / 25 / 29.97 df / 30 fps | Rate change in the middle of a stream, time of day carried over |
+| `Q` or `Esc` | Quit | |
+
+#### Typical test scenarios
+
+```bash
+# Pre-roll: a timeline that starts at 01:00:00:00 should arm, then play exactly at the hour
+dotnet run --project src/TimeCodeGenerator -- --fps 25 --start 00:59:50:00 --stopped
+# press Space when the receiver is ready
+
+# Drop-frame across a minute boundary (59;29 -> 00;02)
+dotnet run --project src/TimeCodeGenerator -- --fps 29.97 --start 00:00:55;00
+
+# Second stream, unicast to one node
+dotnet run --project src/TimeCodeGenerator -- --stream 1 --destination 192.168.1.50
+
+# Bad network: 5 ms jitter and 2% loss for a minute, no interaction
+dotnet run --project src/TimeCodeGenerator -- --jitter 5 --drop 2 --duration 60 --quiet
+```
+
+#### Things to know
+
+- **Loopback is not enough.** Most receivers bind to a real adapter, so packets sent to `127.0.0.1` never arrive. The default broadcast, or unicast to the receiver's own IP, reaches a receiver on the same machine.
+- **Same machine, same port.** If the receiver is already listening on 6454 it owns the port; the generator only sends, so that is fine. A separate sniffer on the same machine will not see the packets, use `--port` for that kind of check.
+- **Timing.** Frames are scheduled against a fixed anchor, so there is no drift, and if the process stalls the clock skips ahead instead of bursting. On Windows the tool raises the timer resolution to 1 ms while running; scheduling lateness is normally well under 1 ms and is reported at exit.
+- **Pause vs hold.** Pause is silence (a dropout). Hold is a stream whose value never changes. Receivers typically treat these differently, so both are available.
+
+#### Reusing the engine in an application
+
+The pacing engine (`ArtTimeCodeGenerator` in `src/TimeCodeGenerator`) has no network dependency: it hands one `ArtTimeCodePacket` per frame to a callback from its own thread. To generate timecode from an application that already has an `ArtNetClient`, wire it to the client:
+
+```csharp
+var start = TimeCode.Parse("01:00:00:00", ArtTimeCodeTypes.Smpte);
+
+using var generator = new ArtTimeCodeGenerator(start, streamId: 0,
+    packet => client.SendPacketImmediately((IPAddress?)null, packet));
+
+generator.Start();
+// generator.Paused = true / false, generator.Seek(...), generator.Hold = true, ...
+```
 
 ### Common Use Cases
 
