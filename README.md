@@ -44,6 +44,7 @@ This library provides a complete implementation of the Art-Net protocol with the
 - `ArtDmx` - DMX data transmission
 - `ArtSync` - Frame synchronization
 - `ArtTrigger` - Trigger/macro messages
+- `ArtTimeCode` - SMPTE timecode (24/25/29.97/30 fps)
 - `ArtAddress` - Node configuration
 - `ArtInput` - Input port configuration
 - `ArtTodRequest` / `ArtTodData` / `ArtTodControl` - RDM table of devices
@@ -215,6 +216,19 @@ cd Samples
 dotnet run
 ```
 
+### ArtTimeCode Generator (CLI)
+
+`src/TimeCodeGenerator` is a console tool that sends one `ArtTimeCode` packet per frame, for testing timecode receivers. It broadcasts on the first Ethernet/Wi-Fi adapter by default and supports all four frame-rate types, including correct 29.97 drop-frame counting.
+
+```bash
+cd src/TimeCodeGenerator
+dotnet run -- --fps 25 --start 00:59:50:00
+dotnet run -- --fps 29.97 --start 01:00:00;02 --destination 192.168.1.50 --stream 1
+dotnet run -- --jitter 5 --drop 2 --duration 60 --quiet
+```
+
+Transport keys while running: `Space`/`P` play or pause (pause stops sending), `S` stop (pause and rewind), `R` rewind, `L` locate to a typed timecode, `C` jump to the system clock, `H` hold (keeps repeating the same frame), `+`/`-` jump 10 s, `.`/`,` step one frame, `1`-`4` switch frame rate, `Q` quits. Add `--stopped` to start parked on the start value. `--help` lists all options and `--list-interfaces` shows the local adapters. The pacing engine (`ArtTimeCodeGenerator`) has no network dependency of its own, so it can be reused inside an application by handing it a send callback.
+
 ### Common Use Cases
 
 #### 1. Simple Lighting Controller
@@ -364,6 +378,8 @@ src/
 │   └── Internal/        # Internal implementation details
 ├── Rdm/                 # RDM (Remote Device Management) implementation
 │   └── Packets/         # RDM packet types
+├── ArtNet.Tests/        # Unit tests
+├── TimeCodeGenerator/   # ArtTimeCode generator CLI for testing receivers
 └── Package/             # NuGet package configuration
 
 Samples/                 # Example applications
