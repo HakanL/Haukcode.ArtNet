@@ -78,6 +78,13 @@ public ref struct SpanBinaryWriter
         WriteBytes(bytes.Span);
     }
 
+    // Explicit array overload: with both the span and the memory overloads a byte[] argument
+    // is ambiguous on net8/net9 (only C# 14's first-class span conversions resolve it)
+    public void WriteBytes(byte[] bytes)
+    {
+        WriteBytes(bytes.AsSpan());
+    }
+
     public void WriteZeros(int count)
     {
         this.buffer.Slice(this.writePosition, count).Clear();
