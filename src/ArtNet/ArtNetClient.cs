@@ -69,6 +69,13 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     // Reconfigured in place and serialized synchronously inside QueuePacket before the next
     // call, so a single instance is safe on the single-threaded send path.
     private readonly ArtNetDmxPacket scratchDmxPacket = new();
+
+    // Receive-side scratch: ArtDmx packets are parsed into this instance and handed on in this
+    // wrapper, both valid only until the channel writer returns (the contract the base client
+    // documents for its receive buffer). Other opcodes are rare and get fresh objects so a
+    // subscriber may keep them.
+    private readonly ArtNetDmxPacket receiveScratchDmxPacket = new();
+    private readonly Internal.ReceiveDataPacket receiveScratchObject = new();
     private readonly Func<Memory<byte>, int> scratchDmxPacketWriter;
 
     // Argument for the cached send-data factory below. QueuePacket invokes the factory
@@ -445,7 +452,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     protected override Internal.ReceiveDataPacket? TryParseObject(ReadOnlyMemory<byte> buffer, double timestampMS,
         IPEndPoint sourceIP, IPAddress destinationIP)
     {
-        var packet = ArtNetPacket.Parse(buffer);
+        var packet = ArtNetPacket.Parse(buffer, this.receiveScratchDmxPacket);
 
         // Note that we're still using the memory from the pipeline here, the packet is not allocating its own DMX data byte array
         if (packet != null)
@@ -455,12 +462,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
                 packet.OpCode == ArtNetOpCodes.Poll ||
                 packet.OpCode == ArtNetOpCodes.PollReply)
             {
-                var parsedObject = new Internal.ReceiveDataPacket
-                {
-                    TimestampMS = timestampMS,
-                    Source = sourceIP,
-                    Packet = packet
-                };
+                var parsedObject = ReferenceEquals(packet, this.receiveScratchDmxPacket) ? this.receiveScratchObject : new Internal.ReceiveDataPacket();
+                parsedObject.TimestampMS = timestampMS;
+                parsedObject.Source = sourceIP;
+                parsedObject.Packet = packet;
 
                 if (!this.endPointCache.TryGetValue(destinationIP, out var ipEndPoint))
                 {

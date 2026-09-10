@@ -19,12 +19,18 @@ public class ArtNetDmxPacket : ArtNetPacket
 
     internal static ArtNetDmxPacket Parse(BigEndianBinaryReader reader)
     {
-        var target = new ArtNetDmxPacket
-        {
-            Sequence = reader.ReadByte(),
-            Physical = reader.ReadByte(),
-            Universe = reader.ReadInt16Reverse()
-        };
+        return Parse(reader, new ArtNetDmxPacket());
+    }
+
+    /// <summary>
+    /// Parse into <paramref name="target"/>; every field is rewritten, so a reused instance
+    /// carries nothing over from the previous packet.
+    /// </summary>
+    internal static ArtNetDmxPacket Parse(BigEndianBinaryReader reader, ArtNetDmxPacket target)
+    {
+        target.Sequence = reader.ReadByte();
+        target.Physical = reader.ReadByte();
+        target.Universe = reader.ReadInt16Reverse();
 
         int length = reader.ReadInt16();
         // Zero-copy slice over the receive buffer instead of ReadBytes().ToArray(); the
