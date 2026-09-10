@@ -54,7 +54,7 @@ public class ArtTodDataPacket : ArtNetPacket
         return target;
     }
 
-    protected override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteByte(RdmVersion);
         writer.WriteByte(Port);
@@ -68,6 +68,6 @@ public class ArtTodDataPacket : ArtNetPacket
         writer.WriteByte((byte)Devices.Count);
 
         foreach (UId id in Devices)
-            WriteUid(writer, id);
+            WriteUid(ref writer, id);
     }
 }

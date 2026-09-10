@@ -26,7 +26,7 @@ public class ArtSyncPacket : ArtNetPacket
         return target;
     }
 
-    protected override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteInt16(Aux);
     }

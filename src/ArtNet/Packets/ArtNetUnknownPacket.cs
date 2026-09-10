@@ -21,7 +21,7 @@ public class ArtNetUnknownPacket : ArtNetPacket
 
     public byte[] Data { get; set; } = null!;
 
-    protected override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteBytes(Data);
     }

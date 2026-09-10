@@ -40,7 +40,7 @@ public class ArtInputPacket : ArtNetPacket
         return target;
     }
 
-    protected override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteByte((byte)0);
         writer.WriteByte(BindIndex);

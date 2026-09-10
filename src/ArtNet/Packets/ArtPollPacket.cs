@@ -23,7 +23,7 @@ public class ArtPollPacket : ArtNetPacket
 
     public byte TalkToMe { get; set; }
 
-    protected override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteByte(TalkToMe);
         writer.WriteByte((byte)0);

@@ -45,11 +45,11 @@ public class ArtRdmSubPacket : ArtNetPacket
         return target;
     }
 
-    protected override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteByte(RdmVersion);
         writer.WriteByte(0x00);
-        WriteUid(writer, DeviceId);
+        WriteUid(ref writer, DeviceId);
         writer.WriteByte(0x00);
         writer.WriteByte((byte)Command);
         writer.WriteInt16((short)ParameterId);

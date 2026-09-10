@@ -65,7 +65,7 @@ public class ArtIpProgReplyPacket : ArtNetPacket
         return target;
     }
 
-    protected override void WriteData(BigEndianBinaryWriter writer)
+    protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteZeros(4);
         writer.WriteBytes(IpAddress);
