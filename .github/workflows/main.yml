@@ -15,14 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Get main version
       id: version
-      uses: notiz-dev/github-action-json-property@release
-      with:
-        path: version.json
-        prop_path: 'version'
+      run: echo "prop=$(jq -r .version ../version.json)" >> $GITHUB_OUTPUT
     - name: Get branch name from branch
       run: echo "BRANCH_NAME=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }' | sed "s/[[:space:]_]/-/g")" >> $GITHUB_ENV
       if: startsWith(github.ref, 'refs/heads/')
@@ -38,7 +35,7 @@ jobs:
     - run: echo Version is ${PACKAGE_VERSION}
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.100
     - name: Install dependencies Core
