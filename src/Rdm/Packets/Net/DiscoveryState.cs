@@ -17,11 +17,11 @@ public class DiscoveryState
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -37,16 +37,16 @@ public class DiscoveryState
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
-        public short DeviceCount { get; set; }
+        public ushort DeviceCount { get; set; }
 
         public DiscoveryStates DiscoveryState { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
-            DeviceCount = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
+            DeviceCount = data.ReadUInt16();
             DiscoveryState = (DiscoveryStates)data.ReadByte();
 
         }
@@ -66,13 +66,13 @@ public class DiscoveryState
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public DiscoveryStates DiscoveryState { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             DiscoveryState = (DiscoveryStates)data.ReadByte();
 
         }

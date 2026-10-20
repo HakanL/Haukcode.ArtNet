@@ -29,18 +29,18 @@ public class DevicePowerCycles
         {
         }
 
-        public int PowerCycles { get; set; }
+        public uint PowerCycles { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            PowerCycles = data.ReadHiLoInt32();
+            PowerCycles = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(PowerCycles);
+            data.WriteUInt32(PowerCycles);
         }
 
         #endregion
@@ -53,18 +53,18 @@ public class DevicePowerCycles
         {
         }
 
-        public int PowerCycles { get; set; }
+        public uint PowerCycles { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            PowerCycles = data.ReadHiLoInt32();
+            PowerCycles = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(PowerCycles);
+            data.WriteUInt32(PowerCycles);
         }
 
         #endregion

@@ -44,7 +44,7 @@ public class ProxiedDeviceCount
         /// <summary>
         /// The number of proxied devices connected to this proxy and discovered.
         /// </summary>
-        public short DeviceCount { get; set; }
+        public ushort DeviceCount { get; set; }
 
         /// <summary>
         /// Whether the list of proxied devices has changed since the list was last obtained.
@@ -55,7 +55,7 @@ public class ProxiedDeviceCount
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            DeviceCount = data.ReadInt16();
+            DeviceCount = data.ReadUInt16();
             ListChanged = data.ReadBool();
         }
 

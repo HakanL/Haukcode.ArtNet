@@ -16,11 +16,11 @@ public class EndpointMode
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -36,13 +36,13 @@ public class EndpointMode
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public EndpointModes EndpointMode { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             EndpointMode = (EndpointModes) data.ReadByte();
         }
 
@@ -60,13 +60,13 @@ public class EndpointMode
         {
         }
         
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public EndpointModes EndpointMode { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             EndpointMode = (EndpointModes) data.ReadByte();
         }
 

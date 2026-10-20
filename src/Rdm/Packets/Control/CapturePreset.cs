@@ -23,22 +23,22 @@ public class CapturePreset
         {
         }
 
-        public short SceneNumber { get; set; }
+        public ushort SceneNumber { get; set; }
 
-        public short UpFadeTime { get; set; }
+        public ushort UpFadeTime { get; set; }
 
-        public short DownFadeTime { get; set; }
+        public ushort DownFadeTime { get; set; }
 
-        public short WaitTime { get; set; }
+        public ushort WaitTime { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            SceneNumber = data.ReadInt16();
-            UpFadeTime = data.ReadInt16();
-            DownFadeTime = data.ReadInt16();
-            WaitTime = data.ReadInt16();
+            SceneNumber = data.ReadUInt16();
+            UpFadeTime = data.ReadUInt16();
+            DownFadeTime = data.ReadUInt16();
+            WaitTime = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

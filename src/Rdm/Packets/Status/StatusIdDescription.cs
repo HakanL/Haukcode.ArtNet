@@ -17,13 +17,13 @@ public class StatusIdDescription
         /// <summary>
         /// The status to request the description for.
         /// </summary>
-        public short StatusId { get; set; }
+        public ushort StatusId { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            StatusId = data.ReadInt16();
+            StatusId = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

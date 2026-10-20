@@ -9,11 +9,11 @@ public class EndpointDeviceListChange
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -29,20 +29,20 @@ public class EndpointDeviceListChange
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
-        public int ListChangeNumber { get; set; }
+        public uint ListChangeNumber { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
-            ListChangeNumber = data.ReadHiLoInt32();
+            EndpointID = data.ReadUInt16();
+            ListChangeNumber = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
             data.WriteUInt16(EndpointID);
-            data.WriteHiLoInt32(ListChangeNumber);
+            data.WriteUInt32(ListChangeNumber);
         }
     }
 }

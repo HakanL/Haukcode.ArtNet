@@ -17,13 +17,13 @@ public class SlotDescription
         {
         }
 
-        public short SlotOffset { get; set; }
+        public ushort SlotOffset { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            SlotOffset = data.ReadInt16();
+            SlotOffset = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -41,7 +41,7 @@ public class SlotDescription
         {
         }
 
-        public short SlotOffset { get; set; }
+        public ushort SlotOffset { get; set; }
 
         public string Description { get; set; } = null!;
 
@@ -49,7 +49,7 @@ public class SlotDescription
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            SlotOffset = data.ReadInt16();
+            SlotOffset = data.ReadUInt16();
             Description = data.ReadString(Header.ParameterDataLength - 2);
         }
 

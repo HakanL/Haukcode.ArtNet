@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ArtNet\Haukcode.ArtNet.csproj" />
+    <ProjectReference Include="..\Rdm\Haukcode.ArtNet.Rdm.csproj" />
     <ProjectReference Include="..\TimeCodeGenerator\Haukcode.ArtNet.TimeCodeGenerator.csproj" />
   </ItemGroup>
 
