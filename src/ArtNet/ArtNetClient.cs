@@ -108,7 +108,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// Number of sender threads/sockets, sharded by universe id. Art-Net is per-universe just like
     /// sACN — 600 universes is 600 packets a frame whether they are unicast, broadcast or
     /// multicast — and a single sender thread saturates a core at roughly 24,000 packets/sec.
-    /// Default 1 = the original behavior.
+    /// With the default of 1, packets are sent from the listen socket, so their source port is the
+    /// Art-Net port as the spec requires ("the UDP port used as both source and destination is
+    /// 0x1936"). With more than 1, each shard sends from its own socket on an ephemeral port: faster,
+    /// but nodes that reply to the source port won't reach this client.
     /// </param>
     public ArtNetClient(
         IPAddress localAddress,
@@ -129,8 +132,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         this.broadcastEndPoint =
             new IPEndPoint(Haukcode.Network.Utils.GetBroadcastAddress(localAddress, localSubnetMask), port);
 
-        this.sendSockets = new Socket[SenderCount];
-        for (int i = 0; i < SenderCount; i++)
+        // A single shard sends from the listen socket (source port = Art-Net port); only sharded
+        // sending needs sockets of its own
+        this.sendSockets = new Socket[SenderCount > 1 ? SenderCount : 0];
+        for (int i = 0; i < this.sendSockets.Length; i++)
         {
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.SendBufferSize = SendBufferSize;
@@ -179,13 +184,43 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     public IPAddress BroadcastAddress => this.broadcastEndPoint.Address;
 
+    /// <summary>
+    /// Allow ArtDmx to be broadcast. Off by default: Art-Net 4 says ArtDmx "must be unicast to
+    /// subscribers" and "there are no conditions in which broadcast is allowed", so
+    /// <see cref="SendDmxData"/> needs a node address unless this is turned on.
+    /// </summary>
+    public bool AllowDmxBroadcast { get; set; }
+
+    /// <summary>
+    /// Art-Net 4 forbids broadcasting ArtDmx (unless <see cref="AllowDmxBroadcast"/>), ArtPollReply,
+    /// ArtRdm and ArtTodData.
+    /// </summary>
+    private void CheckBroadcastAllowed(IPEndPoint destination, ArtNetOpCodes opCode)
+    {
+        if (!destination.Address.Equals(this.broadcastEndPoint.Address) && !destination.Address.Equals(IPAddress.Broadcast))
+            return;
+
+        bool allowed = opCode switch
+        {
+            ArtNetOpCodes.Output => AllowDmxBroadcast,
+            ArtNetOpCodes.PollReply or ArtNetOpCodes.Rdm or ArtNetOpCodes.TodData => false,
+            _ => true
+        };
+
+        if (!allowed)
+            throw new InvalidOperationException($"Art-Net 4 doesn't allow {opCode} to be broadcast; send it to a node address.");
+    }
+
 
 
     /// <summary>
     /// Send data
     /// </summary>
-    /// <param name="address">The optional address to unicast to</param>
-    /// <param name="universeId">The Universe ID, 1 to <see cref="MaxUniverseId"/> (Port-Address + 1)</param>
+    /// <param name="address">The node to send to; null broadcasts, which needs <see cref="AllowDmxBroadcast"/></param>
+    /// <param name="universeId">
+    /// The Universe ID, 1 to <see cref="MaxUniverseId"/> (Port-Address + 1). Universe 1 is
+    /// Port-Address 0, which Art-Net 4 deprecates but still allows.
+    /// </param>
     /// <param name="dmxData">Up to 512 bytes of DMX data</param>
     /// <param name="important">Important</param>
     public Task SendDmxData(
@@ -196,6 +231,9 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     {
         if (universeId < 1 || universeId > MaxUniverseId)
             throw new ArgumentOutOfRangeException(nameof(universeId), universeId, $"Universe id must be 1 to {MaxUniverseId}.");
+
+        var destination = ResolveDestination(address);
+        CheckBroadcastAllowed(destination, ArtNetOpCodes.Output);
 
         if (!IsOperational)
             return Task.CompletedTask;
@@ -210,12 +248,12 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         this.scratchDmxPacket.Universe = (ushort)(universeId - 1);
         this.scratchDmxPacket.Sequence = sequenceId;
 
-        return QueueScratchDmxPacket(address, important, shardKey: universeId);
+        return QueueScratchDmxPacket(destination, important, shardKey: universeId);
     }
 
-    private async Task QueueScratchDmxPacket(IPAddress? destination, bool important, int shardKey)
+    private async Task QueueScratchDmxPacket(IPEndPoint destination, bool important, int shardKey)
     {
-        this.pendingDestination = ResolveDestination(destination);
+        this.pendingDestination = destination;
 
         await QueuePacket(
             allocatePacketLength: this.scratchDmxPacket.PacketLength,
@@ -230,18 +268,21 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     private SendData BuildPendingSendData() => BuildSendData(this.pendingDestination!);
 
     /// <summary>
-    /// Send sync
+    /// Broadcast an ArtSync. Art-Net 4 doesn't allow a controller to unicast it.
     /// </summary>
-    /// <param name="address">The optional address to unicast to</param>
-    public Task SendSync(IPAddress? address)
+    public Task SendSync()
     {
         if (!IsOperational)
             return Task.CompletedTask;
 
-        var packet = new ArtSyncPacket();
-
-        return QueueSyncPacketForSending(ResolveDestination(address), packet);
+        return QueueSyncPacketForSending(this.broadcastEndPoint, new ArtSyncPacket());
     }
+
+    /// <summary>
+    /// Broadcast an ArtSync; <paramref name="address"/> is ignored.
+    /// </summary>
+    [Obsolete("ArtSync is always broadcast (Art-Net 4 doesn't allow a controller to unicast it); use SendSync().")]
+    public Task SendSync(IPAddress? address) => SendSync();
 
     private byte GetNewSequenceId(ushort universeId)
     {
@@ -290,6 +331,8 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// <param name="important">Important</param>
     public async Task QueuePacketForSending(IPEndPoint destination, ArtNetPacket packet, bool important = false, int shardKey = 0)
     {
+        CheckBroadcastAllowed(destination, packet.OpCode);
+
         await QueuePacket(
             allocatePacketLength: packet.PacketLength,
             important: important,
@@ -348,6 +391,8 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     public async Task SendPacketImmediately(IPEndPoint destination, ArtNetPacket packet, bool important = false)
     {
+        CheckBroadcastAllowed(destination, packet.OpCode);
+
         await SendImmediateAsync(
             allocatePacketLength: packet.PacketLength,
             important: important,
@@ -356,14 +401,16 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     }
 
-    // Single sender shard (the base class default), so senderIndex is always 0. Art-Net is
-    // unicast/broadcast rather than a multicast group per universe, so it has none of the
-    // per-universe fan-out that makes sharding pay off for sACN.
     protected override int SendPacket(SendData sendData, ReadOnlyMemory<byte> payload, int senderIndex)
     {
+        // A single shard sends from the listen socket so the source port is the Art-Net port
+        var socket = this.sendSockets.Length > 0 ? this.sendSockets[senderIndex] : this.listenSocket;
+        if (socket == null)
+            return 0;
+
         // SendTo(..., SocketAddress) with a pre-serialized destination: the EndPoint overload
         // re-serializes into a fresh SocketAddress on every call.
-        return this.sendSockets[senderIndex].SendTo(payload.Span, SocketFlags.None, sendData.DestinationAddress!);
+        return socket.SendTo(payload.Span, SocketFlags.None, sendData.DestinationAddress!);
     }
 
     /// <summary>
@@ -428,6 +475,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
         Haukcode.Network.Utils.SetSocketOptions(this.listenSocket);
 
+        // It's also the send socket when there's a single sender shard
+        this.listenSocket.SendBufferSize = SendBufferSize;
+        this.listenSocket.EnableBroadcast = true;
+
         // Linux wants IPAddress.Any to get all types of packets (unicast/multicast/broadcast)
         this.listenSocket.Bind(new IPEndPoint(IPAddress.Any, this.localEndPoint.Port));
 
@@ -460,6 +511,10 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         var packet = ArtNetPacket.Parse(buffer, this.receiveScratchDmxPacket);
 
         // Note that we're still using the memory from the pipeline here, the packet is not allocating its own DMX data byte array
+        // "Controllers should ignore communication with nodes using a protocol version lower than 14"
+        if (packet != null && packet.Version < ArtNetPacket.ProtocolVersion)
+            return null;
+
         if (packet != null)
         {
             // Protect against UDP loopback where we receive our own packets, except for poll/pollreply commands.
