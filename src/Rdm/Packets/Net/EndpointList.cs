@@ -1,13 +1,26 @@
 ﻿namespace Haukcode.ArtNet.Rdm.Packets.Net;
 
 /// <summary>
-/// This parameter is used to retrieve a packed list of all endpoints that exist on an E1.33 device, with the exception of the Management Endpoint.
+/// This parameter is used to retrieve a packed list of all endpoints on a gateway, with the
+/// exception of the Management Endpoint (E1.37-7 §6.1).
 /// </summary>
 /// <remarks>
-/// The list of Endpoint IDs shall not include the Management Endpoint ID. If the device does not have any Endpoints (other than the Management Endpoint) then it shall return a PDL of 0.
+/// The list of Endpoint IDs shall not include the Management Endpoint ID. If the device does not have
+/// any Endpoints (other than the Management Endpoint) then it shall return a PDL of 0.
 /// </remarks>
 public class EndpointList
 {
+    /// <summary>
+    /// Endpoint types (E1.37-7 Table A-5).
+    /// </summary>
+    public enum EndpointTypes : byte
+    {
+        Virtual = 0x00,
+        Physical = 0x01
+    }
+
+    public readonly record struct Endpoint(ushort Id, EndpointTypes Type);
+
     public class Get : RdmRequestPacket
     {
         public Get()
@@ -17,57 +30,47 @@ public class EndpointList
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            //Parameter Data Empty
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            //Parameter Data Empty
         }
     }
 
+    /// <remarks>
+    /// This reads the first message of a response. With ACK_OVERFLOW the following messages carry
+    /// only endpoint records, without the list change number.
+    /// </remarks>
     public class Reply : RdmResponsePacket
     {
+        // Endpoint ID (16 bits) + Endpoint Type (8 bits)
+        private const int EndpointRecordSize = 3;
+
         public Reply()
             : base(RdmCommands.GetResponse, RdmParameters.EndpointList)
         {
         }
 
-        private uint listChangeNumber = 0;
+        public uint ListChangeNumber { get; set; }
 
-        public uint ListChangeNumber
-        {
-            get { return listChangeNumber; }
-            set { listChangeNumber = value; }
-        }
-
-        List<ushort> endpointIDs = new List<ushort>();
-
-        public List<ushort> EndpointIDs
-        {
-            get { return endpointIDs; }
-            set { endpointIDs = value; }
-        }
+        public List<Endpoint> Endpoints { get; set; } = [];
 
         protected override void ReadData(RdmBinaryReader data)
         {
             ListChangeNumber = data.ReadUInt32();
 
-            List<ushort> endpoints = new List<ushort>();
-            for (int n = 0; n < ((Header.ParameterDataLength - 4) / 2); n++)
-            {
-                endpoints.Add(data.ReadUInt16());
-            }
-
-            EndpointIDs = endpoints;
+            Endpoints = [];
+            for (int n = 0; n < (Header.ParameterDataLength - 4) / EndpointRecordSize; n++)
+                Endpoints.Add(new Endpoint(data.ReadUInt16(), (EndpointTypes)data.ReadByte()));
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
             data.WriteUInt32(ListChangeNumber);
-            foreach (ushort endpointId in EndpointIDs)
+            foreach (var endpoint in Endpoints)
             {
-                data.WriteUInt16(endpointId);
+                data.WriteUInt16(endpoint.Id);
+                data.WriteByte((byte)endpoint.Type);
             }
         }
     }

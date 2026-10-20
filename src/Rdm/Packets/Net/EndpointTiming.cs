@@ -81,12 +81,16 @@ public class EndpointTiming
         {
         }
 
+        public ushort EndpointID { get; set; }
+
         protected override void ReadData(RdmBinaryReader data)
         {
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(EndpointID);
         }
     }
 }

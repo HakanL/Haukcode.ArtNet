@@ -5,10 +5,16 @@ public class DiscoveryState
     public enum DiscoveryStates
     {
         Incomplete = 0x0,
-        Incremental = 0x2,
-        Full = 0x1,
+        Incremental = 0x1,
+        Full = 0x2,
         NotActive = 0x4
     }
+
+    /// <summary>Device count while discovery hasn't completed.</summary>
+    public const ushort DeviceCountIncomplete = 0x0000;
+
+    /// <summary>Device count when the gateway can't tell how many devices it has found.</summary>
+    public const ushort DeviceCountUnknown = 0xFFFF;
 
     public class Get : RdmRequestPacket
     {
@@ -90,15 +96,17 @@ public class DiscoveryState
             : base(RdmCommands.SetResponse, RdmParameters.DiscoveryState)
         {
         }
-        
+
+        public ushort EndpointID { get; set; }
+
         protected override void ReadData(RdmBinaryReader data)
         {
-            //Parameter Data Empty
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            //Parameter Data Empty
+            data.WriteUInt16(EndpointID);
         }
     }
 }

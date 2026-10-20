@@ -99,27 +99,33 @@ public enum RdmParameters
     PresetMergeMode = 0x1043,
     PowerOnSelfTest = 0x1044,
 
-    //---- RDMnet ----
-    EndpointList = 0x7FE0,
-    EndpointListChange = 0x7FEE,
-    EndpointIdentify = 0x7FE9,
-    EndpointToUniverse = 0x7FE1,
-    RdmTrafficEnable = 0x7FE2,
-    EndpointMode = 0x7FE3,
-    EndpointLabel = 0x7FE4,
-    DiscoveryState = 0x7FE5,
-    BackgroundDiscovery = 0x7FEA,
-    EndpointTiming = 0x7FE6,
-    EndpointTimingDescription = 0x7FE7,
-    EndpointDeviceListChange = 0x7FEB,
-    EndpointDevices = 0x7FEC,
-    BindingControlFields = 0x7FE8,
-    TcpCommsStatus = 0x7FED,
-    BackgroundQueuedStatusPolicy = 0x7FD0,
-    BackgroundQueuedStatusPolicyDescription = 0x7FD1,
-    BackgroundStatusType = 0x7FD2,
-    QueuedStatusEndpointCollection = 0x7FD3,
-    QueuedStatusUIDCollection = 0x7FD4
+    //---- RDMnet (E1.33 Table A-15) ----
+    ComponentScope = 0x0800,
+    SearchDomain = 0x0801,
+    TcpCommsStatus = 0x0802,
+    BrokerStatus = 0x0803,
+
+    //---- Gateway and splitter configuration (E1.37-7 Table A-1) ----
+    EndpointList = 0x0900,
+    EndpointListChange = 0x0901,
+    EndpointIdentify = 0x0902,
+    EndpointToUniverse = 0x0903,
+    EndpointMode = 0x0904,
+    EndpointLabel = 0x0905,
+    RdmTrafficEnable = 0x0906,
+    DiscoveryState = 0x0907,
+    BackgroundDiscovery = 0x0908,
+    EndpointTiming = 0x0909,
+    EndpointTimingDescription = 0x090A,
+
+    /// <summary>ENDPOINT_RESPONDERS</summary>
+    EndpointDevices = 0x090B,
+
+    /// <summary>ENDPOINT_RESPONDER_LIST_CHANGE</summary>
+    EndpointDeviceListChange = 0x090C,
+    BindingControlFields = 0x090D,
+    BackgroundQueuedStatusPolicy = 0x090E,
+    BackgroundQueuedStatusPolicyDescription = 0x090F
 }
 
 public static class RdmParametersExtensions

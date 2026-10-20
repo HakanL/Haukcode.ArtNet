@@ -95,13 +95,13 @@ public class RdmUnsignedFieldTests
         var reply = new EndpointList.Reply
         {
             ListChangeNumber = 0x80000001,
-            EndpointIDs = [0x0001, 0xF000],
+            Endpoints = [new(0x0001, EndpointList.EndpointTypes.Physical), new(0xF000, EndpointList.EndpointTypes.Virtual)],
         };
 
         var parsed = (EndpointList.Reply)Decode(Encode(reply));
 
         Assert.AreEqual(0x80000001u, parsed.ListChangeNumber);
-        CollectionAssert.AreEqual(new ushort[] { 0x0001, 0xF000 }, parsed.EndpointIDs);
+        CollectionAssert.AreEqual(reply.Endpoints, parsed.Endpoints);
     }
 
     [TestMethod]
