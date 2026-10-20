@@ -117,6 +117,12 @@ public static class RdmPacketFactory
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SubDeviceStatusReportThreshold, typeof(SubDeviceStatusReportThreshold.GetReply));
         RegisterPacketType(RdmCommands.Set, RdmParameters.SubDeviceStatusReportThreshold, typeof(SubDeviceStatusReportThreshold.Set));
         RegisterPacketType(RdmCommands.SetResponse, RdmParameters.SubDeviceStatusReportThreshold, typeof(SubDeviceStatusReportThreshold.SetReply));
+
+        //QueuedMessageSensorSubscribe
+        RegisterPacketType(RdmCommands.Get, RdmParameters.QueuedMessageSensorSubscribe, typeof(QueuedMessageSensorSubscribe.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.QueuedMessageSensorSubscribe, typeof(QueuedMessageSensorSubscribe.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.QueuedMessageSensorSubscribe, typeof(QueuedMessageSensorSubscribe.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.QueuedMessageSensorSubscribe, typeof(QueuedMessageSensorSubscribe.SetReply));
     }
 
     private static void RegisterCoreMessages()
@@ -128,6 +134,34 @@ public static class RdmPacketFactory
         //ParameterDescription
         RegisterPacketType(RdmCommands.Get, RdmParameters.ParameterDescription, typeof(ParameterDescription.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.ParameterDescription, typeof(ParameterDescription.GetReply));
+
+        //SupportedParametersEnhanced
+        RegisterPacketType(RdmCommands.Get, RdmParameters.SupportedParametersEnhanced, typeof(SupportedParametersEnhanced.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SupportedParametersEnhanced, typeof(SupportedParametersEnhanced.GetReply));
+
+        //ControllerFlagSupport
+        RegisterPacketType(RdmCommands.Get, RdmParameters.ControllerFlagSupport, typeof(ControllerFlagSupport.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.ControllerFlagSupport, typeof(ControllerFlagSupport.GetReply));
+
+        //NackDescription
+        RegisterPacketType(RdmCommands.Get, RdmParameters.NackDescription, typeof(NackDescription.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.NackDescription, typeof(NackDescription.GetReply));
+
+        //EnumLabel
+        RegisterPacketType(RdmCommands.Get, RdmParameters.EnumLabel, typeof(EnumLabel.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.EnumLabel, typeof(EnumLabel.GetReply));
+
+        //PackedPidSub
+        RegisterPacketType(RdmCommands.Get, RdmParameters.PackedPidSub, typeof(PackedPidSub.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.PackedPidSub, typeof(PackedPidSub.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.PackedPidSub, typeof(PackedPidSub.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.PackedPidSub, typeof(PackedPidSub.SetReply));
+
+        //PackedPidIndex
+        RegisterPacketType(RdmCommands.Get, RdmParameters.PackedPidIndex, typeof(PackedPidIndex.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.PackedPidIndex, typeof(PackedPidIndex.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.PackedPidIndex, typeof(PackedPidIndex.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.PackedPidIndex, typeof(PackedPidIndex.SetReply));
     }
 
 
@@ -461,6 +495,10 @@ public static class RdmPacketFactory
         //SelfTestDescription
         RegisterPacketType(RdmCommands.Get, RdmParameters.SelfTestDescription, typeof(SelfTestDescription.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SelfTestDescription, typeof(SelfTestDescription.GetReply));
+
+        //SelfTestEnhanced
+        RegisterPacketType(RdmCommands.Get, RdmParameters.SelfTestEnhanced, typeof(SelfTestEnhanced.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SelfTestEnhanced, typeof(SelfTestEnhanced.GetReply));
 
         //CapturePreset
         RegisterPacketType(RdmCommands.Set, RdmParameters.CapturePreset, typeof(CapturePreset.Set));
