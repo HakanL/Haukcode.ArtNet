@@ -5,7 +5,7 @@ public class ArtInputPacket : ArtNetPacket
     private byte[] inputs = { 0, 0, 0, 0 };
     public byte BindIndex { get; set; } = 0;
 
-    public short NumPorts { get; set; } = 0;
+    public ushort NumPorts { get; set; } = 0;
 
     public byte[] Inputs
     {
@@ -33,7 +33,7 @@ public class ArtInputPacket : ArtNetPacket
         var target = new ArtInputPacket
         {
             BindIndex = reader.ReadByte(),
-            NumPorts = reader.ReadInt16(),
+            NumPorts = reader.ReadUInt16(),
             Inputs = reader.ReadBytes(4)
         };
 
@@ -44,7 +44,7 @@ public class ArtInputPacket : ArtNetPacket
     {
         writer.WriteByte((byte)0);
         writer.WriteByte(BindIndex);
-        writer.WriteInt16(NumPorts);
+        writer.WriteUInt16(NumPorts);
         writer.WriteBytes(Inputs);
     }
 }

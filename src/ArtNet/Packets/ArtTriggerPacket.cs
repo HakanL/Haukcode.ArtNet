@@ -11,7 +11,7 @@ public class ArtTriggerPacket : ArtNetPacket
 
     public byte Filler2 { get; set; }
 
-    public Int16 OemCode { get; set; }
+    public ushort OemCode { get; set; }
 
     public byte Key { get; set; }
 
@@ -27,7 +27,7 @@ public class ArtTriggerPacket : ArtNetPacket
         {
             Filler1 = reader.ReadByte(),
             Filler2 = reader.ReadByte(),
-            OemCode = reader.ReadInt16(),
+            OemCode = reader.ReadUInt16(),
             Key = reader.ReadByte(),
             SubKey = reader.ReadByte(),
             Data = reader.ReadBytes(512)
@@ -40,7 +40,7 @@ public class ArtTriggerPacket : ArtNetPacket
     {
         writer.WriteByte(Filler1);
         writer.WriteByte(Filler2);
-        writer.WriteInt16(OemCode);
+        writer.WriteUInt16(OemCode);
         writer.WriteByte(Key);
         writer.WriteByte(SubKey);
         writer.WriteBytes(Data);

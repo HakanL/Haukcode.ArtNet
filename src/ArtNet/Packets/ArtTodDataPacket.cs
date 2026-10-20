@@ -21,7 +21,7 @@ public class ArtTodDataPacket : ArtNetPacket
 
     public byte Universe { get; set; }
 
-    public short UIdTotal { get; set; }
+    public ushort UIdTotal { get; set; }
 
     public byte BlockCount { get; set; }
 
@@ -43,7 +43,7 @@ public class ArtTodDataPacket : ArtNetPacket
         target.Net = reader.ReadByte();
         target.CommandResponse = reader.ReadByte();
         target.Universe = reader.ReadByte();
-        target.UIdTotal = reader.ReadInt16();
+        target.UIdTotal = reader.ReadUInt16();
         target.BlockCount = reader.ReadByte();
 
         int count = reader.ReadByte();
@@ -63,7 +63,7 @@ public class ArtTodDataPacket : ArtNetPacket
         writer.WriteByte(Net);
         writer.WriteByte(CommandResponse);
         writer.WriteByte(Universe);
-        writer.WriteInt16(UIdTotal);
+        writer.WriteUInt16(UIdTotal);
         writer.WriteByte(BlockCount);
         writer.WriteByte((byte)Devices.Count);
 

@@ -2,14 +2,14 @@ namespace Haukcode.ArtNet.Packets;
 
 public class ArtNetUnknownPacket : ArtNetPacket
 {
-    public ArtNetUnknownPacket(int opCode)
-        : base((ArtNetOpCodes)opCode)
+    public ArtNetUnknownPacket(ArtNetOpCodes opCode)
+        : base(opCode)
     {
     }
 
     protected override int DataLength => Data.Length;
 
-    internal static ArtNetUnknownPacket Parse(short opCode, BigEndianBinaryReader reader)
+    internal static ArtNetUnknownPacket Parse(ArtNetOpCodes opCode, BigEndianBinaryReader reader)
     {
         var target = new ArtNetUnknownPacket(opCode)
         {

@@ -35,21 +35,21 @@ public class ArtPollReplyPacket : ArtNetPacket
         }
     }
 
-    public short Port { get; set; } = ArtNetClient.DefaultPort;
+    public ushort Port { get; set; } = ArtNetClient.DefaultPort;
 
-    public short FirmwareVersion { get; set; }
+    public ushort FirmwareVersion { get; set; }
 
     public byte NetSwitch { get; set; }
     
     public byte SubSwitch { get; set; }
     
-    public short Oem { get; set; } = 0xff;
+    public ushort Oem { get; set; } = 0xff;
 
     public byte UbeaVersion { get; set; }
 
     public byte Status { get; set; }
 
-    public short EstaCode { get; set; }
+    public ushort EstaCode { get; set; }
 
     public string ShortName { get; set; } = string.Empty;
 
@@ -57,7 +57,7 @@ public class ArtPollReplyPacket : ArtNetPacket
 
     public string NodeReport { get; set; } = string.Empty;
 
-    public short PortCount { get; set; }
+    public ushort PortCount { get; set; }
 
     private byte[] portTypes = new byte[4];
 
@@ -196,18 +196,18 @@ public class ArtPollReplyPacket : ArtNetPacket
         var target = new ArtPollReplyPacket();
 
         target.IpAddress = reader.ReadBytes(4);
-        target.Port = reader.ReadInt16Reverse();
-        target.FirmwareVersion = reader.ReadInt16();
+        target.Port = reader.ReadUInt16Reverse();
+        target.FirmwareVersion = reader.ReadUInt16();
         target.NetSwitch = reader.ReadByte();
         target.SubSwitch = reader.ReadByte();
-        target.Oem = reader.ReadInt16();
+        target.Oem = reader.ReadUInt16();
         target.UbeaVersion = reader.ReadByte();
         target.Status = reader.ReadByte();
-        target.EstaCode = reader.ReadInt16Reverse();
+        target.EstaCode = reader.ReadUInt16Reverse();
         target.ShortName = reader.ReadString(18);
         target.LongName = reader.ReadString(64);
         target.NodeReport = reader.ReadString(64);
-        target.PortCount = reader.ReadInt16();
+        target.PortCount = reader.ReadUInt16();
         target.PortTypes = reader.ReadBytes(4);
         target.GoodInput = reader.ReadBytes(4);
         target.GoodOutputA = reader.ReadBytes(4);
@@ -249,18 +249,18 @@ public class ArtPollReplyPacket : ArtNetPacket
     protected override void WriteData(ref SpanBinaryWriter writer)
     {
         writer.WriteBytes(IpAddress);
-        writer.WriteInt16Reverse(Port);
-        writer.WriteInt16(FirmwareVersion);
+        writer.WriteUInt16Reverse(Port);
+        writer.WriteUInt16(FirmwareVersion);
         writer.WriteByte(NetSwitch);
         writer.WriteByte(SubSwitch);
-        writer.WriteInt16(Oem);
+        writer.WriteUInt16(Oem);
         writer.WriteByte(UbeaVersion);
         writer.WriteByte((byte)Status);
-        writer.WriteInt16Reverse(EstaCode);
+        writer.WriteUInt16Reverse(EstaCode);
         writer.WriteString(ShortName, 18);
         writer.WriteString(LongName, 64);
         writer.WriteString(NodeReport, 64);
-        writer.WriteInt16(PortCount);
+        writer.WriteUInt16(PortCount);
         writer.WriteBytes(PortTypes);
         writer.WriteBytes(GoodInput);
         writer.WriteBytes(GoodOutputA);

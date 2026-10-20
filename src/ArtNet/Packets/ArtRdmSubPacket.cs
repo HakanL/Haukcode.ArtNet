@@ -14,11 +14,11 @@ public class ArtRdmSubPacket : ArtNetPacket
 
     public byte Command { get; set; }
 
-    public short ParameterId { get; set; }
+    public ushort ParameterId { get; set; }
 
-    public short SubDevice { get; set; }
+    public ushort SubDevice { get; set; }
 
-    public short SubCount { get; set; }
+    public ushort SubCount { get; set; }
 
     public byte[] RdmData { get; set; } = null!;
 
@@ -35,9 +35,9 @@ public class ArtRdmSubPacket : ArtNetPacket
         target.DeviceId = ReadUId(reader);
         reader.SkipBytes(1);
         target.Command = reader.ReadByte();
-        target.ParameterId = reader.ReadInt16();
-        target.SubDevice = reader.ReadInt16();
-        target.SubCount = reader.ReadInt16();
+        target.ParameterId = reader.ReadUInt16();
+        target.SubDevice = reader.ReadUInt16();
+        target.SubCount = reader.ReadUInt16();
         reader.SkipBytes(4);
 
         target.RdmData = reader.ReadBytes();
@@ -52,9 +52,9 @@ public class ArtRdmSubPacket : ArtNetPacket
         WriteUid(ref writer, DeviceId);
         writer.WriteByte(0x00);
         writer.WriteByte((byte)Command);
-        writer.WriteInt16((short)ParameterId);
-        writer.WriteInt16(SubDevice);
-        writer.WriteInt16(SubCount);
+        writer.WriteUInt16(ParameterId);
+        writer.WriteUInt16(SubDevice);
+        writer.WriteUInt16(SubCount);
         writer.WriteZeros(4);
         writer.WriteBytes(RdmData);
     }

@@ -11,7 +11,7 @@ public class ArtNetDmxPacket : ArtNetPacket
 
     public byte Physical { get; set; }
 
-    public short Universe { get; set; }
+    public ushort Universe { get; set; }
 
     public ReadOnlyMemory<byte> DmxData { get; set; }
 
@@ -30,7 +30,7 @@ public class ArtNetDmxPacket : ArtNetPacket
     {
         target.Sequence = reader.ReadByte();
         target.Physical = reader.ReadByte();
-        target.Universe = reader.ReadInt16Reverse();
+        target.Universe = reader.ReadUInt16Reverse();
 
         int length = reader.ReadInt16();
         // Zero-copy slice over the receive buffer instead of ReadBytes().ToArray(); the
@@ -44,7 +44,7 @@ public class ArtNetDmxPacket : ArtNetPacket
     {
         writer.WriteByte(Sequence);
         writer.WriteByte(Physical);
-        writer.WriteInt16Reverse(Universe);
+        writer.WriteUInt16Reverse(Universe);
         writer.WriteInt16((short)DmxData.Length);
         writer.WriteBytes(DmxData);
     }

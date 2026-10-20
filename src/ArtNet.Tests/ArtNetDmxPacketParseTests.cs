@@ -5,7 +5,7 @@ namespace Haukcode.ArtNet.Tests;
 [TestClass]
 public class ArtNetDmxPacketParseTests
 {
-    private static byte[] Encode(short universe, byte sequence, byte[] dmx)
+    private static byte[] Encode(ushort universe, byte sequence, byte[] dmx)
     {
         var packet = new ArtNetDmxPacket { Universe = universe, Sequence = sequence, Physical = 1, DmxData = dmx };
         var buffer = new byte[ArtNetPacket.MAX_PACKET_SIZE];
@@ -23,13 +23,13 @@ public class ArtNetDmxPacketParseTests
 
         var a = ArtNetPacket.Parse(first, scratch);
         Assert.AreSame(scratch, a);
-        Assert.AreEqual((short)5, scratch.Universe);
+        Assert.AreEqual((ushort)5, scratch.Universe);
         Assert.AreEqual((byte)9, scratch.Sequence);
         CollectionAssert.AreEqual(new byte[] { 1, 2, 3, 4 }, scratch.DmxData.ToArray());
 
         var b = ArtNetPacket.Parse(second, scratch);
         Assert.AreSame(scratch, b);
-        Assert.AreEqual((short)700, scratch.Universe);
+        Assert.AreEqual((ushort)700, scratch.Universe);
         Assert.AreEqual((byte)10, scratch.Sequence);
         CollectionAssert.AreEqual(new byte[] { 255, 0 }, scratch.DmxData.ToArray());
 

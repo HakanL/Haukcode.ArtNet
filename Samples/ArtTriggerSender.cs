@@ -25,7 +25,7 @@ public class ArtTriggerSender : SampleCapture
         }
     }
 
-    public Task SendArtTrigger(Int16 oemCode, byte key, byte subKey)
+    public Task SendArtTrigger(ushort oemCode, byte key, byte subKey)
     {
         return this.client.QueuePacketForSending((IPAddress)null, new ArtTriggerPacket
         {

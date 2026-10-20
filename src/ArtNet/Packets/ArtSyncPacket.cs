@@ -7,7 +7,7 @@ public class ArtSyncPacket : ArtNetPacket
     {
     }
 
-    public short Aux { get; set; }
+    public ushort Aux { get; set; }
 
     protected override int DataLength => 2;
 
@@ -19,7 +19,7 @@ public class ArtSyncPacket : ArtNetPacket
         // controllers omit them entirely (12-byte ArtSync). Treat them as optional
         // instead of throwing on every sync frame from such a sender.
         if (reader.BytesLeft >= 2)
-            target.Aux = reader.ReadInt16Reverse();
+            target.Aux = reader.ReadUInt16();
         else
             reader.SkipBytes(reader.BytesLeft);
 
@@ -28,6 +28,6 @@ public class ArtSyncPacket : ArtNetPacket
 
     protected override void WriteData(ref SpanBinaryWriter writer)
     {
-        writer.WriteInt16(Aux);
+        writer.WriteUInt16(Aux);
     }
 }

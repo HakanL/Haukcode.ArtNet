@@ -186,7 +186,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         // send buffer synchronously, so the caller's buffer lifetime is honored (this used to
         // be dmxData.ToArray(), a full per-packet copy on the hot path).
         this.scratchDmxPacket.DmxData = dmxData;
-        this.scratchDmxPacket.Universe = (short)(universeId - 1);
+        this.scratchDmxPacket.Universe = (ushort)(universeId - 1);
         this.scratchDmxPacket.Sequence = sequenceId;
 
         return QueueScratchDmxPacket(address, important, shardKey: universeId);
