@@ -98,4 +98,24 @@ public class RdmPacketFactoryTests
 
         Assert.IsEmpty(failures, string.Join(Environment.NewLine, failures));
     }
+
+    [TestMethod]
+    public void EveryPacketType_DerivesFromBaseMatchingItsCommand()
+    {
+        var failures = new List<string>();
+        foreach (var type in typeof(RdmPacket).Assembly.GetTypes())
+        {
+            if (!type.IsClass || type.IsAbstract || !typeof(RdmPacket).IsAssignableFrom(type) || NotRegistered.Contains(type))
+                continue;
+
+            var command = ((RdmPacket)Activator.CreateInstance(type)!).Header.Command;
+            bool isResponse = command is RdmCommands.GetResponse or RdmCommands.SetResponse or RdmCommands.DiscoveryResponse;
+            var expectedBase = isResponse ? typeof(RdmResponsePacket) : typeof(RdmRequestPacket);
+
+            if (!expectedBase.IsAssignableFrom(type))
+                failures.Add($"{type.FullName}: {command} should derive from {expectedBase.Name}");
+        }
+
+        Assert.IsEmpty(failures, string.Join(Environment.NewLine, failures));
+    }
 }

@@ -20,7 +20,7 @@ public class DefaultSlotValue
         public byte Value { get; set; }
     }
 
-    public class Get : RdmResponsePacket
+    public class Get : RdmRequestPacket
     {
         public Get()
             : base(RdmCommands.Get,RdmParameters.DefaultSlotValue)

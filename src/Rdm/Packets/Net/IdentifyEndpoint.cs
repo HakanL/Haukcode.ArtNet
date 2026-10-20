@@ -70,7 +70,7 @@ public class EndpointIdentify
         }
     }
 
-    public class SetReply : RdmRequestPacket
+    public class SetReply : RdmResponsePacket
     {
         public SetReply()
             : base(RdmCommands.SetResponse, RdmParameters.EndpointIdentify)
