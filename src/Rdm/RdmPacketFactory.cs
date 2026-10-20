@@ -10,6 +10,7 @@ using Haukcode.ArtNet.Rdm.Packets.Management;
 using Haukcode.ArtNet.Rdm.Packets.Discovery;
 using Haukcode.ArtNet.Rdm.Packets.Configuration;
 using Haukcode.ArtNet.Rdm.Packets.Sensors;
+using Haukcode.ArtNet.Rdm.Packets.Display;
 
 namespace Haukcode.ArtNet.Rdm;
 
@@ -28,6 +29,8 @@ public static class RdmPacketFactory
         RegisterConfigurationMessages();
         RegisterControlMessages();
         RegisterSensorMessages();
+        RegisterManagementMessages();
+        RegisterDisplayMessages();
     }
 
     private static void RegisterSensorMessages()
@@ -41,6 +44,42 @@ public static class RdmPacketFactory
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SensorValue, typeof(SensorValue.GetReply));
         RegisterPacketType(RdmCommands.Set, RdmParameters.SensorValue, typeof(SensorValue.Set));
         RegisterPacketType(RdmCommands.SetResponse, RdmParameters.SensorValue, typeof(SensorValue.SetReply));
+
+        //RecordSensors
+        RegisterPacketType(RdmCommands.Set, RdmParameters.RecordSensors, typeof(RecordSensors.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.RecordSensors, typeof(RecordSensors.SetReply));
+    }
+
+    private static void RegisterManagementMessages()
+    {
+        //CommsStatus
+        RegisterPacketType(RdmCommands.Get, RdmParameters.CommsStatus, typeof(CommsStatus.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.CommsStatus, typeof(CommsStatus.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.CommsStatus, typeof(CommsStatus.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.CommsStatus, typeof(CommsStatus.SetReply));
+
+        //ProxiedDeviceCount
+        RegisterPacketType(RdmCommands.Get, RdmParameters.ProxiedDeviceCount, typeof(ProxiedDeviceCount.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.ProxiedDeviceCount, typeof(ProxiedDeviceCount.GetReply));
+
+        //ProxiedDevices
+        RegisterPacketType(RdmCommands.Get, RdmParameters.ProxiedDevices, typeof(ProxiedDevices.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.ProxiedDevices, typeof(ProxiedDevices.GetReply));
+    }
+
+    private static void RegisterDisplayMessages()
+    {
+        //DisplayInvert
+        RegisterPacketType(RdmCommands.Get, RdmParameters.DisplayInvert, typeof(DisplayInvert.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DisplayInvert, typeof(DisplayInvert.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.DisplayInvert, typeof(DisplayInvert.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DisplayInvert, typeof(DisplayInvert.SetReply));
+
+        //DisplayLevel
+        RegisterPacketType(RdmCommands.Get, RdmParameters.DisplayLevel, typeof(DisplayLevel.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DisplayLevel, typeof(DisplayLevel.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.DisplayLevel, typeof(DisplayLevel.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DisplayLevel, typeof(DisplayLevel.SetReply));
     }
 
     private static void RegisterDiscoveryMessages()
@@ -51,8 +90,8 @@ public static class RdmPacketFactory
         RegisterPacketType(RdmCommands.Discovery, RdmParameters.DiscoveryMute, typeof(DiscoveryMute.Request));
         RegisterPacketType(RdmCommands.DiscoveryResponse, RdmParameters.DiscoveryMute, typeof(DiscoveryMute.Reply));
 
-        RegisterPacketType(RdmCommands.Discovery, RdmParameters.DiscoveryUnMute, typeof(DiscoveryMute.Request));
-        RegisterPacketType(RdmCommands.DiscoveryResponse, RdmParameters.DiscoveryUnMute, typeof(DiscoveryMute.Reply));
+        RegisterPacketType(RdmCommands.Discovery, RdmParameters.DiscoveryUnMute, typeof(DiscoveryUnMute.Request));
+        RegisterPacketType(RdmCommands.DiscoveryResponse, RdmParameters.DiscoveryUnMute, typeof(DiscoveryUnMute.Reply));
 
     }
 
@@ -68,6 +107,16 @@ public static class RdmPacketFactory
         //ClearStatusId
         RegisterPacketType(RdmCommands.Set, RdmParameters.ClearStatusId, typeof(ClearStatusId.Set));
         RegisterPacketType(RdmCommands.SetResponse, RdmParameters.ClearStatusId, typeof(ClearStatusId.SetReply));
+
+        //StatusIdDescription
+        RegisterPacketType(RdmCommands.Get, RdmParameters.StatusIdDescription, typeof(StatusIdDescription.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.StatusIdDescription, typeof(StatusIdDescription.GetReply));
+
+        //SubDeviceStatusReportThreshold
+        RegisterPacketType(RdmCommands.Get, RdmParameters.SubDeviceStatusReportThreshold, typeof(SubDeviceStatusReportThreshold.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SubDeviceStatusReportThreshold, typeof(SubDeviceStatusReportThreshold.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.SubDeviceStatusReportThreshold, typeof(SubDeviceStatusReportThreshold.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.SubDeviceStatusReportThreshold, typeof(SubDeviceStatusReportThreshold.SetReply));
     }
 
     private static void RegisterCoreMessages()
@@ -107,7 +156,7 @@ public static class RdmPacketFactory
 
         //RdmTrafficEnable
         RegisterPacketType(RdmCommands.Get, RdmParameters.RdmTrafficEnable, typeof(RdmTrafficEnable.Get));
-        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.RdmTrafficEnable, typeof(BackgroundDiscovery.GetReply));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.RdmTrafficEnable, typeof(RdmTrafficEnable.GetReply));
         RegisterPacketType(RdmCommands.Set, RdmParameters.RdmTrafficEnable, typeof(RdmTrafficEnable.Set));
         RegisterPacketType(RdmCommands.SetResponse, RdmParameters.RdmTrafficEnable, typeof(RdmTrafficEnable.SetReply));
 
@@ -154,12 +203,38 @@ public static class RdmPacketFactory
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.EndpointDevices, typeof(EndpointDevices.Reply));
 
         //BindingControlFields
+        RegisterPacketType(RdmCommands.Get, RdmParameters.BindingControlFields, typeof(BindingControlFields.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BindingControlFields, typeof(BindingControlFields.GetReply));
+
         //TcpCommsStatus
+        RegisterPacketType(RdmCommands.Get, RdmParameters.TcpCommsStatus, typeof(TcpCommsStatus.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.TcpCommsStatus, typeof(TcpCommsStatus.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.TcpCommsStatus, typeof(TcpCommsStatus.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.TcpCommsStatus, typeof(TcpCommsStatus.SetReply));
+
         //BackgroundQueuedStatusPolicy
+        RegisterPacketType(RdmCommands.Get, RdmParameters.BackgroundQueuedStatusPolicy, typeof(BackgroundQueuedStatusPolicy.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BackgroundQueuedStatusPolicy, typeof(BackgroundQueuedStatusPolicy.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.BackgroundQueuedStatusPolicy, typeof(BackgroundQueuedStatusPolicy.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.BackgroundQueuedStatusPolicy, typeof(BackgroundQueuedStatusPolicy.SetReply));
+
         //BackgroundQueuedStatusPolicyDescription
+        RegisterPacketType(RdmCommands.Get, RdmParameters.BackgroundQueuedStatusPolicyDescription, typeof(BackgroundQueuedStatusPolicyDescription.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BackgroundQueuedStatusPolicyDescription, typeof(BackgroundQueuedStatusPolicyDescription.GetReply));
+
         //BackgroundStatusType
+        RegisterPacketType(RdmCommands.Get, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.SetReply));
+
         //QueuedStatusEndpointCollection
+        RegisterPacketType(RdmCommands.Set, RdmParameters.QueuedStatusEndpointCollection, typeof(QueuedStatusEndpointCollection.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.QueuedStatusEndpointCollection, typeof(QueuedStatusEndpointCollection.SetReply));
+
         //QueuedStatusUIDCollection
+        RegisterPacketType(RdmCommands.Set, RdmParameters.QueuedStatusUIDCollection, typeof(QueuedStatusUIDCollection.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.QueuedStatusUIDCollection, typeof(QueuedStatusUIDCollection.SetReply));
     }
 
     private static void RegisterProductMessages()
@@ -301,6 +376,12 @@ public static class RdmPacketFactory
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DmxStartupMode, typeof(DmxStartupMode.GetReply));
         RegisterPacketType(RdmCommands.Set, RdmParameters.DmxStartupMode, typeof(DmxStartupMode.Set));
         RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DmxStartupMode, typeof(DmxStartupMode.SetReply));
+
+        //DmxFailMode
+        RegisterPacketType(RdmCommands.Get, RdmParameters.DmxFailMode, typeof(DmxFailMode.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DmxFailMode, typeof(DmxFailMode.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.DmxFailMode, typeof(DmxFailMode.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DmxFailMode, typeof(DmxFailMode.SetReply));
     }
 
     private static void RegisterDimmerMessages()
