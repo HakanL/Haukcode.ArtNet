@@ -13,16 +13,16 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # push the release tag
+      id-token: write   # NuGet trusted publishing
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Get main version
       id: version
-      uses: notiz-dev/github-action-json-property@release
-      with:
-        path: version.json
-        prop_path: 'version'
+      run: echo "prop=$(jq -r .version ../version.json)" >> $GITHUB_OUTPUT
     - name: Get branch name from branch
       run: echo "BRANCH_NAME=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }' | sed "s/[[:space:]_]/-/g")" >> $GITHUB_ENV
       if: startsWith(github.ref, 'refs/heads/')
@@ -38,7 +38,7 @@ jobs:
     - run: echo Version is ${PACKAGE_VERSION}
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.100
     - name: Install dependencies Core
@@ -57,8 +57,14 @@ jobs:
       run: dotnet build --configuration Release --no-restore /p:Version="${PACKAGE_VERSION}" Package/Haukcode.ArtNet.Package.csproj /p:PackageId=Haukcode.ArtNet
 
     ## Publish and Tag
+    - name: NuGet login
+      id: nuget-login
+      uses: NuGet/login@v1
+      with:
+        user: HakanL
+      if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     - name: Publish NuGet
-      run: dotnet nuget push Package/bin/Release/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
+      run: dotnet nuget push Package/bin/Release/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
       if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     - name: Tag
       run: |
