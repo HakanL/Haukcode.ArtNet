@@ -52,7 +52,7 @@ public class ArtAddressPacket : ArtNetPacket
         SwIn = src.SwIn.Select(x => (byte)(x | 0x80)).ToArray();
         SwOut = src.SwOut.Select(x => (byte)(x | 0x80)).ToArray();
         SubSwitch = (byte)((src.SubSwitch & 0x000F) | 0x80);
-        NetSwitch = (byte)(((src.SubSwitch & 0x7F00) >> 8) | 0x80);
+        NetSwitch = (byte)((src.NetSwitch & 0x7F) | 0x80);
     }
 
     internal static ArtAddressPacket Parse(BigEndianBinaryReader reader)

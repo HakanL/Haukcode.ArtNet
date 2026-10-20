@@ -1,5 +1,9 @@
 ﻿namespace Haukcode.ArtNet;
 
+/// <remarks>
+/// Equality and hashing compare only the UID, not <see cref="SubDeviceId"/>, so the same device's
+/// sub-devices are equal; use <see cref="IsMatch"/> to compare including the sub-device.
+/// </remarks>
 public class SubDeviceUId : UId
 {
     protected SubDeviceUId()

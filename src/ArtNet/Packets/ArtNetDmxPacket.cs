@@ -15,7 +15,13 @@ public class ArtNetDmxPacket : ArtNetPacket
 
     public ReadOnlyMemory<byte> DmxData { get; set; }
 
-    protected override int DataLength => 6 + DmxData.Length;
+    /// <summary>Maximum number of DMX slots in one packet.</summary>
+    public const int MaxDmxLength = 512;
+
+    // The spec requires an even length of 2 to 512; shorter or odd data is zero-padded
+    private int PaddedDmxLength => Math.Max(2, DmxData.Length + (DmxData.Length & 1));
+
+    protected override int DataLength => 6 + PaddedDmxLength;
 
     internal static ArtNetDmxPacket Parse(BigEndianBinaryReader reader)
     {
@@ -32,7 +38,10 @@ public class ArtNetDmxPacket : ArtNetPacket
         target.Physical = reader.ReadByte();
         target.Universe = reader.ReadUInt16Reverse();
 
-        int length = reader.ReadInt16();
+        int length = reader.ReadUInt16();
+        if (length > reader.BytesLeft)
+            throw new InvalidDataException($"ArtDmx length {length} is longer than the {reader.BytesLeft} bytes received.");
+
         // Zero-copy slice over the receive buffer instead of ReadBytes().ToArray(); the
         // consumer copies it into a pooled buffer synchronously before the buffer is reused.
         target.DmxData = reader.ReadSlice(length);
@@ -45,7 +54,12 @@ public class ArtNetDmxPacket : ArtNetPacket
         writer.WriteByte(Sequence);
         writer.WriteByte(Physical);
         writer.WriteUInt16Reverse(Universe);
-        writer.WriteInt16((short)DmxData.Length);
+        if (DmxData.Length > MaxDmxLength)
+            throw new InvalidOperationException($"ArtDmx data is at most {MaxDmxLength} bytes.");
+
+        int length = PaddedDmxLength;
+        writer.WriteUInt16((ushort)length);
         writer.WriteBytes(DmxData);
+        writer.WriteZeros(length - DmxData.Length);
     }
 }

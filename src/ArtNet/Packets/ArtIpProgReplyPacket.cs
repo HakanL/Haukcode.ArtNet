@@ -44,7 +44,8 @@ public class ArtIpProgReplyPacket : ArtNetPacket
         }
     }
 
-    protected override int DataLength => 19;
+    // Filler (4), IP (4), mask (4), port (2), status, spare, gateway (4), spare (2)
+    protected override int DataLength => 22;
 
     public ArtIpProgReplyPacket()
         : base(ArtNetOpCodes.IpProgReply)
@@ -60,7 +61,9 @@ public class ArtIpProgReplyPacket : ArtNetPacket
         target.Netmask = reader.ReadBytes(4);
         reader.SkipBytes(2);
         target.DhcpEnabled = (reader.ReadByte() & (1 << 6)) != 0;
+        reader.SkipBytes(1);
         target.DefaultGateway = reader.ReadBytes(4);
+        reader.SkipBytes(Math.Min(2, reader.BytesLeft));
 
         return target;
     }
@@ -70,8 +73,10 @@ public class ArtIpProgReplyPacket : ArtNetPacket
         writer.WriteZeros(4);
         writer.WriteBytes(IpAddress);
         writer.WriteBytes(Netmask);
-        writer.WriteZeros(2);
+        writer.WriteUInt16((ushort)ArtNetClient.DefaultPort);
         writer.WriteByte((byte)(DhcpEnabled ? (1 << 6) : 0));
+        writer.WriteZeros(1);
         writer.WriteBytes(DefaultGateway);
+        writer.WriteZeros(2);
     }
 }

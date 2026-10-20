@@ -25,6 +25,9 @@ public class ArtTodDataPacket : ArtNetPacket
 
     public byte BlockCount { get; set; }
 
+    /// <summary>Most UIDs one ArtTodData packet may carry.</summary>
+    public const int MaxDevices = 200;
+
     public List<UId> Devices { get; set; }
 
     protected override int DataLength => 16 + Devices.Count * 6;
@@ -65,6 +68,10 @@ public class ArtTodDataPacket : ArtNetPacket
         writer.WriteByte(Universe);
         writer.WriteUInt16(UIdTotal);
         writer.WriteByte(BlockCount);
+
+        if (Devices.Count > MaxDevices)
+            throw new InvalidOperationException($"An ArtTodData packet carries at most {MaxDevices} UIDs; split the table into blocks.");
+
         writer.WriteByte((byte)Devices.Count);
 
         foreach (UId id in Devices)

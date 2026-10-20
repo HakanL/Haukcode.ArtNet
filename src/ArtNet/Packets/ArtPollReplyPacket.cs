@@ -115,9 +115,33 @@ public class ArtPollReplyPacket : ArtNetPacket
         }
     }
 
-    public byte[] SwIn { get; set; } = new byte[4];
+    private byte[] swIn = new byte[4];
 
-    public byte[] SwOut { get; set; } = new byte[4];
+    public byte[] SwIn
+    {
+        get => swIn;
+        set
+        {
+            if (value.Length != 4)
+                throw new ArgumentException("SwIn must be an array of 4 bytes.");
+
+            swIn = value;
+        }
+    }
+
+    private byte[] swOut = new byte[4];
+
+    public byte[] SwOut
+    {
+        get => swOut;
+        set
+        {
+            if (value.Length != 4)
+                throw new ArgumentException("SwOut must be an array of 4 bytes.");
+
+            swOut = value;
+        }
+    }
 
     public byte AcnPriority { get; set; }
 
@@ -175,13 +199,10 @@ public class ArtPollReplyPacket : ArtNetPacket
 
         if (NetSwitch > 0 || SubSwitch > 0)
         {
-            universe = (NetSwitch & 0x7F00);
-            universe += (NetSwitch & 0xFF) << 8;
-
-            universe += (SubSwitch & 0x7F00);
+            // 15-bit Port-Address: Net (7 bits), Sub-Net (4 bits), Universe (4 bits)
+            universe = (NetSwitch & 0x7F) << 8;
             universe += (SubSwitch & 0x0F) << 4;
-
-            universe += (outPorts ? SwOut[portIndex] : SwIn[portIndex]) & 0xF;
+            universe += (outPorts ? SwOut[portIndex] : SwIn[portIndex]) & 0x0F;
         }
         else
         {

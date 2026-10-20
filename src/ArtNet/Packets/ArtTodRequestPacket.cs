@@ -14,7 +14,10 @@ public class ArtTodRequestPacket : ArtNetPacket
 
     public List<byte> RequestedUniverses { get; set; }
 
-    protected override int DataLength => 12 + RequestedUniverses.Count;
+    /// <summary>Size of the fixed Address array.</summary>
+    public const int MaxRequestedUniverses = 32;
+
+    protected override int DataLength => 12 + MaxRequestedUniverses;
 
     internal static ArtTodRequestPacket Parse(BigEndianBinaryReader reader)
     {
@@ -26,9 +29,10 @@ public class ArtTodRequestPacket : ArtNetPacket
             Command = reader.ReadByte()
         };
 
-        int count = reader.ReadByte();
+        int count = Math.Min((int)reader.ReadByte(), MaxRequestedUniverses);
+        var addresses = reader.ReadBytes(Math.Min(MaxRequestedUniverses, reader.BytesLeft));
 
-        target.RequestedUniverses = new List<byte>(reader.ReadBytes(count));
+        target.RequestedUniverses = new List<byte>(addresses.Take(count));
 
         return target;
     }
@@ -38,7 +42,11 @@ public class ArtTodRequestPacket : ArtNetPacket
         writer.WriteZeros(9);
         writer.WriteByte(Net);
         writer.WriteByte(Command);
+        if (RequestedUniverses.Count > MaxRequestedUniverses)
+            throw new InvalidOperationException($"An ArtTodRequest can request at most {MaxRequestedUniverses} universes.");
+
         writer.WriteByte((byte)RequestedUniverses.Count);
         writer.WriteBytes(RequestedUniverses.ToArray());
+        writer.WriteZeros(MaxRequestedUniverses - RequestedUniverses.Count);
     }
 }

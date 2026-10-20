@@ -91,7 +91,10 @@ public ref struct SpanBinaryWriter
         this.writePosition += count;
     }
 
-    /// <summary>Fixed-width field: the string's UTF-8 bytes, truncated to fit, zero-padded.</summary>
+    /// <summary>
+    /// Fixed-width, null-terminated field: the string's UTF-8 bytes, truncated to leave room for the
+    /// terminating NUL (without splitting a character), zero-padded.
+    /// </summary>
     public void WriteString(string value, int length)
     {
         var field = this.buffer.Slice(this.writePosition, length);
@@ -99,17 +102,23 @@ public ref struct SpanBinaryWriter
 
         if (!string.IsNullOrEmpty(value))
         {
-            if (Encoding.UTF8.GetByteCount(value) <= length)
+            int maxBytes = length - 1;
+
+            if (Encoding.UTF8.GetByteCount(value) <= maxBytes)
             {
                 // The common case: encode straight into the packet, no intermediate array
                 bytesWritten = Encoding.UTF8.GetBytes(value, field);
             }
             else
             {
-                // Too long: encode to a scratch span and keep what fits
+                // Too long: encode to a scratch span and keep what fits, backing up to the start
+                // of a character so a multi-byte sequence isn't cut in half
                 Span<byte> scratch = stackalloc byte[Encoding.UTF8.GetMaxByteCount(value.Length)];
                 int encoded = Encoding.UTF8.GetBytes(value, scratch);
-                bytesWritten = Math.Min(encoded, length);
+                bytesWritten = Math.Min(encoded, maxBytes);
+                while (bytesWritten > 0 && bytesWritten < encoded && (scratch[bytesWritten] & 0xC0) == 0x80)
+                    bytesWritten--;
+
                 scratch[..bytesWritten].CopyTo(field);
             }
         }

@@ -127,7 +127,11 @@ public class UId : IComparable
     public int CompareTo(object? obj)
     {
         if (obj is UId id)
-            return ManufacturerId.CompareTo(id.ManufacturerId) + DeviceId.CompareTo(id.DeviceId);
+        {
+            // RDM orders UIDs by manufacturer first, then device
+            int result = ManufacturerId.CompareTo(id.ManufacturerId);
+            return result != 0 ? result : DeviceId.CompareTo(id.DeviceId);
+        }
 
         return -1;
     }

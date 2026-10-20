@@ -44,7 +44,8 @@ public class ArtIpProgPacket : ArtNetPacket
         }
     }
 
-    protected override int DataLength => 18;
+    // Filler (2), command, filler, IP (4), mask (4), port (2), gateway (4), spare (4)
+    protected override int DataLength => 22;
 
     public ArtIpProgPacket()
         : base(ArtNetOpCodes.IpProg)
@@ -62,6 +63,7 @@ public class ArtIpProgPacket : ArtNetPacket
         target.Netmask = reader.ReadBytes(4);
         reader.SkipBytes(2);
         target.DefaultGateway = reader.ReadBytes(4);
+        reader.SkipBytes(Math.Min(4, reader.BytesLeft));
 
         return target;
     }
@@ -73,7 +75,8 @@ public class ArtIpProgPacket : ArtNetPacket
         writer.WriteByte(0x00);
         writer.WriteBytes(IpAddress);
         writer.WriteBytes(Netmask);
-        writer.WriteInt16((short)ArtNetClient.DefaultPort);
+        writer.WriteUInt16((ushort)ArtNetClient.DefaultPort);
         writer.WriteBytes(DefaultGateway);
+        writer.WriteZeros(4);
     }
 }
