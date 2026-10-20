@@ -65,13 +65,22 @@ public abstract class RdmPacket
 
     public static RdmPacket ReadPacket(RdmCommands command, RdmParameters parameterId, RdmBinaryReader contentData)
     {
-        RdmPacket? rdmPacket = null;
-
         RdmHeader header = new RdmHeader();
         header.Command = command;
         header.ParameterId = parameterId;
 
-        rdmPacket = RdmPacket.Create(header);
+        return ReadPacket(header, contentData);
+    }
+
+    /// <summary>
+    /// Reads a packet body using an already prepared header, for example a deferred/queued
+    /// response where <see cref="RdmHeader.PortOrResponseType"/> (ACK_TIMER, NACK_REASON,
+    /// ACK_OVERFLOW) must be preserved. Set <see cref="RdmHeader.ParameterDataLength"/> to the
+    /// body length, variable-length bodies are read based on it.
+    /// </summary>
+    public static RdmPacket ReadPacket(RdmHeader header, RdmBinaryReader contentData)
+    {
+        RdmPacket? rdmPacket = RdmPacket.Create(header);
         if (rdmPacket != null)
         {
             rdmPacket.ReadData(contentData);

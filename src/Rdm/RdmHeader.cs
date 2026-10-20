@@ -30,7 +30,11 @@ public class RdmHeader
 
     public RdmParameters ParameterId { get; set; }
 
-    public byte ParameterDataLength { get; protected set;  }
+    /// <summary>
+    /// Length of the parameter data. Set when the header is read and when the packet is written;
+    /// set it yourself when parsing a body with <see cref="RdmPacket.ReadPacket(RdmHeader, RdmBinaryReader)"/>.
+    /// </summary>
+    public byte ParameterDataLength { get; set; }
 
     #endregion
 
