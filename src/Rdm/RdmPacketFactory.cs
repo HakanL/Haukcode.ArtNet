@@ -605,6 +605,7 @@ public static class RdmPacketFactory
             switch ((RdmResponseTypes)header.PortOrResponseType)
             {
                 case RdmResponseTypes.AckTimer:
+                case RdmResponseTypes.AckTimerHiRes:
                     return RdmPacket.Create(header, typeof(RdmAckTimer));
                 case RdmResponseTypes.NackReason:
                     return RdmPacket.Create(header, typeof(RdmNack));

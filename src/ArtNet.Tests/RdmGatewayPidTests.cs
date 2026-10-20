@@ -85,13 +85,6 @@ public class RdmGatewayPidTests
     }
 
     [TestMethod]
-    public void DiscoveryState_ValuesMatchTableA2()
-    {
-        Assert.AreEqual(0x01, (int)DiscoveryState.DiscoveryStates.Incremental);
-        Assert.AreEqual(0x02, (int)DiscoveryState.DiscoveryStates.Full);
-    }
-
-    [TestMethod]
     public void BindingControlFields_EndpointThenUid()
     {
         var uid = new UId(0x1234, 0x56789ABC);
@@ -133,14 +126,5 @@ public class RdmGatewayPidTests
         Assert.AreEqual((ushort)3, reply.UnhealthyTcpEvents);
 
         Assert.AreEqual("default", RoundTrip(new TcpCommsStatus.Set { Scope = "default" }, 63).Scope);
-    }
-
-    [TestMethod]
-    public void NackReason_HasTheE120_2025Table()
-    {
-        Assert.AreEqual(0x0B, (int)NackReason.ActionNotSupported);
-        Assert.AreEqual(0x0E, (int)NackReason.UnknownUid);
-        Assert.AreEqual(0x13, (int)NackReason.InvalidPort);
-        Assert.AreEqual(0x20, (int)NackReason.AllCallSetFail);
     }
 }

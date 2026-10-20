@@ -41,6 +41,9 @@ public enum ProductCategories
     DimmerAcColdCathode = 0x0503,
     DimmerAcNonDim = 0x0504,
     DimmerAcElv = 0x0505,
+    DimmerAcOther = 0x0506,
+
+    [Obsolete("Renamed to DimmerAcOther: 0x0506 is PRODUCT_CATEGORY_DIMMER_AC_OTHER.")]
     DimmerDcOther = 0x0506,
     DimmerDcLevel = 0x0507,
     DimmerDcPwm = 0x0508,

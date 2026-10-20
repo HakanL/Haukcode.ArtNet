@@ -67,7 +67,68 @@ public class ProductDetailIdList
         WaterJet = 0x30A,
         Wind = 0x30B,
         Confetti = 0x30C,
-        Hazard = 0x30D
+        Hazard = 0x30D,
+
+        // Dimmer types
+        PhaseControl = 0x0400,
+        ReversePhaseControl = 0x0401,
+        Sine = 0x0402,
+        Pwm = 0x0403,
+        DC = 0x0404,
+        HfBallast = 0x0405,
+        HfHvNeonBallast = 0x0406,
+        HfHvEl = 0x0407,
+        MhrBallast = 0x0408,
+        BitAngleModulation = 0x0409,
+        FrequencyModulation = 0x040A,
+        HighFrequency12V = 0x040B,
+        RelayMechanical = 0x040C,
+        RelayElectronic = 0x040D,
+        SwitchElectronic = 0x040E,
+        Contactor = 0x040F,
+
+        // Scenic
+        MirrorballRotator = 0x0500,
+        OtherRotator = 0x0501,
+        KabukiDrop = 0x0502,
+        Curtain = 0x0503,
+        Lineset = 0x0504,
+        MotorControl = 0x0505,
+        DamperControl = 0x0506,
+
+        // Data distribution
+        Splitter = 0x0600,
+        EthernetNode = 0x0601,
+        Merge = 0x0602,
+        Datapatch = 0x0603,
+        WirelessLink = 0x0604,
+
+        // Data conversion
+        ProtocolConverter = 0x0701,
+        AnalogDemultiplex = 0x0702,
+        AnalogMultiplex = 0x0703,
+        SwitchPanel = 0x0704,
+
+        // Audio-visual
+        Router = 0x0800,
+        Fader = 0x0801,
+        Mixer = 0x0802,
+
+        // Connections
+        ChangeoverManual = 0x0900,
+        ChangeoverAuto = 0x0901,
+        Test = 0x0902,
+
+        // Power
+        GfiRcd = 0x0A00,
+        Battery = 0x0A01,
+        ControllableBreaker = 0x0A02,
+
+        // Sensors
+        Input = 0x0B00,
+        Sensor = 0x0B01,
+
+        Other = 0x7FFF
     }
 
     public class Get : RdmRequestPacket

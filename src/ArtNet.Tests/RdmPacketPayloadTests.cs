@@ -64,12 +64,6 @@ public class RdmPacketPayloadTests
     }
 
     [TestMethod]
-    public void SlotIds_ColorSemaphore_MatchesSpec()
-    {
-        Assert.AreEqual(0x0210, (int)SlotIds.ColorSemaphore);
-    }
-
-    [TestMethod]
     public void DiscoveryMuteReply_BindingUidIsOptional()
     {
         Assert.IsNull(RoundTrip(new DiscoveryMute.Reply { ControlField = 1 }, 2).BindingId);

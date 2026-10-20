@@ -195,19 +195,11 @@ public class ArtPollReplyPacket : ArtNetPacket
     /// <returns>The 15 Bit universe address</returns>
     public int UniverseAddress(bool outPorts, int portIndex)
     {
-        int universe;
-
-        if (NetSwitch > 0 || SubSwitch > 0)
-        {
-            // 15-bit Port-Address: Net (7 bits), Sub-Net (4 bits), Universe (4 bits)
-            universe = (NetSwitch & 0x7F) << 8;
-            universe += (SubSwitch & 0x0F) << 4;
-            universe += (outPorts ? SwOut[portIndex] : SwIn[portIndex]) & 0x0F;
-        }
-        else
-        {
-            universe = (outPorts ? SwOut[portIndex] : SwIn[portIndex]);
-        }
+        // 15-bit Port-Address: Net (7 bits), Sub-Net (4 bits), Universe (4 bits). Only the low
+        // nibble of SwIn/SwOut is the universe, whatever the Net and Sub-Net are.
+        int universe = (NetSwitch & 0x7F) << 8;
+        universe += (SubSwitch & 0x0F) << 4;
+        universe += (outPorts ? SwOut[portIndex] : SwIn[portIndex]) & 0x0F;
 
         return universe;
     }
