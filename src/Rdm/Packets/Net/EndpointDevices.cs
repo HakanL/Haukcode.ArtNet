@@ -9,11 +9,11 @@ public class EndpointDevices
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -29,9 +29,9 @@ public class EndpointDevices
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
-        public int ListChangeNumber { get; set; }
+        public uint ListChangeNumber { get; set; }
 
         private List<UId> deviceIds = new List<UId>();
 
@@ -44,8 +44,8 @@ public class EndpointDevices
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
-            ListChangeNumber = data.ReadHiLoInt32();
+            EndpointID = data.ReadUInt16();
+            ListChangeNumber = data.ReadUInt32();
 
             for (int n = 0; n < (Header.ParameterDataLength - 6) / 6; n++)
             {
@@ -56,7 +56,7 @@ public class EndpointDevices
         protected override void WriteData(RdmBinaryWriter data)
         {
             data.WriteUInt16(EndpointID);
-            data.WriteHiLoInt32(ListChangeNumber);
+            data.WriteUInt32(ListChangeNumber);
 
             foreach (UId id in DeviceIds)
                 data.WriteUid(id);

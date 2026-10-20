@@ -28,11 +28,11 @@ public class EndpointToUniverse
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -49,11 +49,11 @@ public class EndpointToUniverse
         }
 
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
-        private short universeNumber = 0;
+        private ushort universeNumber = 0;
 
-        public short UniverseNumber
+        public ushort UniverseNumber
         {
             get { return universeNumber; }
             set
@@ -71,9 +71,9 @@ public class EndpointToUniverse
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
 
-            int universeNumber = data.ReadInt16();
+            ushort universeNumber = data.ReadUInt16();
             switch (universeNumber)
             {
                 case 0:
@@ -84,7 +84,7 @@ public class EndpointToUniverse
                     break;
                 default:
                     EndpointMode = UniverseMode.Standard;
-                    UniverseNumber = (short)universeNumber;
+                    UniverseNumber = universeNumber;
                     break;
 
             }
@@ -121,11 +121,11 @@ public class EndpointToUniverse
             EndpointMode = UniverseMode.Standard;
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
-        private short universeNumber = 0;
+        private ushort universeNumber = 0;
 
-        public short UniverseNumber
+        public ushort UniverseNumber
         {
             get { return universeNumber; }
             set
@@ -141,9 +141,9 @@ public class EndpointToUniverse
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
 
-            int universeNumber = data.ReadInt16();
+            ushort universeNumber = data.ReadUInt16();
             switch (universeNumber)
             {
                 case 0:
@@ -154,7 +154,7 @@ public class EndpointToUniverse
                     break;
                 default:
                     EndpointMode = UniverseMode.Standard;
-                    UniverseNumber = (short)universeNumber;
+                    UniverseNumber = universeNumber;
                     break;
 
             }

@@ -16,7 +16,7 @@ public class StatusMessage
         /// to which the status message belongs. If the status message does not reference a particular subdevice
         /// the field shall be set to 0x0000, to reference the root device.
         /// </summary>
-        public short SubDeviceId { get; set; }
+        public ushort SubDeviceId { get; set; }
 
         /// <summary>
         /// The Status Type is used to identify the severity of the condition.
@@ -26,7 +26,7 @@ public class StatusMessage
         /// <summary>
         /// Status Message ID’s within the range of 0x0000 — 0x7FFF are reserved for publicly defined Status Messages.
         /// </summary>
-        public short StatusMessageId { get; set; }
+        public ushort StatusMessageId { get; set; }
 
         /// <summary>
         /// Each Status Message supports the return of two separate data values relevant to the context of
@@ -94,9 +94,9 @@ public class StatusMessage
             for (int n = 0; n < (Header.ParameterDataLength / 9); n++)
             {
                 Status subDeviceStatus = new Status();
-                subDeviceStatus.SubDeviceId = data.ReadInt16();
+                subDeviceStatus.SubDeviceId = data.ReadUInt16();
                 subDeviceStatus.StatusType = (StatusTypes) data.ReadByte();
-                subDeviceStatus.StatusMessageId = data.ReadInt16();
+                subDeviceStatus.StatusMessageId = data.ReadUInt16();
                 subDeviceStatus.DataValue1 = data.ReadInt16();
                 subDeviceStatus.DataValue2 = data.ReadInt16();
 

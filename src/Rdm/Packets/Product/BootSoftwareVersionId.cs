@@ -40,18 +40,18 @@ public class BootSoftwareVersionId
         {
         }
 
-        public int VersionId { get; set; }
+        public uint VersionId { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            VersionId = data.ReadHiLoInt32();
+            VersionId = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(VersionId);
+            data.WriteUInt32(VersionId);
         }
 
         #endregion

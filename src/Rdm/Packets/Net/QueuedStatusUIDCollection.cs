@@ -11,7 +11,7 @@ public class QueuedStatusUIDCollection
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public UId TargetUID { get; set; } = null!;
 
@@ -19,7 +19,7 @@ public class QueuedStatusUIDCollection
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             TargetUID = data.ReadUId();
             StatusType = (StatusTypes) data.ReadByte();
         }

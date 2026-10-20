@@ -54,7 +54,7 @@ public class DiscoveryMute
         /// Reserved bits (Bits 4-15)
         /// The Reserved bits (Bits 4-15) are reserved for future implementation and shall be set to 0.
         /// </remarks>
-        public short ControlField { get; set; }
+        public ushort ControlField { get; set; }
 
         /// <summary>
         /// The id for the primary port on the device.
@@ -71,7 +71,7 @@ public class DiscoveryMute
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            ControlField = data.ReadInt16();
+            ControlField = data.ReadUInt16();
             if (Header.ParameterDataLength > 2)
                 BindingId = data.ReadUId();
         }

@@ -33,18 +33,18 @@ public class LampStrikes
         {
         }
 
-        public int LampStrikes { get; set; }
+        public uint LampStrikes { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            LampStrikes = data.ReadHiLoInt32();
+            LampStrikes = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(LampStrikes);
+            data.WriteUInt32(LampStrikes);
         }
 
         #endregion
@@ -57,18 +57,18 @@ public class LampStrikes
         {
         }
 
-        public int LampStrikes { get; set; }
+        public uint LampStrikes { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            LampStrikes = data.ReadHiLoInt32();
+            LampStrikes = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(LampStrikes);
+            data.WriteUInt32(LampStrikes);
         }
 
         #endregion

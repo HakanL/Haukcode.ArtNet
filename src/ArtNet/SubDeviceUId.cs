@@ -6,19 +6,19 @@ public class SubDeviceUId : UId
     {
     }
 
-    public SubDeviceUId(ushort manufacturerId, uint deviceId, short subDeviceId)
+    public SubDeviceUId(ushort manufacturerId, uint deviceId, ushort subDeviceId)
         : base(manufacturerId, deviceId)
     {
         SubDeviceId = subDeviceId;
     }
 
-    public SubDeviceUId(UId source, short subDeviceId)
+    public SubDeviceUId(UId source, ushort subDeviceId)
         : base(source)
     {
         SubDeviceId = subDeviceId;
     }
 
-    public short SubDeviceId { get; set; }
+    public ushort SubDeviceId { get; set; }
 
     public static bool IsSubDevice(UId id)
     {

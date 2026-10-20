@@ -46,7 +46,7 @@ public class DmxBlockAddress
         /// <remarks>
         /// The footprint of the root device shall not be included within this footprint field. 
         /// </remarks>
-        public short TotalDeviceFootprint { get; set; }
+        public ushort TotalDeviceFootprint { get; set; }
 
         /// <summary>
         /// The first DMX address of all sub-devices.
@@ -57,14 +57,14 @@ public class DmxBlockAddress
         /// addressed as a contiguous block. If the sub-devices are not currently linearly addressed as a contiguous 
         /// block then this field shall be set to 0xFFFF in the response message. 
         /// </remarks>
-        public short DmxAddress { get; set; }
+        public ushort DmxAddress { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            TotalDeviceFootprint = data.ReadInt16();
-            DmxAddress = data.ReadInt16();
+            TotalDeviceFootprint = data.ReadUInt16();
+            DmxAddress = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -91,13 +91,13 @@ public class DmxBlockAddress
         /// the device shall automatically address each sub-device incrementally accounting for the footprint size of 
         /// each sub-device. 
         /// </remarks>
-        public short DmxAddress { get; set; }
+        public ushort DmxAddress { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            DmxAddress = data.ReadInt16();
+            DmxAddress = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

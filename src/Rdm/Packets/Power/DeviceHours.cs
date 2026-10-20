@@ -37,18 +37,18 @@ public class DeviceHours
         {
         }
 
-        public int DeviceHours { get; set; }
+        public uint DeviceHours { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            DeviceHours = data.ReadHiLoInt32();
+            DeviceHours = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(DeviceHours);
+            data.WriteUInt32(DeviceHours);
         }
 
         #endregion
@@ -61,18 +61,18 @@ public class DeviceHours
         {
         }
 
-        public int DeviceHours { get; set; }
+        public uint DeviceHours { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            DeviceHours = data.ReadHiLoInt32();
+            DeviceHours = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(DeviceHours);
+            data.WriteUInt32(DeviceHours);
         }
 
         #endregion

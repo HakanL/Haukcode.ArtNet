@@ -48,13 +48,13 @@ public class DmxStartAddress
         /// This should be in the range of 1 to 512. A value
         /// of zero indicates the parameter is not set.
         /// </remarks>
-        public short DmxAddress { get; set; }
+        public ushort DmxAddress { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            DmxAddress = data.ReadInt16();
+            DmxAddress = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -79,13 +79,13 @@ public class DmxStartAddress
         /// This should be in the range of 1 to 512. A value
         /// of zero indicates the parameter is not set.
         /// </remarks>
-        public short DmxAddress { get; set; }
+        public ushort DmxAddress { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            DmxAddress = data.ReadInt16();
+            DmxAddress = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

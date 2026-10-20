@@ -44,7 +44,7 @@ public class CommsStatus
         /// <summary>
         /// The message ended before the Message Length field was received.
         /// </summary>
-        public short ShortMessage { get; set; }
+        public ushort ShortMessage { get; set; }
 
         /// <summary>
         /// The number of slots actually received did not match the Message Length plus
@@ -54,7 +54,7 @@ public class CommsStatus
         /// This counter shall only be incremented if the Destination UID in the
         /// packet matches the Device’s UID.
         /// </remarks>
-        public short LengthMismatch { get; set; }
+        public ushort LengthMismatch { get; set; }
 
         /// <summary>
         /// The message checksum failed.
@@ -62,15 +62,15 @@ public class CommsStatus
         /// <remarks>
         /// This counter shall only be incremented if the Destination UID in the packet matches the Device’s UID.
         /// </remarks>
-        public short ChecksumFail { get; set; }
+        public ushort ChecksumFail { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            ShortMessage = data.ReadInt16();
-            LengthMismatch = data.ReadInt16();
-            ChecksumFail = data.ReadInt16();
+            ShortMessage = data.ReadUInt16();
+            LengthMismatch = data.ReadUInt16();
+            ChecksumFail = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

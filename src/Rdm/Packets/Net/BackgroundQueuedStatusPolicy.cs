@@ -9,11 +9,11 @@ public class BackgroundQueuedStatusPolicy
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -29,7 +29,7 @@ public class BackgroundQueuedStatusPolicy
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public byte CurrentPolicyID { get; set; }
 
@@ -37,7 +37,7 @@ public class BackgroundQueuedStatusPolicy
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             CurrentPolicyID = data.ReadByte();
             PolicyCount = data.ReadByte();
         }
@@ -57,13 +57,13 @@ public class BackgroundQueuedStatusPolicy
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public byte CurrentPolicyID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             CurrentPolicyID = data.ReadByte();
         }
 

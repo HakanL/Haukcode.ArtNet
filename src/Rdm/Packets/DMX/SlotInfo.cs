@@ -8,14 +8,14 @@ public class SlotInfo
 {
     public struct SlotInformation
     {
-        public SlotInformation(short offset, SlotIds id):this()
+        public SlotInformation(ushort offset, SlotIds id):this()
         {
             this.Offset = offset;
             this.Type = SlotTypes.Primary;
             this.Id = id;
         }
 
-        public SlotInformation(short offset, SlotTypes type, int slotLink)
+        public SlotInformation(ushort offset, SlotTypes type, ushort slotLink)
             : this()
         {
             this.Offset = offset;
@@ -23,17 +23,17 @@ public class SlotInfo
             this.SlotLink = slotLink;
         }
 
-        public short Offset { get; set; }
+        public ushort Offset { get; set; }
 
         public SlotTypes Type { get; set; }
 
         public SlotIds Id
         {
             get { return (SlotIds)SlotLink; }
-            set { SlotLink = (int)value; }
+            set { SlotLink = (ushort)value; }
         }
 
-        public int SlotLink { get; set; }     
+        public ushort SlotLink { get; set; }     
     }
 
     public class Get : RdmRequestPacket
@@ -74,9 +74,9 @@ public class SlotInfo
             for (int n = 0; n < Header.ParameterDataLength / 5; n++)
             {
                 SlotInformation slot = new SlotInformation();
-                slot.Offset = data.ReadInt16();
+                slot.Offset = data.ReadUInt16();
                 slot.Type = (SlotTypes) data.ReadByte();
-                slot.SlotLink = (int)data.ReadInt16();
+                slot.SlotLink = data.ReadUInt16();
                 Slots.Add(slot);
             }
         }
@@ -87,7 +87,7 @@ public class SlotInfo
             {
                 data.WriteUInt16(slot.Offset);
                 data.WriteByte((byte) slot.Type);
-                data.WriteUInt16((short)slot.SlotLink);
+                data.WriteUInt16(slot.SlotLink);
             }
         }
 

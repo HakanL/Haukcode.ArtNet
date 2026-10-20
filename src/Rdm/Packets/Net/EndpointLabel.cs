@@ -9,11 +9,11 @@ public class EndpointLabel
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -29,13 +29,13 @@ public class EndpointLabel
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public string Label { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             Label = Encoding.ASCII.GetString(data.ReadBytes(Header.ParameterDataLength-2));
         }
 
@@ -53,13 +53,13 @@ public class EndpointLabel
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public string Label { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             Label = Encoding.ASCII.GetString(data.ReadBytes(Header.ParameterDataLength - 2));
         }
 
