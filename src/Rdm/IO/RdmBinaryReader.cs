@@ -19,6 +19,11 @@ public class RdmBinaryReader
         return (short)((highByte << 8) | lowByte);
     }
 
+    public ushort ReadUInt16()
+    {
+        return unchecked((ushort)ReadInt16());
+    }
+
     public int ReadHiLoInt32()
     {
         // Read the bytes individually
@@ -31,6 +36,11 @@ public class RdmBinaryReader
         return (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
     }
 
+    public uint ReadUInt32()
+    {
+        return unchecked((uint)ReadHiLoInt32());
+    }
+
     public string ReadString(int length)
     {
         return Encoding.ASCII.GetString(this.reader.ReadBytes(length)).TrimEnd((char)0);
@@ -38,7 +48,7 @@ public class RdmBinaryReader
 
     public UId ReadUId()
     {
-        return new UId((ushort)ReadInt16(), (uint)ReadHiLoInt32());
+        return new UId(ReadUInt16(), ReadUInt32());
     }
 
     public bool ReadBool()

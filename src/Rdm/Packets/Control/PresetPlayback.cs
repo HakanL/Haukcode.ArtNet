@@ -47,7 +47,7 @@ public class PresetPlayback
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            SceneNumber = (ushort) data.ReadInt16();
+            SceneNumber = data.ReadUInt16();
             if (SceneNumber > (ushort) PlayMode.Off || SceneNumber < (ushort) PlayMode.All)
                 Mode = PlayMode.Scene;
             else
@@ -57,7 +57,7 @@ public class PresetPlayback
         protected override void WriteData(RdmBinaryWriter data)
         {
             if (Mode == PlayMode.Scene)
-                data.WriteUInt16((short) SceneNumber);
+                data.WriteUInt16(SceneNumber);
             else
                 data.WriteUInt16((short) Mode);
         }
@@ -82,7 +82,7 @@ public class PresetPlayback
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            SceneNumber = (ushort) data.ReadInt16();
+            SceneNumber = data.ReadUInt16();
             if (SceneNumber > (ushort)PlayMode.Off || SceneNumber < (ushort)PlayMode.All)
                 Mode = PlayMode.Scene;
             else
@@ -93,7 +93,7 @@ public class PresetPlayback
         protected override void WriteData(RdmBinaryWriter data)
         {
             if (Mode == PlayMode.Scene)
-                data.WriteUInt16((short)SceneNumber);
+                data.WriteUInt16(SceneNumber);
             else
                 data.WriteUInt16((short)Mode);
             data.WriteByte(Level);

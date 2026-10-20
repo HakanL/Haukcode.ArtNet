@@ -11,13 +11,13 @@ public class QueuedStatusEndpointCollection
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         public StatusTypes StatusType { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             StatusType = (StatusTypes) data.ReadByte();
         }
 

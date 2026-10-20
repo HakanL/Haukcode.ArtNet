@@ -38,7 +38,7 @@ public class SupportedParameters
         {
             for (int n = 0; n < base.Header.ParameterDataLength / 2; n++)
             {
-                ParameterIds.Add((RdmParameters)data.ReadInt16());
+                ParameterIds.Add((RdmParameters)data.ReadUInt16());
             }
         }
 

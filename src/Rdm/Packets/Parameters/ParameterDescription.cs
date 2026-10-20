@@ -18,7 +18,7 @@ public class ParameterDescription
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            ParameterId = (RdmParameters)((ushort)data.ReadInt16());
+            ParameterId = (RdmParameters)data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -112,7 +112,7 @@ public class ParameterDescription
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            ParameterId = (RdmParameters)((ushort)data.ReadInt16());
+            ParameterId = (RdmParameters)data.ReadUInt16();
             PDLSize = data.ReadByte();
             DataType = data.ReadByte();
             CommandClass = data.ReadByte();

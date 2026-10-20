@@ -9,11 +9,11 @@ public class BackgroundDiscovery
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -29,7 +29,7 @@ public class BackgroundDiscovery
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         /// <summary>
         /// Controls whether background discovery is enabled within the RDM device.
@@ -38,7 +38,7 @@ public class BackgroundDiscovery
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             BackgroundDiscovery = data.ReadBool();
         }
 
@@ -56,7 +56,7 @@ public class BackgroundDiscovery
         {
         }
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
         /// <summary>
         /// Controls whether background discovery is enabled within the RDM device.
@@ -65,7 +65,7 @@ public class BackgroundDiscovery
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
             BackgroundDiscovery = data.ReadBool();
         }
 

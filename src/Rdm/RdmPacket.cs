@@ -17,7 +17,7 @@ public abstract class RdmPacket
 
     public RdmHeader Header { get; protected set; } = null!;
 
-    public short Checksum { get; set; }
+    public ushort Checksum { get; set; }
 
     #endregion
 

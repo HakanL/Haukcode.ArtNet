@@ -35,7 +35,7 @@ public class DmxPersonalityDescription
 
         public byte PersonalityIndex { get; set; }
 
-        public short DmxSlotsRequired { get; set; }
+        public ushort DmxSlotsRequired { get; set; }
 
         public string Description { get; set; } = null!;
         
@@ -44,7 +44,7 @@ public class DmxPersonalityDescription
         protected override void ReadData(RdmBinaryReader data)
         {
             PersonalityIndex = data.ReadByte();
-            DmxSlotsRequired = data.ReadInt16();
+            DmxSlotsRequired = data.ReadUInt16();
             if(Header.ParameterDataLength > 3)
                 Description = data.ReadString(Header.ParameterDataLength - 3);
         }

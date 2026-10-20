@@ -24,7 +24,7 @@ public class RdmHeader
 
     public byte MessageCount { get; set; }
 
-    public short SubDevice { get; set; }
+    public ushort SubDevice { get; set; }
 
     public RdmCommands Command { get; set; }
 
@@ -44,9 +44,9 @@ public class RdmHeader
         TransactionNumber = data.ReadByte();
         PortOrResponseType = data.ReadByte();
         MessageCount = data.ReadByte();
-        SubDevice = data.ReadInt16();
+        SubDevice = data.ReadUInt16();
         Command = (RdmCommands)data.ReadByte();
-        ParameterId = (RdmParameters)data.ReadInt16();
+        ParameterId = (RdmParameters)data.ReadUInt16();
         ParameterDataLength = data.ReadByte();
     }
 

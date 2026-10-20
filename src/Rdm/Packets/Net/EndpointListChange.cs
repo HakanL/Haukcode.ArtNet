@@ -37,9 +37,9 @@ public class EndpointListChange
         {
         }
 
-        private int listChangeNumber = 0;
+        private uint listChangeNumber = 0;
 
-        public int ListChangeNumber
+        public uint ListChangeNumber
         {
             get { return listChangeNumber; }
             set { listChangeNumber = value; }
@@ -47,12 +47,12 @@ public class EndpointListChange
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            ListChangeNumber = data.ReadHiLoInt32();
+            ListChangeNumber = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(ListChangeNumber);
+            data.WriteUInt32(ListChangeNumber);
         }
     }
 }

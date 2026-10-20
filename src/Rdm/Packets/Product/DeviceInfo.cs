@@ -33,23 +33,23 @@ public class DeviceInfo
         {
         }
 
-        public short RdmProtocolVersion { get; set; }
+        public ushort RdmProtocolVersion { get; set; }
 
-        public short DeviceModelId { get; set; }
+        public ushort DeviceModelId { get; set; }
 
         public ProductCategories ProductCategory { get; set; }
 
-        public int SoftwareVersionId { get; set; }
+        public uint SoftwareVersionId { get; set; }
 
-        public short DmxFootprint { get; set; }
+        public ushort DmxFootprint { get; set; }
 
         public byte DmxPersonality { get; set; }
 
         public byte DmxPersonalityCount { get; set; }
 
-        public short DmxStartAddress { get; set; }
+        public ushort DmxStartAddress { get; set; }
 
-        public short SubDeviceCount { get; set; }
+        public ushort SubDeviceCount { get; set; }
 
         public byte SensorCount { get; set; }
 
@@ -57,15 +57,15 @@ public class DeviceInfo
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            RdmProtocolVersion = data.ReadInt16();
-            DeviceModelId = data.ReadInt16();
-            ProductCategory = (ProductCategories) data.ReadInt16();
-            SoftwareVersionId = data.ReadHiLoInt32();
-            DmxFootprint = data.ReadInt16();
+            RdmProtocolVersion = data.ReadUInt16();
+            DeviceModelId = data.ReadUInt16();
+            ProductCategory = (ProductCategories)data.ReadUInt16();
+            SoftwareVersionId = data.ReadUInt32();
+            DmxFootprint = data.ReadUInt16();
             DmxPersonality = data.ReadByte();
             DmxPersonalityCount = data.ReadByte();
-            DmxStartAddress = data.ReadInt16();
-            SubDeviceCount = data.ReadInt16();
+            DmxStartAddress = data.ReadUInt16();
+            SubDeviceCount = data.ReadUInt16();
             SensorCount = data.ReadByte();
         }
 
@@ -74,7 +74,7 @@ public class DeviceInfo
             data.WriteUInt16(RdmProtocolVersion);
             data.WriteUInt16(DeviceModelId);
             data.WriteUInt16((short) ProductCategory);
-            data.WriteHiLoInt32(SoftwareVersionId);
+            data.WriteUInt32(SoftwareVersionId);
             data.WriteUInt16(DmxFootprint);
             data.WriteByte(DmxPersonality);
             data.WriteByte(DmxPersonalityCount);

@@ -33,18 +33,18 @@ public class LampHours
         {
         }
 
-        public int LampHours { get; set; }
+        public uint LampHours { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            LampHours = data.ReadHiLoInt32();
+            LampHours = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(LampHours);
+            data.WriteUInt32(LampHours);
         }
 
         #endregion
@@ -57,18 +57,18 @@ public class LampHours
         {
         }
 
-        public int LampHours { get; set; }
+        public uint LampHours { get; set; }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            LampHours = data.ReadHiLoInt32();
+            LampHours = data.ReadUInt32();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(LampHours);
+            data.WriteUInt32(LampHours);
         }
 
         #endregion

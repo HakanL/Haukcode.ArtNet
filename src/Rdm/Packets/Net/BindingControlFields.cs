@@ -31,17 +31,17 @@ public class BindingControlFields
 
         public UId Id { get; set; } = null!;
 
-        public short EndpointID { get; set; }
+        public ushort EndpointID { get; set; }
 
-        public short ControlFields { get; set; }
+        public ushort ControlFields { get; set; }
 
         public UId BindingId { get; set; } = null!;
 
         protected override void ReadData(RdmBinaryReader data)
         {
             Id = data.ReadUId();
-            EndpointID = data.ReadInt16();
-            ControlFields = data.ReadInt16();
+            EndpointID = data.ReadUInt16();
+            ControlFields = data.ReadUInt16();
             BindingId = data.ReadUId();
         }
 

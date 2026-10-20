@@ -42,6 +42,11 @@ public class RdmBinaryWriter
         this.writer.Write(byte4);
     }
 
+    public void WriteUInt32(uint value)
+    {
+        WriteHiLoInt32(unchecked((int)value));
+    }
+
     public void WriteByte(byte value)
     {
         this.writer.Write(value);
@@ -55,8 +60,8 @@ public class RdmBinaryWriter
 
     public void WriteUid(UId value)
     {
-        WriteUInt16((short)value.ManufacturerId);
-        WriteHiLoInt32((int)value.DeviceId);
+        WriteUInt16(value.ManufacturerId);
+        WriteUInt32(value.DeviceId);
     }
 
     public void WriteBool(bool value)

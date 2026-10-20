@@ -33,17 +33,17 @@ public class EndpointList
         {
         }
 
-        private int listChangeNumber = 0;
+        private uint listChangeNumber = 0;
 
-        public int ListChangeNumber
+        public uint ListChangeNumber
         {
             get { return listChangeNumber; }
             set { listChangeNumber = value; }
         }
 
-        List<short> endpointIDs = new List<short>();
+        List<ushort> endpointIDs = new List<ushort>();
 
-        public List<short> EndpointIDs
+        public List<ushort> EndpointIDs
         {
             get { return endpointIDs; }
             set { endpointIDs = value; }
@@ -51,12 +51,12 @@ public class EndpointList
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            ListChangeNumber = data.ReadHiLoInt32();
+            ListChangeNumber = data.ReadUInt32();
 
-            List<short> endpoints = new List<short>();
+            List<ushort> endpoints = new List<ushort>();
             for (int n = 0; n < ((Header.ParameterDataLength - 4) / 2); n++)
             {
-                endpoints.Add(data.ReadInt16());
+                endpoints.Add(data.ReadUInt16());
             }
 
             EndpointIDs = endpoints;
@@ -64,8 +64,8 @@ public class EndpointList
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteHiLoInt32(ListChangeNumber);
-            foreach (short endpointId in EndpointIDs)
+            data.WriteUInt32(ListChangeNumber);
+            foreach (ushort endpointId in EndpointIDs)
             {
                 data.WriteUInt16(endpointId);
             }

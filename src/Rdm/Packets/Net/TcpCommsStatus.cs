@@ -29,15 +29,15 @@ public class TcpCommsStatus
 
         public IPAddress CurrentConnectionIP { get; set; } = null!;
 
-        public short UnhealthyTCPEvents { get; set; }
+        public ushort UnhealthyTCPEvents { get; set; }
 
-        public short TCPConnectEvents { get; set; }
+        public ushort TCPConnectEvents { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
             CurrentConnectionIP = new IPAddress(data.ReadBytes(4));
-            UnhealthyTCPEvents = data.ReadInt16();
-            TCPConnectEvents = data.ReadInt16();
+            UnhealthyTCPEvents = data.ReadUInt16();
+            TCPConnectEvents = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)

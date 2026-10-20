@@ -8,14 +8,14 @@ public class DefaultSlotValue
 {
     public struct SlotValue
     {
-        public SlotValue(short offset, byte value)
+        public SlotValue(ushort offset, byte value)
             : this()
         {
             Offset = offset;
             Value = value;
         }
 
-        public short Offset { get; set; }
+        public ushort Offset { get; set; }
 
         public byte Value { get; set; }
     }
@@ -57,7 +57,7 @@ public class DefaultSlotValue
             for (int n = 0; n < Header.ParameterDataLength / 3; n++)
             {
                 SlotValue slot = new SlotValue();
-                slot.Offset = data.ReadInt16();
+                slot.Offset = data.ReadUInt16();
                 slot.Value = data.ReadByte();
                 DefaultValues.Add(slot);
             }
