@@ -55,6 +55,10 @@ jobs:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
     - name: Build
       run: dotnet build --configuration Release --no-restore /p:Version="${PACKAGE_VERSION}" Package/Haukcode.ArtNet.Package.csproj /p:PackageId=Haukcode.ArtNet
+    - name: Test
+      run: dotnet test --configuration Release ArtNet.Tests/Haukcode.ArtNet.Tests.csproj
+      env:
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
     ## Publish and Tag
     - name: NuGet login
