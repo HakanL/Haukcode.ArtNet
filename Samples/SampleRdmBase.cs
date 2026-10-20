@@ -43,12 +43,18 @@ public abstract class SampleRdmBase : IDisposable
 
     private static ReceiveDataPacket TransformPacket(ReceiveDataPacket receiveData)
     {
+        // The client reuses the received wrapper and ArtDmx packet for the next datagram, so
+        // copy both before queueing them for the consumer
         var copyBuf = new byte[receiveData.Packet.PacketLength];
         receiveData.Packet.WriteToBuffer(copyBuf);
 
-        receiveData.Packet = ArtNetPacket.Parse(copyBuf);
-
-        return receiveData;
+        return new ReceiveDataPacket
+        {
+            TimestampMS = receiveData.TimestampMS,
+            Source = receiveData.Source,
+            Destination = receiveData.Destination,
+            Packet = ArtNetPacket.Parse(copyBuf)!
+        };
     }
 
     private async Task WriteToWriterAsync(Channel<ReceiveDataPacket> inputChannel, CancellationToken cancellationToken)

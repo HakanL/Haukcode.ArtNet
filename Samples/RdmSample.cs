@@ -18,7 +18,7 @@ namespace Haukcode.ArtNet.Samples;
 public class RdmSample : SampleRdmBase
 {
     
-    private readonly List<(UId uid, short universe, IPEndPoint ip)> devices = new();
+    private readonly List<(UId uid, ushort universe, IPEndPoint ip)> devices = new();
     private int deviceCount;
 
     public RdmSample(IPAddress localIp, IPAddress localSubnetMask)
@@ -104,8 +104,10 @@ public class RdmSample : SampleRdmBase
         //byte port = (byte)(packet.BindIndex - 1 + packet.Port);
         foreach (var uid in packet.Devices)
         {
-            Console.WriteLine($"found in TOD: universe: {packet.Universe}  UId:{uid}");
-            devices.Add((uid, packet.Universe, source));
+            // ArtTodData splits the Port-Address into Net and the Sub-Net/Universe byte
+            ushort portAddress = (ushort)((packet.Net << 8) | packet.Universe);
+            Console.WriteLine($"found in TOD: universe: {portAddress}  UId:{uid}");
+            devices.Add((uid, portAddress, source));
         }
     }
 

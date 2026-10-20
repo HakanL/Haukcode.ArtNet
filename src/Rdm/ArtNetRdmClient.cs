@@ -14,16 +14,27 @@ public class ArtNetRdmClient : ArtNetClient
     {
     }
 
-    public Task SendRdm(RdmPacket packet, IPEndPoint targetAddress, short targetUniverse, UId targetId)
+    private int transactionNumber;
+
+    /// <param name="targetUniverse">The 15-bit Port-Address the device is on.</param>
+    public Task SendRdm(RdmPacket packet, IPEndPoint targetAddress, ushort targetUniverse, UId targetId)
     {
         return SendRdm(packet, targetAddress, targetUniverse, targetId, RdmId);
     }
 
-    public Task SendRdm(RdmPacket packet, IPEndPoint targetAddress, short targetUniverse, UId targetId, UId sourceId)
+    /// <param name="targetUniverse">The 15-bit Port-Address the device is on.</param>
+    /// <remarks>
+    /// A transaction number is assigned unless the packet already has a non-zero one; responses
+    /// echo it, so it identifies which request a response belongs to.
+    /// </remarks>
+    public Task SendRdm(RdmPacket packet, IPEndPoint targetAddress, ushort targetUniverse, UId targetId, UId sourceId)
     {
         //Fill in addition details
         packet.Header.SourceId = sourceId;
         packet.Header.DestinationId = targetId;
+
+        if (packet.Header.TransactionNumber == 0)
+            packet.Header.TransactionNumber = (byte)Interlocked.Increment(ref this.transactionNumber);
 
         //Sub Devices
         if (targetId is SubDeviceUId subDevice)

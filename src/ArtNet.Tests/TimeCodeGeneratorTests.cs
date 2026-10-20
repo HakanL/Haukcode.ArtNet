@@ -49,6 +49,41 @@ public class TimeCodeGeneratorTests
     }
 
     [TestMethod]
+    public void StopThenStart_ResumesFromTheNextFrame()
+    {
+        var start = TimeCode.Parse("10:00:00:00", ArtTimeCodeTypes.Ebu);
+        var frames = new List<TimeCode>();
+
+        using var generator = new ArtTimeCodeGenerator(start, 0, packet =>
+        {
+            lock (frames)
+                frames.Add(Capture(packet));
+        });
+
+        generator.Start();
+        Thread.Sleep(200);
+        generator.Stop();
+        Assert.IsFalse(generator.IsRunning);
+
+        int countAtStop;
+        lock (frames)
+            countAtStop = frames.Count;
+
+        generator.Start();
+        Assert.IsTrue(generator.IsRunning);
+        Thread.Sleep(200);
+        generator.Stop();
+
+        lock (frames)
+        {
+            Assert.IsGreaterThan(countAtStop, frames.Count, "no frames after restarting");
+
+            for (int i = 1; i < frames.Count; i++)
+                Assert.AreEqual(frames[i - 1].FrameNumber + 1, frames[i].FrameNumber, $"frame {i}: {frames[i - 1]} -> {frames[i]}");
+        }
+    }
+
+    [TestMethod]
     public void DropFrame_SkipsDroppedNumbersAtMinuteBoundary()
     {
         var start = TimeCode.Parse("00:00:59;25", ArtTimeCodeTypes.DropFrame);

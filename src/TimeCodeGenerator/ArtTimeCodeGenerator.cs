@@ -8,7 +8,8 @@ namespace Haukcode.ArtNet.TimeCodeGenerator;
 /// frame to a send callback from its own thread. Has no network dependency of its own, so
 /// the same class can be driven by a raw socket (this CLI) or by an ArtNetClient.
 ///
-/// Frame k is due at <c>anchor + k * period</c>; the clock never accumulates drift and, if
+/// Frame k is due at <c>anchor + k / fps</c>, computed from the exact frame rate (30000/1001
+/// for drop frame) rather than a rounded per-frame period, so the clock never accumulates drift and, if
 /// the host stalls for longer than a frame, it skips ahead rather than bursting so the
 /// timecode stays aligned with wall time (like a real LTC source). Pause and hold freeze the
 /// clock instead: the anchor slides with wall time and the count resumes where it stopped.
@@ -22,10 +23,13 @@ public sealed class ArtTimeCodeGenerator : IDisposable
     private readonly TimeCode start;
 
     private Thread? thread;
-    private volatile bool stopRequested;
+
+    // One per run, so a thread that outlives Stop's join timeout stays stopped after a new Start
+    private CancellationTokenSource? stopSource;
 
     private ArtTimeCodeTypes type;
-    private long periodTicks;
+    private long frameRateNumerator;
+    private long frameRateDenominator;
     private long anchorTicks;
     private long frameBase;
     private long lastSentIndex = -1;
@@ -49,7 +53,7 @@ public sealed class ArtTimeCodeGenerator : IDisposable
         StreamId = streamId;
 
         this.type = start.Type;
-        this.periodTicks = PeriodTicks(start.Type);
+        (this.frameRateNumerator, this.frameRateDenominator) = FrameRate(start.Type);
         this.frameBase = start.FrameNumber;
     }
 
@@ -61,7 +65,7 @@ public sealed class ArtTimeCodeGenerator : IDisposable
     /// <summary>Percentage of frames to silently skip, to simulate packet loss.</summary>
     public double DropPercent { get; set; }
 
-    public bool IsRunning => this.thread != null && !this.stopRequested;
+    public bool IsRunning => this.thread != null && this.stopSource?.IsCancellationRequested == false;
 
     public ArtTimeCodeTypes Type
     {
@@ -105,9 +109,14 @@ public sealed class ArtTimeCodeGenerator : IDisposable
         if (this.thread != null)
             throw new InvalidOperationException("Already started");
 
-        this.anchorTicks = Stopwatch.GetTimestamp();
+        lock (this.sync)
+            this.anchorTicks = Stopwatch.GetTimestamp() - TicksForFrames(this.lastSentIndex + 1);
 
-        this.thread = new Thread(Run)
+        var stopSource = new CancellationTokenSource();
+        var stopToken = stopSource.Token;
+        this.stopSource = stopSource;
+
+        this.thread = new Thread(() => Run(stopToken))
         {
             Name = "ArtTimeCode generator",
             IsBackground = true,
@@ -116,9 +125,13 @@ public sealed class ArtTimeCodeGenerator : IDisposable
         this.thread.Start();
     }
 
+    /// <summary>
+    /// Stop the clock thread; <see cref="Start"/> can be called again afterwards and continues
+    /// from the frame after the last one sent.
+    /// </summary>
     public void Stop()
     {
-        this.stopRequested = true;
+        this.stopSource?.Cancel();
         this.thread?.Join(2_000);
         this.thread = null;
     }
@@ -144,9 +157,9 @@ public sealed class ArtTimeCodeGenerator : IDisposable
             long nextIndex = this.lastSentIndex + 1;
 
             this.type = timeCode.Type;
-            this.periodTicks = PeriodTicks(timeCode.Type);
+            (this.frameRateNumerator, this.frameRateDenominator) = FrameRate(timeCode.Type);
             this.frameBase = Normalize(timeCode.FrameNumber - nextIndex, timeCode.Type);
-            this.anchorTicks = Stopwatch.GetTimestamp() - nextIndex * this.periodTicks;
+            this.anchorTicks = Stopwatch.GetTimestamp() - TicksForFrames(nextIndex);
             this.seekPending = true;
         }
     }
@@ -213,49 +226,52 @@ public sealed class ArtTimeCodeGenerator : IDisposable
         double LateStdDevMs,
         double LateMaxMs);
 
-    private void Run()
+    private void Run(CancellationToken stopToken)
     {
-        while (!this.stopRequested)
+        while (!stopToken.IsCancellationRequested)
         {
             long deadline;
             bool isPaused;
-            bool isHold;
             long period;
 
             lock (this.sync)
             {
-                period = this.periodTicks;
+                period = TicksForFrames(1);
 
                 if (this.paused || this.hold)
                 {
                     // Freeze: slide the anchor so the next frame is always one period away
-                    this.anchorTicks = Stopwatch.GetTimestamp() - this.lastSentIndex * period;
+                    this.anchorTicks = Stopwatch.GetTimestamp() - TicksForFrames(this.lastSentIndex);
                 }
 
                 isPaused = this.paused;
-                isHold = this.hold;
-                deadline = this.anchorTicks + (this.lastSentIndex + 1) * period;
+                deadline = this.anchorTicks + TicksForFrames(this.lastSentIndex + 1);
             }
 
             if (isPaused)
             {
                 // Idle in short steps so resume and stop are picked up promptly
-                WaitUntil(Math.Min(deadline, Stopwatch.GetTimestamp() + MsToTicks(5)));
+                WaitUntil(Math.Min(deadline, Stopwatch.GetTimestamp() + MsToTicks(5)), stopToken);
                 continue;
             }
 
             long sendAt = deadline + JitterTicks(period);
-            WaitUntil(sendAt);
-            if (this.stopRequested)
+            WaitUntil(sendAt, stopToken);
+            if (stopToken.IsCancellationRequested)
                 break;
 
             long now = Stopwatch.GetTimestamp();
-            RecordLateness(now - sendAt);
 
-            long index;
+            // Decide the frame from the state as it is now, not as it was before the wait, so a
+            // pause, hold or seek made meanwhile is honoured
+            TimeCode timeCode;
             lock (this.sync)
             {
-                if (isHold)
+                if (this.paused)
+                    continue;
+
+                long index;
+                if (this.hold)
                 {
                     index = this.seekPending ? this.lastSentIndex + 1 : Math.Max(this.lastSentIndex, 0);
                 }
@@ -264,26 +280,26 @@ public sealed class ArtTimeCodeGenerator : IDisposable
                     index = this.lastSentIndex + 1;
 
                     // Stalled for more than a frame (debugger, scheduling hiccup): skip ahead
-                    // instead of bursting, keeping the timecode aligned with wall time
-                    long dueIndex = (now - this.anchorTicks) / period;
-                    if (dueIndex > index)
+                    // instead of bursting, keeping the timecode aligned with wall time. Not right
+                    // after a seek, whose target frame must go out first.
+                    long dueIndex = FramesForTicks(now - this.anchorTicks);
+                    if (!this.seekPending && dueIndex > index)
                         index = dueIndex;
 
                     this.lastSentIndex = index;
                     this.seekPending = false;
                 }
+
+                timeCode = TimeCode.FromFrameNumber(this.frameBase + index, this.type);
             }
 
-            SendFrame(index);
+            RecordLateness(now - sendAt);
+            SendFrame(timeCode);
         }
     }
 
-    private void SendFrame(long index)
+    private void SendFrame(TimeCode timeCode)
     {
-        TimeCode timeCode;
-        lock (this.sync)
-            timeCode = TimeCode.FromFrameNumber(this.frameBase + index, this.type);
-
         if (DropPercent > 0 && this.random.NextDouble() * 100 < DropPercent)
         {
             lock (this.sync)
@@ -344,11 +360,11 @@ public sealed class ArtTimeCodeGenerator : IDisposable
     /// Sleep in 1 ms steps until ~2 ms remain, then spin. On Windows the 1 ms sleep relies on
     /// the process having raised its timer resolution (see Program), otherwise it is ~15 ms.
     /// </summary>
-    private void WaitUntil(long targetTicks)
+    private static void WaitUntil(long targetTicks, CancellationToken stopToken)
     {
         long spinThreshold = MsToTicks(2);
 
-        while (!this.stopRequested)
+        while (!stopToken.IsCancellationRequested)
         {
             long remaining = targetTicks - Stopwatch.GetTimestamp();
             if (remaining <= 0)
@@ -361,8 +377,15 @@ public sealed class ArtTimeCodeGenerator : IDisposable
         }
     }
 
-    private static long PeriodTicks(ArtTimeCodeTypes type) =>
-        (long)Math.Round(Stopwatch.Frequency / TimeCode.RealFps(type));
+    private static (long Numerator, long Denominator) FrameRate(ArtTimeCodeTypes type) =>
+        TimeCode.IsDropFrame(type) ? (30000, 1001) : (TimeCode.NominalFps(type), 1);
+
+    /// <summary>Stopwatch ticks spanned by a number of frames, exact apart from one final truncation.</summary>
+    private long TicksForFrames(long frames) =>
+        (long)((Int128)frames * Stopwatch.Frequency * this.frameRateDenominator / this.frameRateNumerator);
+
+    private long FramesForTicks(long ticks) =>
+        (long)((Int128)ticks * this.frameRateNumerator / ((Int128)Stopwatch.Frequency * this.frameRateDenominator));
 
     private static long MsToTicks(double ms) => (long)(ms * Stopwatch.Frequency / 1000.0);
 
