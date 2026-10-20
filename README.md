@@ -26,30 +26,54 @@ This library provides a complete implementation of the Art-Net protocol with the
 - ✅ **DMX Reception**: Receive DMX data from other ArtNet nodes
 - ✅ **Multiple Universes**: Support for multiple DMX universes simultaneously
 - ✅ **Device Discovery**: Poll and discover ArtNet devices on the network
-- ✅ **Broadcast & Unicast**: Send to all devices or specific nodes
+- ✅ **Broadcast & Unicast**: Unicast DMX to nodes; broadcast where Art-Net 4 allows it (ArtPoll, ArtSync, ArtTrigger, ...)
 - ✅ **Frame Synchronization**: ArtSync support for synchronized output
 
 ### Advanced Features
 - ✅ **RDM Support**: Full Remote Device Management (separate Haukcode.ArtNet.Rdm package)
-  - Device discovery (TOD - Table of Devices)
-  - Parameter queries and configuration
-  - Device identification
-  - Sensor monitoring
+  - Device discovery through the node (TOD - Table of Devices)
+  - Typed request and response classes for every standard PID
+  - `RequestAsync`: request/response matching with ACK_OVERFLOW and ACK_TIMER follow-ups
+  - UTF-8 text when the controller allows Unicode
+  - Direct-line discovery (DISC_UNIQUE_BRANCH binary search) and ACK_OVERFLOW response writing
 - ✅ **ArtTrigger**: Send trigger messages for show control and automation
 - ✅ **IP Programming**: Remote network configuration of ArtNet nodes
 - ✅ **Packet Parsing**: Parse and handle all standard ArtNet packet types
 
 ### Supported ArtNet Packets
-- `ArtPoll` / `ArtPollReply` - Device discovery
+- `ArtPoll` / `ArtPollReply` - Device discovery, including targeted polls
 - `ArtDmx` - DMX data transmission
+- `ArtNzs` / `ArtVlc` - Non-zero start code DMX and Visible Light Communication
 - `ArtSync` - Frame synchronization
 - `ArtTrigger` - Trigger/macro messages
 - `ArtTimeCode` - SMPTE timecode (24/25/29.97/30 fps)
+- `ArtCommand` - Text commands
+- `ArtDataRequest` / `ArtDataReply` - Product and support URLs
+- `ArtDiagData` - Diagnostics
 - `ArtAddress` - Node configuration
 - `ArtInput` - Input port configuration
 - `ArtTodRequest` / `ArtTodData` / `ArtTodControl` - RDM table of devices
 - `ArtRdm` / `ArtRdmSub` - RDM messages
 - `ArtIpProg` / `ArtIpProgReply` - IP configuration
+- `ArtFirmwareMaster` / `ArtFirmwareReply` - Firmware upload
+
+## Standards Compliance
+
+The packet layouts, field types and value tables were checked against the published documents,
+and the client follows their transport rules. Tests check packet sizes, field offsets and PDLs against them.
+
+| Standard | Coverage |
+|---|---|
+| **Art-Net 4** (rev 1.4dp, 2025) | Every packet the specification defines a layout for. ArtDmx, ArtNzs, ArtPollReply, ArtRdm, ArtTodData, ArtDataRequest/Reply and ArtFirmwareMaster/Reply are never broadcast, and packets go out from port 6454 (with the default single sender). Not implemented: the opcodes the specification lists without a layout (ArtMedia, ArtTimeSync, ArtDirectory, ArtFile*) and the deprecated ArtVideo and ArtMac packets. |
+| **ANSI E1.20-2025** (RDM) | Every PID, response type (including ACK_TIMER_HI_RES), NACK reason, controller flag, sensor type and unit. ACK_OVERFLOW reading and writing, ACK_TIMER follow-up through QUEUED_MESSAGE, UTF-8 text, the DISC_UNIQUE_BRANCH response encoding and discovery. |
+| **ANSI E1.37-1** (dimmer and additional PIDs) | Every PID. |
+| **ANSI E1.37-2** (IPv4 and DNS configuration) | Every PID. |
+| **ANSI E1.37-7** (gateway and splitter configuration) | Every PID, with the published values (not the draft ones). |
+| **ANSI E1.33** (RDMnet) | The RDM PIDs only (component scope, search domain, broker status, TCP comms status). The RDMnet transport itself (LLRP, broker and EPT protocols) is not implemented. |
+
+Checked on hardware against a DMXking LeDMX2 MAX: discovery, IP query, RDM table and RDM
+requests to an attached fixture, name programming and unicast DMX output.
+Found something that doesn't match the specification? Please [open an issue](https://github.com/HakanL/Haukcode.ArtNet/issues).
 
 ## Installation
 
@@ -88,9 +112,10 @@ dmxData[0] = 255;  // Channel 1 at full brightness
 dmxData[1] = 128;  // Channel 2 at 50%
 dmxData[2] = 0;    // Channel 3 off
 
-// Send to universe 1 (broadcast)
+// Send to universe 1 on a node. Art-Net 4 doesn't allow DMX to be broadcast;
+// set client.AllowDmxBroadcast = true if you really need to.
 await client.SendDmxData(
-    address: null,           // null = broadcast
+    address: IPAddress.Parse("192.168.1.50"),
     universeId: 1,
     dmxData: dmxData);
 ```
@@ -135,12 +160,13 @@ await foreach (var receivedPacket in channel.Reader.ReadAllAsync())
 using var client = new ArtNetClient(localIp, subnetMask);
 
 // Send DMX data to multiple universes
-await client.SendDmxData(null, 1, dmxDataUniverse1);
-await client.SendDmxData(null, 2, dmxDataUniverse2);
-await client.SendDmxData(null, 3, dmxDataUniverse3);
+var node = IPAddress.Parse("192.168.1.50");
+await client.SendDmxData(node, 1, dmxDataUniverse1);
+await client.SendDmxData(node, 2, dmxDataUniverse2);
+await client.SendDmxData(node, 3, dmxDataUniverse3);
 
-// Send sync to apply all changes simultaneously
-await client.SendSync(null);
+// Send sync to apply all changes simultaneously (always broadcast)
+await client.SendSync();
 ```
 
 ### Device Discovery with ArtPoll
@@ -338,20 +364,22 @@ generator.Start();
 public class LightingController : IDisposable
 {
     private readonly ArtNetClient client;
-    
-    public LightingController(IPAddress localIp, IPAddress subnetMask)
+    private readonly IPAddress node;
+
+    public LightingController(IPAddress localIp, IPAddress subnetMask, IPAddress node)
     {
         client = new ArtNetClient(localIp, subnetMask);
+        this.node = node;
     }
-    
+
     public async Task SetChannel(ushort universe, int channel, byte value)
     {
         var dmxData = new byte[512];
         dmxData[channel - 1] = value;  // DMX channels are 1-indexed
-        
-        await client.SendDmxData(null, universe, dmxData);
+
+        await client.SendDmxData(node, universe, dmxData);
     }
-    
+
     public void Dispose() => client.Dispose();
 }
 ```
@@ -362,23 +390,23 @@ public class LightingController : IDisposable
 public class DmxMonitor
 {
     private readonly Dictionary<int, byte[]> universeData = new();
-    
+
     public async Task StartMonitoring(IPAddress localIp, IPAddress subnetMask)
     {
         var channel = Channel.CreateUnbounded<ReceiveDataPacket>();
-        
+
         using var client = new ArtNetClient(
             localIp, subnetMask,
             async (p) => await channel.Writer.WriteAsync(p),
             () => channel.Writer.Complete());
-        
+
         await foreach (var packet in channel.Reader.ReadAllAsync())
         {
             if (packet.Packet is ArtNetDmxPacket dmx)
             {
                 int universe = dmx.Universe + 1;
                 universeData[universe] = dmx.DmxData.ToArray();
-                
+
                 Console.WriteLine($"Universe {universe}: " +
                     $"Seq {dmx.Sequence}, Channels: {dmx.DmxData.Length}");
             }
@@ -402,7 +430,8 @@ public ArtNetClient(
     Func<ReceiveDataPacket, Task>? channelWriter = null,
     Action? channelWriterComplete = null,
     int port = 6454,
-    UId? rdmId = null)
+    UId? rdmId = null,
+    int senderCount = 1)
 ```
 
 **Parameters:**
@@ -412,32 +441,42 @@ public ArtNetClient(
 - `channelWriterComplete`: Optional callback when receive channel closes
 - `port`: ArtNet port (default: 6454)
 - `rdmId`: RDM UID for this client (optional)
+- `senderCount`: Sender threads/sockets. With 1 (the default) packets go out from port 6454 as Art-Net requires; more is faster but sends from ephemeral ports
 
 #### Key Methods
 
 ```csharp
-// Send DMX data
+// Send DMX data (address must be a node unless AllowDmxBroadcast is set)
 Task SendDmxData(
-    IPAddress? address, 
-    ushort universeId, 
-    ReadOnlyMemory<byte> dmxData, 
+    IPAddress? address,
+    ushort universeId,
+    ReadOnlyMemory<byte> dmxData,
     bool important = false)
 
-// Send sync packet
-Task SendSync(IPAddress? address)
+// Send sync packet (broadcast)
+Task SendSync()
 
 // Send any ArtNet packet
 Task QueuePacketForSending(
-    IPAddress? destination, 
-    ArtNetPacket packet, 
+    IPAddress? destination,
+    ArtNetPacket packet,
     bool important = false)
 
-// Send RDM packet (requires Haukcode.ArtNet.Rdm)
+// Send RDM packet (ArtNetRdmClient, requires Haukcode.ArtNet.Rdm)
 Task SendRdm(
     RdmPacket packet,
     IPEndPoint destination,
-    short universe,
+    ushort portAddress,
     UId targetId)
+
+// Send an RDM GET/SET and wait for the matching response (ArtNetRdmClient)
+Task<RdmPacket> RequestAsync(
+    RdmRequestPacket packet,
+    IPEndPoint destination,
+    ushort portAddress,
+    UId targetId,
+    TimeSpan? responseTimeout = null,
+    CancellationToken cancellationToken = default)
 ```
 
 #### Properties
@@ -458,14 +497,14 @@ UId RdmId { get; }                     // RDM UID
 
 ## Thread Safety
 
-- `ArtNetClient` is thread-safe for sending operations
+- The `ArtNetClient` send methods reuse buffers on the hot path, so call them from one thread at a time
 - Received packets are delivered via async callbacks
 - Multiple clients can coexist on the same machine with different ports
 
 ## Platform Support
 
 - **.NET 8.0** and above
-- **.NET 9.0** and above  
+- **.NET 9.0** and above
 - **.NET 10.0** and above
 - **Windows**, **Linux**, and **macOS** (cross-platform)
 
@@ -511,7 +550,7 @@ Based on the abandoned [Architecture for Control Networks (ACN)](http://acn.code
 
 - [Art-Net Protocol Specification](https://www.artisticlicence.com/WebSiteMaster/User%20Guides/art-net.pdf) - Official specification from Artistic Licence
 - [DMX512 Standard](https://www.usitt.org/dmx512) - USITT DMX512-A standard
-- [RDM Standard](https://www.estechnical.org/) - ANSI E1.20 RDM specification
+- [ESTA published standards](https://tsp.esta.org/tsp/documents/published_docs.php) - ANSI E1.20 (RDM), E1.37 and E1.33, free to download
 
 ## Support
 

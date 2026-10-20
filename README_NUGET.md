@@ -12,10 +12,14 @@ Art-Net is a royalty-free protocol for transmitting DMX512 lighting control data
 - ✅ Multiple universe support (up to 32,768 universes)
 - ✅ Device discovery (ArtPoll)
 - ✅ Frame synchronization (ArtSync)
-- ✅ RDM support (Remote Device Management) - separate package
+- ✅ RDM support (Remote Device Management) - separate package, with request/response matching
 - ✅ ArtTrigger for show control
 - ✅ High-performance UDP communication
 - ✅ Cross-platform (.NET 8.0+)
+
+## Standards
+
+Checked against the published documents: every packet Art-Net 4 (rev 1.4dp) defines a layout for, and every PID in ANSI E1.20-2025 (RDM), E1.37-1, E1.37-2, E1.37-7 and the RDM PIDs of E1.33. See the [compliance table](https://github.com/HakanL/Haukcode.ArtNet#standards-compliance) for details.
 
 ## Quick Start
 
@@ -42,10 +46,10 @@ var subnetMask = IPAddress.Parse("255.255.255.0");
 // Create client
 using var client = new ArtNetClient(localIp, subnetMask);
 
-// Send DMX data
+// Send DMX data to a node (Art-Net 4 doesn't allow DMX to be broadcast)
 var dmxData = new byte[512];
 dmxData[0] = 255;  // Channel 1 at full
-await client.SendDmxData(null, universeId: 1, dmxData);
+await client.SendDmxData(IPAddress.Parse("192.168.1.50"), universeId: 1, dmxData);
 ```
 
 ### Receiving DMX
@@ -80,38 +84,40 @@ await client.QueuePacketForSending(null, new ArtPollPacket());
 
 ```csharp
 // Send data to multiple universes
-await client.SendDmxData(null, 1, dmxData1);
-await client.SendDmxData(null, 2, dmxData2);
+var node = IPAddress.Parse("192.168.1.50");
+await client.SendDmxData(node, 1, dmxData1);
+await client.SendDmxData(node, 2, dmxData2);
 
-// Sync all outputs
-await client.SendSync(null);
+// Sync all outputs (always broadcast)
+await client.SendSync();
 ```
 
 ## Key Methods
 
 ```csharp
-// Send DMX data (null = broadcast to all)
-Task SendDmxData(IPAddress? address, ushort universeId, 
+// Send DMX data (address must be a node unless AllowDmxBroadcast is set)
+Task SendDmxData(IPAddress? address, ushort universeId,
                  ReadOnlyMemory<byte> dmxData, bool important = false)
 
-// Send sync packet
-Task SendSync(IPAddress? address)
+// Send sync packet (broadcast)
+Task SendSync()
 
 // Send any packet
-Task QueuePacketForSending(IPAddress? destination, 
+Task QueuePacketForSending(IPAddress? destination,
                           ArtNetPacket packet, bool important = false)
 ```
 
 ## Supported Packets
 
 - `ArtPoll` / `ArtPollReply` - Device discovery
-- `ArtDmx` - DMX data transmission
+- `ArtDmx`, `ArtNzs` / `ArtVlc` - DMX data
 - `ArtSync` - Frame synchronization
-- `ArtTrigger` - Show control triggers
-- `ArtAddress` - Node configuration
-- `ArtTodRequest` / `ArtTodData` - RDM device discovery
-- `ArtRdm` - RDM commands (requires RDM package)
-- `ArtIpProg` - Remote IP configuration
+- `ArtTrigger`, `ArtTimeCode`, `ArtCommand` - Show control
+- `ArtAddress`, `ArtInput`, `ArtIpProg` - Node configuration
+- `ArtDataRequest` / `ArtDataReply`, `ArtDiagData` - Product data and diagnostics
+- `ArtTodRequest` / `ArtTodData` / `ArtTodControl` - RDM device discovery
+- `ArtRdm` / `ArtRdmSub` - RDM commands (requires RDM package)
+- `ArtFirmwareMaster` / `ArtFirmwareReply` - Firmware upload
 
 ## Platform Support
 
