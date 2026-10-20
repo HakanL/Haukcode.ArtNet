@@ -81,7 +81,63 @@ public class ArtNetPacketLayoutTests
     [TestMethod]
     public void Poll_KeepsDiagPriority()
     {
-        Assert.AreEqual((byte)0x40, RoundTrip(new ArtPollPacket { TalkToMe = 2, DiagPriority = 0x40 }, 14).DiagPriority);
+        Assert.AreEqual((byte)0x40, RoundTrip(new ArtPollPacket { TalkToMe = 2, DiagPriority = 0x40 }, 22).DiagPriority);
+    }
+
+    [TestMethod]
+    public void Poll_TargetedModeFieldsRoundTrip_AndShortPollsParse()
+    {
+        var poll = ArtPollPacket.Targeted(bottom: 49, top: 52, ArtPollFlags.SendDiagnostics);
+        poll.EstaManufacturer = 0x6A6B;
+        poll.Oem = 0x2BD3;
+
+        var parsed = RoundTrip(poll, 22);
+        Assert.AreEqual(ArtPollFlags.TargetedMode | ArtPollFlags.SendDiagnostics, parsed.Flags);
+        Assert.AreEqual((ushort)52, parsed.TargetPortAddressTop);
+        Assert.AreEqual((ushort)49, parsed.TargetPortAddressBottom);
+        Assert.AreEqual((ushort)0x6A6B, parsed.EstaManufacturer);
+        Assert.AreEqual((ushort)0x2BD3, parsed.Oem);
+
+        // A 14-byte (legacy) ArtPoll is valid; missing fields read as zero
+        var shortPoll = (ArtPollPacket)ArtNetPacket.Parse(Write(poll)[..14])!;
+        Assert.AreEqual((ushort)0, shortPoll.TargetPortAddressTop);
+        Assert.AreEqual(ArtPollFlags.TargetedMode | ArtPollFlags.SendDiagnostics, shortPoll.Flags);
+    }
+
+    [TestMethod]
+    public void PollReply_TrailingFieldsAndStatusViews()
+    {
+        var parsed = RoundTrip(new ArtPollReplyPacket
+        {
+            User = 0x1234,
+            RefreshRate = 120,
+            BackgroundQueuePolicy = BackgroundQueuePolicies.StatusWarning,
+            Status = 0b1110_0110,   // Normal indicators, network-programmed, booted from ROM, RDM capable
+            Status2 = 0b0000_1101,  // web config, DHCP capable, 15-bit Port-Address
+            Status3 = 0b0110_0010,  // failsafe to zero, programmable failsafe, background queue
+            GoodOutputA = [0x80, 0, 0, 0],
+            GoodOutputB = [0xA0, 0, 0, 0],
+        }, 10 + 229);
+
+        Assert.AreEqual((ushort)0x1234, parsed.User);
+        Assert.AreEqual((ushort)120, parsed.RefreshRate);
+        Assert.AreEqual(BackgroundQueuePolicies.StatusWarning, parsed.BackgroundQueuePolicy);
+
+        Assert.AreEqual(IndicatorStates.Normal, parsed.IndicatorState);
+        Assert.AreEqual(PortAddressAuthorities.Network, parsed.PortAddressAuthority);
+        Assert.AreEqual(PollReplyStatus1.BootedFromRom | PollReplyStatus1.RdmCapable, parsed.Status1Flags);
+        Assert.AreEqual(PollReplyStatus2.WebConfiguration | PollReplyStatus2.DhcpCapable | PollReplyStatus2.PortAddress15Bit, parsed.Status2Flags);
+        Assert.AreEqual(FailsafeStates.Zero, parsed.FailsafeState);
+        Assert.AreEqual(PollReplyStatus3.ProgrammableFailsafe | PollReplyStatus3.BackgroundQueue, parsed.Status3Flags);
+        Assert.AreEqual(GoodOutputAFlags.DataOutput, parsed.GetGoodOutputA(0));
+        Assert.AreEqual(GoodOutputBFlags.RdmDisabled | GoodOutputBFlags.DiscoveryNotRunning, parsed.GetGoodOutputB(0));
+    }
+
+    [TestMethod]
+    public void ArtAddress_SetBackgroundQueuePolicy_UsesAcBqp()
+    {
+        Assert.AreEqual(ArtAddressCommand.AcBqp0 + 3, ArtAddressPacket.SetBackgroundQueuePolicy(1, 3).Command);
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ArtAddressPacket.SetBackgroundQueuePolicy(1, 16));
     }
 
     [TestMethod]

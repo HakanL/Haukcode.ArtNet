@@ -185,6 +185,40 @@ public class ArtPollReplyPacket : ArtNetPacket
 
     public byte Status3 { get; set; }
 
+    /// <summary>Data available for user-specific purposes.</summary>
+    public ushort User { get; set; }
+
+    /// <summary>
+    /// Highest ArtDmx refresh rate the node can process, in Hz; 0 to 44 means the DMX512 maximum
+    /// of 44 Hz.
+    /// </summary>
+    public ushort RefreshRate { get; set; }
+
+    /// <summary>
+    /// How the node collects status and queued messages from its RDM devices (values 5-250 are
+    /// manufacturer-defined). Only used when <see cref="Status3Flags"/> has
+    /// <see cref="PollReplyStatus3.BackgroundQueue"/>.
+    /// </summary>
+    public BackgroundQueuePolicies BackgroundQueuePolicy { get; set; }
+
+    public IndicatorStates IndicatorState => (IndicatorStates)(Status >> 6);
+
+    public PortAddressAuthorities PortAddressAuthority => (PortAddressAuthorities)((Status >> 4) & 0x03);
+
+    public PollReplyStatus1 Status1Flags => (PollReplyStatus1)(Status & 0x07);
+
+    public PollReplyStatus2 Status2Flags => (PollReplyStatus2)Status2;
+
+    public FailsafeStates FailsafeState => (FailsafeStates)(Status3 >> 6);
+
+    public PollReplyStatus3 Status3Flags => (PollReplyStatus3)(Status3 & 0x3F);
+
+    public GoodInputFlags GetGoodInput(int port) => (GoodInputFlags)GoodInput[port];
+
+    public GoodOutputAFlags GetGoodOutputA(int port) => (GoodOutputAFlags)GoodOutputA[port];
+
+    public GoodOutputBFlags GetGoodOutputB(int port) => (GoodOutputBFlags)GoodOutputB[port];
+
     protected override int DataLength => 229;
 
     /// <summary>
@@ -251,8 +285,14 @@ public class ArtPollReplyPacket : ArtNetPacket
             target.Status3 = reader.ReadByte();
         if (reader.BytesLeft >= 6)
             target.RespUID = reader.ReadBytes(6);
+        if (reader.BytesLeft >= 2)
+            target.User = reader.ReadUInt16();
+        if (reader.BytesLeft >= 2)
+            target.RefreshRate = reader.ReadUInt16();
+        if (reader.BytesLeft >= 1)
+            target.BackgroundQueuePolicy = (BackgroundQueuePolicies)reader.ReadByte();
 
-        // Consume the trailing filler (15 spare bytes in a full-length packet, or
+        // Consume the trailing filler (10 spare bytes in a full-length packet, or
         // whatever a nonstandard node appended) so the datagram is fully read.
         reader.SkipBytes(reader.BytesLeft);
 
@@ -291,6 +331,9 @@ public class ArtPollReplyPacket : ArtNetPacket
         writer.WriteBytes(GoodOutputB);
         writer.WriteByte(Status3);
         writer.WriteBytes(respUID);
-        writer.WriteZeros(15);
+        writer.WriteUInt16(User);
+        writer.WriteUInt16(RefreshRate);
+        writer.WriteByte((byte)BackgroundQueuePolicy);
+        writer.WriteZeros(10);
     }
 }

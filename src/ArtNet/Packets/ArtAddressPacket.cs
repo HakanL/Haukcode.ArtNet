@@ -44,6 +44,22 @@ public class ArtAddressPacket : ArtNetPacket
     {
     }
 
+    /// <summary>
+    /// An ArtAddress that only sets the BackgroundQueuePolicy (AcBqp0-AcBqp15) of a node.
+    /// </summary>
+    /// <param name="policy">0-4 as in <see cref="BackgroundQueuePolicies"/>, or a manufacturer value up to 15.</param>
+    public static ArtAddressPacket SetBackgroundQueuePolicy(byte bindIndex, byte policy)
+    {
+        if (policy > 15)
+            throw new ArgumentOutOfRangeException(nameof(policy), policy, "ArtAddress can set policies 0 to 15.");
+
+        return new ArtAddressPacket
+        {
+            BindIndex = bindIndex,
+            Command = (ArtAddressCommand)((byte)ArtAddressCommand.AcBqp0 + policy)
+        };
+    }
+
     public ArtAddressPacket(ArtPollReplyPacket src)
         : base(ArtNetOpCodes.Address)
     {
