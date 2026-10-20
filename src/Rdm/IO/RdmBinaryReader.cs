@@ -41,8 +41,19 @@ public class RdmBinaryReader
         return unchecked((uint)ReadHiLoInt32());
     }
 
+    /// <summary>
+    /// Bytes left in the underlying stream, or null when it can't seek.
+    /// </summary>
+    public long? BytesLeft => this.reader.BaseStream.CanSeek
+        ? this.reader.BaseStream.Length - this.reader.BaseStream.Position
+        : null;
+
+    /// <remarks>A zero or negative length (from a short or truncated reply) reads nothing.</remarks>
     public string ReadString(int length)
     {
+        if (length <= 0)
+            return string.Empty;
+
         return Encoding.ASCII.GetString(this.reader.ReadBytes(length)).TrimEnd((char)0);
     }
 
@@ -61,8 +72,12 @@ public class RdmBinaryReader
         return this.reader.ReadByte();
     }
 
+    /// <remarks>A zero or negative count (from a short or truncated reply) reads nothing.</remarks>
     public byte[] ReadBytes(int count)
     {
+        if (count <= 0)
+            return [];
+
         return this.reader.ReadBytes(count);
     }
 }

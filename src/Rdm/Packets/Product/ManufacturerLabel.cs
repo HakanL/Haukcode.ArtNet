@@ -45,7 +45,7 @@ public class ManufacturerLabel
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteBytes(Encoding.ASCII.GetBytes(Label));
+            data.WriteString(Label);
         }
 
         #endregion

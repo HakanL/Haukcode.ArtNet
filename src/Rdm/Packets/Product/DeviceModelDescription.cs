@@ -43,7 +43,7 @@ public class DeviceModelDescription
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteBytes(Encoding.ASCII.GetBytes(Description));
+            data.WriteString(Description);
         }
 
         #endregion

@@ -52,10 +52,21 @@ public class RdmBinaryWriter
         this.writer.Write(value);
     }
 
+    /// <summary>
+    /// Longest RDM text field (labels and descriptions) in characters.
+    /// </summary>
+    public const int MaxTextLength = 32;
+
+    /// <summary>
+    /// Writes <paramref name="value"/> as ASCII, truncated to <see cref="MaxTextLength"/> characters.
+    /// </summary>
     public void WriteString(string value)
     {
-        if (!string.IsNullOrEmpty(value))
-            this.writer.Write(Encoding.ASCII.GetBytes(value));
+        if (string.IsNullOrEmpty(value))
+            return;
+
+        var bytes = Encoding.ASCII.GetBytes(value);
+        this.writer.Write(bytes, 0, Math.Min(bytes.Length, MaxTextLength));
     }
 
     public void WriteUid(UId value)

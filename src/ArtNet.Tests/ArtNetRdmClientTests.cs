@@ -28,6 +28,7 @@ public class ArtNetRdmClientTests
         var first = await ReceiveArtRdm(receiver);
         var second = await ReceiveArtRdm(receiver);
 
+        Assert.IsTrue(RdmPacket.IsChecksumValid(first.RdmData), "SendRdm's checksum");
         Assert.AreEqual((byte)1, first.RdmData[TransactionNumberOffset]);
         Assert.AreEqual((byte)2, second.RdmData[TransactionNumberOffset]);
 

@@ -36,23 +36,30 @@ public class LanguageCapabilities
         public GetReply()
             : base(RdmCommands.GetResponse, RdmParameters.LanguageCapabilities)
         {
-            Languages = new List<CultureInfo>();
         }
 
-        public List<CultureInfo> Languages { get; set; }
+        /// <summary>The supported 2-character ISO 639-1 language codes.</summary>
+        public List<string> LanguageCodes { get; set; } = [];
+
+        /// <summary>
+        /// The supported languages that are known cultures.
+        /// </summary>
+        public IEnumerable<CultureInfo> Languages =>
+            LanguageCodes.Select(Product.LanguageCodes.ToCulture).OfType<CultureInfo>();
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            for(int n=0;n<Header.ParameterDataLength/2;n++)
-                Languages.Add(new CultureInfo(data.ReadString(2)));
+            LanguageCodes.Clear();
+            for (int n = 0; n < Header.ParameterDataLength / Product.LanguageCodes.Length; n++)
+                LanguageCodes.Add(Product.LanguageCodes.Read(data));
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            foreach(CultureInfo language in Languages)
-                data.WriteString(language.TwoLetterISOLanguageName);
+            foreach (string code in LanguageCodes)
+                Product.LanguageCodes.Write(data, code);
         }
 
         #endregion

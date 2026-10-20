@@ -137,7 +137,7 @@ public class ParameterDescription
             data.WriteHiLoInt32(MinValidValue);
             data.WriteHiLoInt32(MaxValidValue);
             data.WriteHiLoInt32(DefaultValue);
-            data.WriteBytes(Encoding.ASCII.GetBytes(Description));
+            data.WriteString(Description);
             ;
         }
     }

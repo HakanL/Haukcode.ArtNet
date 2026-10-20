@@ -4,6 +4,11 @@ public class RdmHeader
 {
     public const int Size = 8;
 
+    /// <summary>
+    /// Most parameter data one RDM message can carry; larger responses are split with ACK_OVERFLOW.
+    /// </summary>
+    public const int MaxParameterDataLength = 231;
+
     public RdmHeader()
     {
         DestinationId = UId.Empty;
@@ -82,8 +87,12 @@ public class RdmHeader
         if (messageLengthPosition < 0 || dataLengthPosition <= 0)
             throw new InvalidOperationException("Packet data has not been written yet. You can not write the length until the body is written.");
 
+        long parameterDataLength = (data.BaseStream.Position - 1) - dataLengthPosition;
+        if (parameterDataLength > MaxParameterDataLength)
+            throw new InvalidOperationException($"The parameter data is {parameterDataLength} bytes but an RDM message carries at most {MaxParameterDataLength}; split larger responses with ACK_OVERFLOW.");
+
         MessageLength = (byte)(data.BaseStream.Position - messageLengthPosition + 2);
-        ParameterDataLength = (byte)((data.BaseStream.Position - 1) - dataLengthPosition);
+        ParameterDataLength = (byte)parameterDataLength;
 
         //Write Message Length
         data.BaseStream.Seek(messageLengthPosition, System.IO.SeekOrigin.Begin);

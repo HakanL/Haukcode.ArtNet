@@ -42,7 +42,7 @@ public class EndpointLabel
         protected override void WriteData(RdmBinaryWriter data)
         {
             data.WriteUInt16(EndpointID);
-            data.WriteBytes(Encoding.ASCII.GetBytes(Label));
+            data.WriteString(Label);
         }
     }
 
@@ -66,7 +66,7 @@ public class EndpointLabel
         protected override void WriteData(RdmBinaryWriter data)
         {
             data.WriteUInt16(EndpointID);
-            data.WriteBytes(Encoding.ASCII.GetBytes(Label));
+            data.WriteString(Label);
         }
     }
 

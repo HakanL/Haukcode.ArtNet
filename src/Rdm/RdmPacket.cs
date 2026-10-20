@@ -37,30 +37,62 @@ public abstract class RdmPacket
 
     protected abstract void WriteData(RdmBinaryWriter data);
 
+    /// <summary>
+    /// Reads a packet. When the 2 checksum bytes follow the message they are read into
+    /// <see cref="Checksum"/>, but not checked; use <see cref="ReadPacket(ReadOnlySpan{byte}, bool)"/>
+    /// to check them.
+    /// </summary>
     public static RdmPacket ReadPacket(RdmBinaryReader data)
     {
-        RdmPacket? rdmPacket = null;
-
         RdmHeader header = new RdmHeader();
         header.ReadData(data);
 
-        rdmPacket = RdmPacket.Create(header);
-        if (rdmPacket != null)
-        {
-            rdmPacket.ReadData(data);
-            return rdmPacket;
-         }
-        else
-        {
-            RdmRawPacket? rawPacket = RdmPacket.Create(header, typeof(RdmRawPacket)) as RdmRawPacket;
-            if (rawPacket != null)
-            {
-                rawPacket.ReadData(data);
-                return rawPacket;
-            }
-        }
+        RdmPacket? rdmPacket = RdmPacket.Create(header) ?? RdmPacket.Create(header, typeof(RdmRawPacket));
+        if (rdmPacket == null)
+            throw new UnknownRdmPacketException(header);
 
-        throw new UnknownRdmPacketException(header);
+        rdmPacket.ReadData(data);
+
+        if (data.BytesLeft >= 2)
+            rdmPacket.Checksum = data.ReadUInt16();
+
+        return rdmPacket;
+    }
+
+    /// <summary>
+    /// Reads a packet from RDM data as ArtRdm carries it: from the Message Length byte on, without
+    /// the start code, ending with the checksum.
+    /// </summary>
+    /// <exception cref="InvalidPacketException">The checksum is missing or wrong; E1.20 requires the message to be discarded.</exception>
+    public static RdmPacket ReadPacket(ReadOnlySpan<byte> rdmData, bool validateChecksum = true)
+    {
+        if (validateChecksum && !IsChecksumValid(rdmData))
+            throw new InvalidPacketException("The RDM checksum is missing or doesn't match the message.");
+
+        using var stream = new MemoryStream(rdmData.ToArray());
+        return ReadPacket(new RdmBinaryReader(stream));
+    }
+
+    /// <summary>
+    /// True when <paramref name="rdmData"/> (from the Message Length byte on, as in ArtRdm) is
+    /// followed by a matching checksum. The checksum also covers the start code and sub-start
+    /// code, which aren't in the data.
+    /// </summary>
+    public static bool IsChecksumValid(ReadOnlySpan<byte> rdmData)
+    {
+        if (rdmData.IsEmpty)
+            return false;
+
+        // Message Length counts the start code and sub-start code but not the checksum
+        int covered = rdmData[0] - 2;
+        if (covered <= 0 || rdmData.Length < covered + 2)
+            return false;
+
+        ushort sum = (ushort)((int)DmxStartCodes.RDM + (int)RdmVersions.SubMessage);
+        foreach (byte value in rdmData[..covered])
+            sum += value;
+
+        return sum == (ushort)((rdmData[covered] << 8) | rdmData[covered + 1]);
     }
 
     public static RdmPacket ReadPacket(RdmCommands command, RdmParameters parameterId, RdmBinaryReader contentData)

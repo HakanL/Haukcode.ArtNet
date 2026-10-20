@@ -38,18 +38,28 @@ public class Language
         {
         }       
 
-        public CultureInfo Language { get; set; } = null!;
+        /// <summary>The 2-character ISO 639-1 language code.</summary>
+        public string LanguageCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The language as a culture, or null when the code isn't a known culture.
+        /// </summary>
+        public CultureInfo? Language
+        {
+            get => LanguageCodes.ToCulture(LanguageCode);
+            set => LanguageCode = LanguageCodes.FromCulture(value);
+        }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            Language = new CultureInfo(data.ReadString(Header.ParameterDataLength));
+            LanguageCode = LanguageCodes.Read(data);
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteString(Language.TwoLetterISOLanguageName);
+            LanguageCodes.Write(data, LanguageCode);
         }
 
         #endregion
@@ -62,18 +72,28 @@ public class Language
         {
         }
 
-        public CultureInfo Language { get; set; } = null!;
+        /// <summary>The 2-character ISO 639-1 language code.</summary>
+        public string LanguageCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The language as a culture, or null when the code isn't a known culture.
+        /// </summary>
+        public CultureInfo? Language
+        {
+            get => LanguageCodes.ToCulture(LanguageCode);
+            set => LanguageCode = LanguageCodes.FromCulture(value);
+        }
 
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            Language = new CultureInfo(data.ReadString(Header.ParameterDataLength));
+            LanguageCode = LanguageCodes.Read(data);
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteString(Language.TwoLetterISOLanguageName);
+            LanguageCodes.Write(data, LanguageCode);
         }
 
         #endregion
