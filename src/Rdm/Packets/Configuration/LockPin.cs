@@ -1,5 +1,8 @@
 namespace Haukcode.ArtNet.Rdm.Packets.Configuration;
 
+/// <summary>
+/// This parameter is used to get or change the PIN that locks the device (E1.37-1). PINs are 0 to 9999.
+/// </summary>
 public class LockPin
 {
     public class Get : RdmRequestPacket
@@ -8,7 +11,7 @@ public class LockPin
             : base(RdmCommands.Get, RdmParameters.LockPin)
         {
         }
-        
+
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -25,17 +28,17 @@ public class LockPin
         {
         }
 
-        #region Read and Write
+        public ushort PinCode { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            PinCode = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(PinCode);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -45,17 +48,21 @@ public class LockPin
         {
         }
 
-        #region Read and Write
+        public ushort NewPinCode { get; set; }
+
+        public ushort CurrentPinCode { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            NewPinCode = data.ReadUInt16();
+            CurrentPinCode = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(NewPinCode);
+            data.WriteUInt16(CurrentPinCode);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -65,8 +72,6 @@ public class LockPin
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -74,7 +79,5 @@ public class LockPin
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }

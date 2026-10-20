@@ -1,5 +1,9 @@
 ﻿namespace Haukcode.ArtNet.Rdm.Packets.Power;
 
+/// <summary>
+/// This parameter is used to burn in a lamp for a number of hours (E1.37-1). The reply holds the
+/// hours remaining, 0 when no burn in is running.
+/// </summary>
 public class BurnIn
 {
     public class Get : RdmRequestPacket
@@ -8,8 +12,6 @@ public class BurnIn
             : base(RdmCommands.Get, RdmParameters.BurnIn)
         {
         }
-        
-        #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -18,8 +20,6 @@ public class BurnIn
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,17 +29,17 @@ public class BurnIn
         {
         }
 
-        #region Read and Write
+        public byte HoursRemaining { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            HoursRemaining = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(HoursRemaining);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -49,17 +49,17 @@ public class BurnIn
         {
         }
 
-        #region Read and Write
+        public byte Hours { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Hours = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(Hours);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -69,8 +69,6 @@ public class BurnIn
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -78,7 +76,5 @@ public class BurnIn
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }

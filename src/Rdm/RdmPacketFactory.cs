@@ -395,14 +395,10 @@ public static class RdmPacketFactory
         //CurveDescription
         RegisterPacketType(RdmCommands.Get, RdmParameters.CurveDescription, typeof(CurveDescription.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.CurveDescription, typeof(CurveDescription.GetReply));
-        RegisterPacketType(RdmCommands.Set, RdmParameters.CurveDescription, typeof(CurveDescription.Set));
-        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.CurveDescription, typeof(CurveDescription.SetReply));
 
         //DimmerInfo
         RegisterPacketType(RdmCommands.Get, RdmParameters.DimmerInfo, typeof(DimmerInfo.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DimmerInfo, typeof(DimmerInfo.GetReply));
-        RegisterPacketType(RdmCommands.Set, RdmParameters.DimmerInfo, typeof(DimmerInfo.Set));
-        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DimmerInfo, typeof(DimmerInfo.SetReply));
 
         //MaximumLevel
         RegisterPacketType(RdmCommands.Get, RdmParameters.MaximumLevel, typeof(MaximumLevel.Get));
@@ -425,8 +421,6 @@ public static class RdmPacketFactory
         //ModulationFrequencyDescription
         RegisterPacketType(RdmCommands.Get, RdmParameters.ModulationFrequencyDescription, typeof(ModulationFrequencyDescription.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.ModulationFrequencyDescription, typeof(ModulationFrequencyDescription.GetReply));
-        RegisterPacketType(RdmCommands.Set, RdmParameters.ModulationFrequencyDescription, typeof(ModulationFrequencyDescription.Set));
-        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.ModulationFrequencyDescription, typeof(ModulationFrequencyDescription.SetReply));
 
         //OutputResponseTime
         RegisterPacketType(RdmCommands.Get, RdmParameters.OutputResponseTime, typeof(OutputResponseTime.Get));
@@ -437,8 +431,6 @@ public static class RdmPacketFactory
         //OutputResponseTimeDescription
         RegisterPacketType(RdmCommands.Get, RdmParameters.OutputResponseTimeDescription, typeof(OutputResponseTimeDescription.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.OutputResponseTimeDescription, typeof(OutputResponseTimeDescription.GetReply));
-        RegisterPacketType(RdmCommands.Set, RdmParameters.OutputResponseTimeDescription, typeof(OutputResponseTimeDescription.Set));
-        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.OutputResponseTimeDescription, typeof(OutputResponseTimeDescription.SetReply));
     }
 
     private static void RegisterControlMessages()

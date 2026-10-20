@@ -59,26 +59,9 @@ public class PerformSelfTest
         {
         }
 
-        #region Read and Write
-
-        protected override void ReadData(RdmBinaryReader data)
-        {
-        }
-
-        protected override void WriteData(RdmBinaryWriter data)
-        {
-        }
-
-        #endregion
-    }
-
-    public class SetReply : RdmResponsePacket
-    {
-        public SetReply()
-            : base(RdmCommands.SetResponse, RdmParameters.PerformSelfTest)
-        {
-        }
-
+        /// <summary>
+        /// The self test to run: a test number, or <see cref="TestMode.Off"/> (0x00) / <see cref="TestMode.All"/> (0xFF).
+        /// </summary>
         public byte TestNumber { get; set; }
 
         #region Read and Write
@@ -91,6 +74,26 @@ public class PerformSelfTest
         protected override void WriteData(RdmBinaryWriter data)
         {
             data.WriteByte(TestNumber);
+        }
+
+        #endregion
+    }
+
+    public class SetReply : RdmResponsePacket
+    {
+        public SetReply()
+            : base(RdmCommands.SetResponse, RdmParameters.PerformSelfTest)
+        {
+        }
+
+        #region Read and Write
+
+        protected override void ReadData(RdmBinaryReader data)
+        {
+        }
+
+        protected override void WriteData(RdmBinaryWriter data)
+        {
         }
 
         #endregion

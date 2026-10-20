@@ -22,7 +22,14 @@ public enum SlotIds
     ColorAddBlue = 0x0207,
     ColorCorrection = 0x0208,
     ColorScroll = 0x0209,
-    ColorSemaphore = 0x020A,
+    ColorSemaphore = 0x0210,
+    ColorAddAmber = 0x0211,
+    ColorAddWhite = 0x0212,
+    ColorAddWarmWhite = 0x0213,
+    ColorAddCoolWhite = 0x0214,
+    ColorSubUV = 0x0215,
+    ColorHue = 0x0216,
+    ColorSaturation = 0x0217,
 
     //Image Functions
     StaticGoboWheel = 0x0301,

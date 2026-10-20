@@ -1,5 +1,9 @@
 namespace Haukcode.ArtNet.Rdm.Packets.Dimmer;
 
+/// <summary>
+/// This parameter is used to get the frequency and a text description, up to 32 characters, of a
+/// modulation frequency setting (E1.37-1). GET only.
+/// </summary>
 public class ModulationFrequencyDescription
 {
     public class Get : RdmRequestPacket
@@ -8,18 +12,18 @@ public class ModulationFrequencyDescription
             : base(RdmCommands.Get, RdmParameters.ModulationFrequencyDescription)
         {
         }
-        
-        #region Read and Write
+
+        public byte Setting { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Setting = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(Setting);
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,56 +33,27 @@ public class ModulationFrequencyDescription
         {
         }
 
-        #region Read and Write
+        public byte Setting { get; set; }
+
+        /// <summary>
+        /// Frequency in Hz, 0xFFFFFFFF when not declared.
+        /// </summary>
+        public uint Frequency { get; set; }
+
+        public string Description { get; set; } = string.Empty;
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Setting = data.ReadByte();
+            Frequency = data.ReadUInt32();
+            Description = data.ReadString(Header.ParameterDataLength - 5);
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(Setting);
+            data.WriteUInt32(Frequency);
+            data.WriteString(Description);
         }
-
-        #endregion
-    }
-
-    public class Set : RdmRequestPacket
-    {
-        public Set()
-            : base(RdmCommands.Set, RdmParameters.ModulationFrequencyDescription)
-        {
-        }
-
-        #region Read and Write
-
-        protected override void ReadData(RdmBinaryReader data)
-        {
-        }
-
-        protected override void WriteData(RdmBinaryWriter data)
-        {
-        }
-
-        #endregion
-    }
-
-    public class SetReply : RdmResponsePacket
-    {
-        public SetReply()
-            : base(RdmCommands.SetResponse, RdmParameters.ModulationFrequencyDescription)
-        {
-        }
-
-        #region Read and Write
-
-        protected override void ReadData(RdmBinaryReader data)
-        {
-        }
-
-        protected override void WriteData(RdmBinaryWriter data)
-        {
-        }
-
-        #endregion
     }
 }

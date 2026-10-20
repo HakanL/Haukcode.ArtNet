@@ -1,5 +1,8 @@
 namespace Haukcode.ArtNet.Rdm.Packets.Control;
 
+/// <summary>
+/// This parameter is used to get or set whether the device runs its self test at power on (E1.37-1).
+/// </summary>
 public class PowerOnSelfTest
 {
     public class Get : RdmRequestPacket
@@ -8,8 +11,6 @@ public class PowerOnSelfTest
             : base(RdmCommands.Get, RdmParameters.PowerOnSelfTest)
         {
         }
-        
-        #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -18,8 +19,6 @@ public class PowerOnSelfTest
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,17 +28,17 @@ public class PowerOnSelfTest
         {
         }
 
-        #region Read and Write
+        public bool Enabled { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Enabled = data.ReadBool();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteBool(Enabled);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -49,17 +48,17 @@ public class PowerOnSelfTest
         {
         }
 
-        #region Read and Write
+        public bool Enabled { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Enabled = data.ReadBool();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteBool(Enabled);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -69,8 +68,6 @@ public class PowerOnSelfTest
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -78,7 +75,5 @@ public class PowerOnSelfTest
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }

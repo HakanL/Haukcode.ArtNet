@@ -12,6 +12,10 @@ public class PresetPlayback
         All = 0xffff
     }
 
+    // 0x0000 is Off and 0xFFFF is All; every other value is a scene number
+    private static PlayMode ToPlayMode(ushort value) =>
+        value == (ushort)PlayMode.Off || value == (ushort)PlayMode.All ? (PlayMode)value : PlayMode.Scene;
+
     public class Get : RdmRequestPacket
     {
         public Get()
@@ -43,23 +47,21 @@ public class PresetPlayback
 
         public ushort SceneNumber { get; set; }
 
+        public byte Level { get; set; }
+
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
             SceneNumber = data.ReadUInt16();
-            if (SceneNumber > (ushort) PlayMode.Off || SceneNumber < (ushort) PlayMode.All)
-                Mode = PlayMode.Scene;
-            else
-                Mode = (PlayMode) SceneNumber;
+            Mode = ToPlayMode(SceneNumber);
+            Level = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            if (Mode == PlayMode.Scene)
-                data.WriteUInt16(SceneNumber);
-            else
-                data.WriteUInt16((short) Mode);
+            data.WriteUInt16(Mode == PlayMode.Scene ? SceneNumber : (ushort)Mode);
+            data.WriteByte(Level);
         }
 
         #endregion
@@ -83,19 +85,13 @@ public class PresetPlayback
         protected override void ReadData(RdmBinaryReader data)
         {
             SceneNumber = data.ReadUInt16();
-            if (SceneNumber > (ushort)PlayMode.Off || SceneNumber < (ushort)PlayMode.All)
-                Mode = PlayMode.Scene;
-            else
-                Mode = (PlayMode)SceneNumber;
+            Mode = ToPlayMode(SceneNumber);
             Level = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            if (Mode == PlayMode.Scene)
-                data.WriteUInt16(SceneNumber);
-            else
-                data.WriteUInt16((short)Mode);
+            data.WriteUInt16(Mode == PlayMode.Scene ? SceneNumber : (ushort)Mode);
             data.WriteByte(Level);
         }
 

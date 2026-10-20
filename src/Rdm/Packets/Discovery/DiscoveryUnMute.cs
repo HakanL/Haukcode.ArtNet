@@ -65,7 +65,7 @@ public class DiscoveryUnMute
         /// 
         /// This Binding UID field allows the controller to associate multiple responder ports discovered within a single physical device.
         /// </remarks>
-        public UId BindingId { get; set; } = null!;
+        public UId? BindingId { get; set; }
 
         #region Read and Write
 
@@ -79,7 +79,10 @@ public class DiscoveryUnMute
         protected override void WriteData(RdmBinaryWriter data)
         {
             data.WriteUInt16(ControlField);
-            data.WriteUid(BindingId);
+
+            // The binding UID is optional (PDL 2 or 8)
+            if (BindingId != null)
+                data.WriteUid(BindingId);
         }
 
         #endregion

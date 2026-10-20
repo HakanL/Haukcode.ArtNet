@@ -1,5 +1,9 @@
 namespace Haukcode.ArtNet.Rdm.Packets.Dimmer;
 
+/// <summary>
+/// This parameter is used to get or select the dimmer's output response time setting (E1.37-1).
+/// Settings are numbered from 1; <see cref="OutputResponseTimeDescription"/> describes each one.
+/// </summary>
 public class OutputResponseTime
 {
     public class Get : RdmRequestPacket
@@ -8,8 +12,6 @@ public class OutputResponseTime
             : base(RdmCommands.Get, RdmParameters.OutputResponseTime)
         {
         }
-        
-        #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -18,8 +20,6 @@ public class OutputResponseTime
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,17 +29,21 @@ public class OutputResponseTime
         {
         }
 
-        #region Read and Write
+        public byte CurrentSetting { get; set; }
+
+        public byte SettingCount { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            CurrentSetting = data.ReadByte();
+            SettingCount = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(CurrentSetting);
+            data.WriteByte(SettingCount);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -49,17 +53,17 @@ public class OutputResponseTime
         {
         }
 
-        #region Read and Write
+        public byte Setting { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Setting = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(Setting);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -69,8 +73,6 @@ public class OutputResponseTime
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -78,7 +80,5 @@ public class OutputResponseTime
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }

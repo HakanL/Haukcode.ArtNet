@@ -66,14 +66,18 @@ public class LampState
         {
         }
 
+        public LampStates LampState { get; set; }
+
         #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            LampState = (LampStates)data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte((byte)LampState);
         }
 
         #endregion

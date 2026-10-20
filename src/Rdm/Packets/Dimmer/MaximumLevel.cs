@@ -1,5 +1,8 @@
 namespace Haukcode.ArtNet.Rdm.Packets.Dimmer;
 
+/// <summary>
+/// This parameter is used to get or set the dimmer's maximum level (E1.37-1).
+/// </summary>
 public class MaximumLevel
 {
     public class Get : RdmRequestPacket
@@ -8,8 +11,6 @@ public class MaximumLevel
             : base(RdmCommands.Get, RdmParameters.MaximumLevel)
         {
         }
-        
-        #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -18,8 +19,6 @@ public class MaximumLevel
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,17 +28,17 @@ public class MaximumLevel
         {
         }
 
-        #region Read and Write
+        public ushort Level { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Level = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(Level);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -49,17 +48,17 @@ public class MaximumLevel
         {
         }
 
-        #region Read and Write
+        public ushort Level { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            Level = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(Level);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -69,8 +68,6 @@ public class MaximumLevel
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -78,7 +75,5 @@ public class MaximumLevel
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }

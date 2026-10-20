@@ -1,5 +1,9 @@
 ﻿namespace Haukcode.ArtNet.Rdm.Packets.DMX;
 
+/// <summary>
+/// This parameter is used to get or set what the device does at power on when no DMX512 input is
+/// present (E1.37-1). Times are in tenths of a second, 0xFFFF meaning infinite.
+/// </summary>
 public class DmxStartupMode
 {
     public class Get : RdmRequestPacket
@@ -8,8 +12,6 @@ public class DmxStartupMode
             : base(RdmCommands.Get, RdmParameters.DmxStartupMode)
         {
         }
-        
-        #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -18,8 +20,6 @@ public class DmxStartupMode
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,17 +29,29 @@ public class DmxStartupMode
         {
         }
 
-        #region Read and Write
+        public ushort SceneNumber { get; set; }
+
+        public ushort StartupDelay { get; set; }
+
+        public ushort HoldTime { get; set; }
+
+        public byte Level { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            SceneNumber = data.ReadUInt16();
+            StartupDelay = data.ReadUInt16();
+            HoldTime = data.ReadUInt16();
+            Level = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(SceneNumber);
+            data.WriteUInt16(StartupDelay);
+            data.WriteUInt16(HoldTime);
+            data.WriteByte(Level);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -49,17 +61,29 @@ public class DmxStartupMode
         {
         }
 
-        #region Read and Write
+        public ushort SceneNumber { get; set; }
+
+        public ushort StartupDelay { get; set; }
+
+        public ushort HoldTime { get; set; }
+
+        public byte Level { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            SceneNumber = data.ReadUInt16();
+            StartupDelay = data.ReadUInt16();
+            HoldTime = data.ReadUInt16();
+            Level = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(SceneNumber);
+            data.WriteUInt16(StartupDelay);
+            data.WriteUInt16(HoldTime);
+            data.WriteByte(Level);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -69,8 +93,6 @@ public class DmxStartupMode
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -78,7 +100,5 @@ public class DmxStartupMode
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }

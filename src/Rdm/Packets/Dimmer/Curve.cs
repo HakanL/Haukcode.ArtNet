@@ -1,5 +1,9 @@
 namespace Haukcode.ArtNet.Rdm.Packets.Dimmer;
 
+/// <summary>
+/// This parameter is used to get or select the dimmer curve (E1.37-1). Curves are numbered from 1;
+/// <see cref="CurveDescription"/> describes each one.
+/// </summary>
 public class Curve
 {
     public class Get : RdmRequestPacket
@@ -8,8 +12,6 @@ public class Curve
             : base(RdmCommands.Get, RdmParameters.Curve)
         {
         }
-        
-        #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -18,8 +20,6 @@ public class Curve
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,17 +29,21 @@ public class Curve
         {
         }
 
-        #region Read and Write
+        public byte CurrentCurve { get; set; }
+
+        public byte CurveCount { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            CurrentCurve = data.ReadByte();
+            CurveCount = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(CurrentCurve);
+            data.WriteByte(CurveCount);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -49,17 +53,17 @@ public class Curve
         {
         }
 
-        #region Read and Write
+        public byte CurveNumber { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            CurveNumber = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteByte(CurveNumber);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -69,8 +73,6 @@ public class Curve
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -78,7 +80,5 @@ public class Curve
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }

@@ -1,5 +1,8 @@
 namespace Haukcode.ArtNet.Rdm.Packets.Dimmer;
 
+/// <summary>
+/// This parameter is used to get or set the dimmer's minimum level (E1.37-1).
+/// </summary>
 public class MinimumLevel
 {
     public class Get : RdmRequestPacket
@@ -8,8 +11,6 @@ public class MinimumLevel
             : base(RdmCommands.Get, RdmParameters.MinimumLevel)
         {
         }
-        
-        #region Read and Write
 
         protected override void ReadData(RdmBinaryReader data)
         {
@@ -18,8 +19,6 @@ public class MinimumLevel
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 
     public class GetReply : RdmResponsePacket
@@ -29,17 +28,25 @@ public class MinimumLevel
         {
         }
 
-        #region Read and Write
+        public ushort MinimumLevelIncreasing { get; set; }
+
+        public ushort MinimumLevelDecreasing { get; set; }
+
+        public bool OnBelowMinimum { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            MinimumLevelIncreasing = data.ReadUInt16();
+            MinimumLevelDecreasing = data.ReadUInt16();
+            OnBelowMinimum = data.ReadBool();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(MinimumLevelIncreasing);
+            data.WriteUInt16(MinimumLevelDecreasing);
+            data.WriteBool(OnBelowMinimum);
         }
-
-        #endregion
     }
 
     public class Set : RdmRequestPacket
@@ -49,17 +56,25 @@ public class MinimumLevel
         {
         }
 
-        #region Read and Write
+        public ushort MinimumLevelIncreasing { get; set; }
+
+        public ushort MinimumLevelDecreasing { get; set; }
+
+        public bool OnBelowMinimum { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            MinimumLevelIncreasing = data.ReadUInt16();
+            MinimumLevelDecreasing = data.ReadUInt16();
+            OnBelowMinimum = data.ReadBool();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            data.WriteUInt16(MinimumLevelIncreasing);
+            data.WriteUInt16(MinimumLevelDecreasing);
+            data.WriteBool(OnBelowMinimum);
         }
-
-        #endregion
     }
 
     public class SetReply : RdmResponsePacket
@@ -69,8 +84,6 @@ public class MinimumLevel
         {
         }
 
-        #region Read and Write
-
         protected override void ReadData(RdmBinaryReader data)
         {
         }
@@ -78,7 +91,5 @@ public class MinimumLevel
         protected override void WriteData(RdmBinaryWriter data)
         {
         }
-
-        #endregion
     }
 }
