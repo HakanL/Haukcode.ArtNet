@@ -54,6 +54,12 @@ public class DiscoveryUniqueBranch
         #endregion
     }
 
+    /// <remarks>
+    /// The DISC_UNIQUE_BRANCH response has no RDM header, so it can't be parsed with
+    /// <see cref="RdmPacket.ReadPacket(RdmBinaryReader)"/> and this class carries no data. Use
+    /// <see cref="DiscoveryUniqueBranchResponse"/> to encode and decode it. Art-Net doesn't carry
+    /// discovery traffic; nodes report discovered devices with ArtTodData instead.
+    /// </remarks>
     public class Reply : RdmResponsePacket
     {
         public Reply()
