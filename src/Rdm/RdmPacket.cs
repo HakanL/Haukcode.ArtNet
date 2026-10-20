@@ -1,4 +1,4 @@
-﻿namespace Haukcode.ArtNet.Rdm;
+namespace Haukcode.ArtNet.Rdm;
 
 public abstract class RdmPacket
 {
@@ -65,26 +65,34 @@ public abstract class RdmPacket
 
     public static RdmPacket ReadPacket(RdmCommands command, RdmParameters parameterId, RdmBinaryReader contentData)
     {
-        RdmPacket? rdmPacket = null;
+        RdmHeader header = new RdmHeader
+        {
+            Command = command,
+            ParameterId = parameterId
+        };
 
-        RdmHeader header = new RdmHeader();
-        header.Command = command;
-        header.ParameterId = parameterId;
+        return ReadPacket(header, contentData);
+    }
 
-        rdmPacket = RdmPacket.Create(header);
+    /// <summary>
+    /// Reads the packet body using an already prepared header. Use this overload
+    /// for deferred/queued responses where <see cref="RdmHeader.PortOrResponseType"/>
+    /// must be preserved (ACK_TIMER, NACK_REASON, ACK_OVERFLOW).
+    /// </summary>
+    public static RdmPacket ReadPacket(RdmHeader header, RdmBinaryReader contentData)
+    {
+        RdmPacket? rdmPacket = RdmPacket.Create(header);
         if (rdmPacket != null)
         {
             rdmPacket.ReadData(contentData);
             return rdmPacket;
         }
-        else
+
+        RdmRawPacket? rawPacket = RdmPacket.Create(header, typeof(RdmRawPacket)) as RdmRawPacket;
+        if (rawPacket != null)
         {
-            RdmRawPacket? rawPacket2 = RdmPacket.Create(header, typeof(RdmRawPacket)) as RdmRawPacket;
-            if (rawPacket2 != null)
-            {
-                rawPacket2.ReadData(contentData);
-                return rawPacket2;
-            }
+            rawPacket.ReadData(contentData);
+            return rawPacket;
         }
 
         throw new UnknownRdmPacketException(header);

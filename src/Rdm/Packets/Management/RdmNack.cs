@@ -1,6 +1,6 @@
-﻿namespace Haukcode.ArtNet.Rdm.Packets.Management;
+namespace Haukcode.ArtNet.Rdm.Packets.Management;
 
-public class RdmNack:RdmPacket
+public class RdmNack : RdmResponsePacket
 {
     public RdmNack()
     {
@@ -9,7 +9,7 @@ public class RdmNack:RdmPacket
     public RdmNack(RdmCommands command, RdmParameters parameterId)
         : base(command, parameterId)
     {
-        Header.PortOrResponseType = (byte) RdmResponseTypes.NackReason;
+        ResponseType = RdmResponseTypes.NackReason;
     }
 
     public NackReason Reason { get; set; }
@@ -18,12 +18,12 @@ public class RdmNack:RdmPacket
 
     protected override void ReadData(RdmBinaryReader data)
     {
-        Reason = (NackReason) data.ReadInt16();
+        Reason = (NackReason)data.ReadInt16();
     }
 
     protected override void WriteData(RdmBinaryWriter data)
     {
-        data.WriteByte((byte) Reason);
+        data.WriteUInt16((short)Reason);
     }
 
     #endregion

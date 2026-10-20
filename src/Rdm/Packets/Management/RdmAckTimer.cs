@@ -1,6 +1,6 @@
-﻿namespace Haukcode.ArtNet.Rdm.Packets.Management;
+namespace Haukcode.ArtNet.Rdm.Packets.Management;
 
-public class RdmAckTimer : RdmPacket
+public class RdmAckTimer : RdmResponsePacket
 {
     public RdmAckTimer()
     {
@@ -9,16 +9,19 @@ public class RdmAckTimer : RdmPacket
     public RdmAckTimer(RdmCommands command, RdmParameters parameterId)
         : base(command, parameterId)
     {
-        Header.PortOrResponseType = (byte)RdmResponseTypes.AckTimer;
+        ResponseType = RdmResponseTypes.AckTimer;
     }
 
-    public short EstimatedResponseTime { get; set; }
+    /// <summary>
+    /// Estimated response time in tenths of a second (100 ms increments).
+    /// </summary>
+    public ushort EstimatedResponseTime { get; set; }
 
     #region Read and Write
 
     protected override void ReadData(RdmBinaryReader data)
     {
-        EstimatedResponseTime = data.ReadInt16();
+        EstimatedResponseTime = unchecked((ushort)data.ReadInt16());
     }
 
     protected override void WriteData(RdmBinaryWriter data)
@@ -27,5 +30,4 @@ public class RdmAckTimer : RdmPacket
     }
 
     #endregion
-
 }
