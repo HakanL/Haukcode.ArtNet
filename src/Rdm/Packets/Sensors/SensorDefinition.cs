@@ -40,6 +40,17 @@ public class SensorDefinition
         Items = 0x1E,
         Humidity = 0x1F,
         Counter16Bit = 0x20,
+
+        // E1.20-2025
+        CpuLoad = 0x21,
+        Bandwidth = 0x22,
+        Concentration = 0x23,
+        SoundPressureLevel = 0x24,
+        SolidAngle = 0x25,
+        LogRatio = 0x26,
+        LogRatioVolts = 0x27,
+        LogRatioWatts = 0x28,
+
         Other = 0x7F,
     }
 
@@ -74,6 +85,16 @@ public class SensorDefinition
         Lux = 0x1A,
         Ire = 0x1B,
         Byte = 0x1C,
+
+        // E1.20-2025
+        Decibel = 0x1D,
+        DecibelVolt = 0x1E,
+        DecibelWatt = 0x1F,
+        DecibelMeter = 0x20,
+        Percent = 0x21,
+        MolesPerMeterCubed = 0x22,
+        Rpm = 0x23,
+        BytesPerSecond = 0x24,
     }
 
     public enum SensorPrefix

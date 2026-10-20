@@ -18,10 +18,19 @@ public enum RdmParameters
     StatusIdDescription = 0x031,
     ClearStatusId = 0x032,
     SubDeviceStatusReportThreshold = 0x033,
+    QueuedMessageSensorSubscribe = 0x0034,
 
     //---- RDM ----
     SupportedParameters = 0x0050,
     ParameterDescription = 0x0051,
+
+    // E1.20-2025
+    SupportedParametersEnhanced = 0x0055,
+    ControllerFlagSupport = 0x0056,
+    NackDescription = 0x0057,
+    PackedPidSub = 0x0058,
+    PackedPidIndex = 0x0059,
+    EnumLabel = 0x005A,
 
     //---- Product Information ----
     DeviceInfo = 0x0060,
@@ -91,6 +100,7 @@ public enum RdmParameters
     PowerState = 0x1010,
     PerformSelfTest = 0x1020,
     SelfTestDescription = 0x1021,
+    SelfTestEnhanced = 0x1022,
     CapturePreset = 0x1030,
     PresetPlayback = 0x1031,
     IdentifyMode = 0x1040,
