@@ -51,7 +51,7 @@ public class TcpCommsStatus
     public class Set : RdmRequestPacket
     {
         public Set()
-            : base(RdmCommands.Set, RdmParameters.EndpointLabel)
+            : base(RdmCommands.Set, RdmParameters.TcpCommsStatus)
         {
         }
 
@@ -69,7 +69,7 @@ public class TcpCommsStatus
     public class SetReply : RdmResponsePacket
     {
         public SetReply()
-            : base(RdmCommands.SetResponse, RdmParameters.EndpointLabel)
+            : base(RdmCommands.SetResponse, RdmParameters.TcpCommsStatus)
         {
         }
 

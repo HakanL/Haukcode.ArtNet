@@ -30,7 +30,7 @@ public class DiscoveryUnMute
     public class Reply : RdmResponsePacket
     {
         public Reply()
-            : base(RdmCommands.DiscoveryResponse, RdmParameters.DiscoveryUniqueBranch)
+            : base(RdmCommands.DiscoveryResponse, RdmParameters.DiscoveryUnMute)
         {
         }
 
