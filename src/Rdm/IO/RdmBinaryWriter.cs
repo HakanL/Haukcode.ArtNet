@@ -62,11 +62,20 @@ public class RdmBinaryWriter
     /// </summary>
     public void WriteString(string value)
     {
+        WriteString(value, MaxTextLength);
+    }
+
+    /// <summary>
+    /// Writes <paramref name="value"/> as ASCII, truncated to <paramref name="maxLength"/>
+    /// characters, for fields longer than the usual 32 (e.g. host and domain names).
+    /// </summary>
+    public void WriteString(string value, int maxLength)
+    {
         if (string.IsNullOrEmpty(value))
             return;
 
         var bytes = Encoding.ASCII.GetBytes(value);
-        this.writer.Write(bytes, 0, Math.Min(bytes.Length, MaxTextLength));
+        this.writer.Write(bytes, 0, Math.Min(bytes.Length, maxLength));
     }
 
     public void WriteUid(UId value)

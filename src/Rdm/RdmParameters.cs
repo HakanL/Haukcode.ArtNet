@@ -109,6 +109,22 @@ public enum RdmParameters
     PresetMergeMode = 0x1043,
     PowerOnSelfTest = 0x1044,
 
+    //---- IPv4 and DNS configuration (E1.37-2 Table A-1) ----
+    ListInterfaces = 0x0700,
+    InterfaceLabel = 0x0701,
+    InterfaceHardwareAddressType1 = 0x0702,
+    Ipv4DhcpMode = 0x0703,
+    Ipv4ZeroconfMode = 0x0704,
+    Ipv4CurrentAddress = 0x0705,
+    Ipv4StaticAddress = 0x0706,
+    InterfaceRenewDhcp = 0x0707,
+    InterfaceReleaseDhcp = 0x0708,
+    InterfaceApplyConfiguration = 0x0709,
+    Ipv4DefaultRoute = 0x070A,
+    DnsIpv4NameServer = 0x070B,
+    DnsHostname = 0x070C,
+    DnsDomainName = 0x070D,
+
     //---- RDMnet (E1.33 Table A-15) ----
     ComponentScope = 0x0800,
     SearchDomain = 0x0801,

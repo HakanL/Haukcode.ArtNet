@@ -10,6 +10,7 @@ using Haukcode.ArtNet.Rdm.Packets.Management;
 using Haukcode.ArtNet.Rdm.Packets.Discovery;
 using Haukcode.ArtNet.Rdm.Packets.Configuration;
 using Haukcode.ArtNet.Rdm.Packets.Sensors;
+using Haukcode.ArtNet.Rdm.Packets.Network;
 using Haukcode.ArtNet.Rdm.Packets.Display;
 
 namespace Haukcode.ArtNet.Rdm;
@@ -22,6 +23,7 @@ public static class RdmPacketFactory
         RegisterStatusMessages();
         RegisterCoreMessages();
         RegisterRdmNetMessages();
+        RegisterNetworkMessages();
         RegisterProductMessages();
         RegisterDmxMessages();
         RegisterDimmerMessages();
@@ -166,8 +168,99 @@ public static class RdmPacketFactory
 
 
 
+    private static void RegisterNetworkMessages()
+    {
+        //ListInterfaces
+        RegisterPacketType(RdmCommands.Get, RdmParameters.ListInterfaces, typeof(ListInterfaces.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.ListInterfaces, typeof(ListInterfaces.GetReply));
+
+        //InterfaceLabel
+        RegisterPacketType(RdmCommands.Get, RdmParameters.InterfaceLabel, typeof(InterfaceLabel.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.InterfaceLabel, typeof(InterfaceLabel.GetReply));
+
+        //InterfaceHardwareAddressType1
+        RegisterPacketType(RdmCommands.Get, RdmParameters.InterfaceHardwareAddressType1, typeof(InterfaceHardwareAddressType1.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.InterfaceHardwareAddressType1, typeof(InterfaceHardwareAddressType1.GetReply));
+
+        //Ipv4DhcpMode
+        RegisterPacketType(RdmCommands.Get, RdmParameters.Ipv4DhcpMode, typeof(Ipv4DhcpMode.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.Ipv4DhcpMode, typeof(Ipv4DhcpMode.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.Ipv4DhcpMode, typeof(Ipv4DhcpMode.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.Ipv4DhcpMode, typeof(Ipv4DhcpMode.SetReply));
+
+        //Ipv4ZeroconfMode
+        RegisterPacketType(RdmCommands.Get, RdmParameters.Ipv4ZeroconfMode, typeof(Ipv4ZeroconfMode.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.Ipv4ZeroconfMode, typeof(Ipv4ZeroconfMode.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.Ipv4ZeroconfMode, typeof(Ipv4ZeroconfMode.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.Ipv4ZeroconfMode, typeof(Ipv4ZeroconfMode.SetReply));
+
+        //Ipv4CurrentAddress
+        RegisterPacketType(RdmCommands.Get, RdmParameters.Ipv4CurrentAddress, typeof(Ipv4CurrentAddress.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.Ipv4CurrentAddress, typeof(Ipv4CurrentAddress.GetReply));
+
+        //Ipv4StaticAddress
+        RegisterPacketType(RdmCommands.Get, RdmParameters.Ipv4StaticAddress, typeof(Ipv4StaticAddress.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.Ipv4StaticAddress, typeof(Ipv4StaticAddress.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.Ipv4StaticAddress, typeof(Ipv4StaticAddress.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.Ipv4StaticAddress, typeof(Ipv4StaticAddress.SetReply));
+
+        //InterfaceApplyConfiguration
+        RegisterPacketType(RdmCommands.Set, RdmParameters.InterfaceApplyConfiguration, typeof(InterfaceApplyConfiguration.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.InterfaceApplyConfiguration, typeof(InterfaceApplyConfiguration.SetReply));
+
+        //InterfaceRenewDhcp
+        RegisterPacketType(RdmCommands.Set, RdmParameters.InterfaceRenewDhcp, typeof(InterfaceRenewDhcp.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.InterfaceRenewDhcp, typeof(InterfaceRenewDhcp.SetReply));
+
+        //InterfaceReleaseDhcp
+        RegisterPacketType(RdmCommands.Set, RdmParameters.InterfaceReleaseDhcp, typeof(InterfaceReleaseDhcp.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.InterfaceReleaseDhcp, typeof(InterfaceReleaseDhcp.SetReply));
+
+        //Ipv4DefaultRoute
+        RegisterPacketType(RdmCommands.Get, RdmParameters.Ipv4DefaultRoute, typeof(Ipv4DefaultRoute.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.Ipv4DefaultRoute, typeof(Ipv4DefaultRoute.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.Ipv4DefaultRoute, typeof(Ipv4DefaultRoute.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.Ipv4DefaultRoute, typeof(Ipv4DefaultRoute.SetReply));
+
+        //DnsIpv4NameServer
+        RegisterPacketType(RdmCommands.Get, RdmParameters.DnsIpv4NameServer, typeof(DnsIpv4NameServer.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DnsIpv4NameServer, typeof(DnsIpv4NameServer.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.DnsIpv4NameServer, typeof(DnsIpv4NameServer.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DnsIpv4NameServer, typeof(DnsIpv4NameServer.SetReply));
+
+        //DnsHostname
+        RegisterPacketType(RdmCommands.Get, RdmParameters.DnsHostname, typeof(DnsHostname.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DnsHostname, typeof(DnsHostname.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.DnsHostname, typeof(DnsHostname.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DnsHostname, typeof(DnsHostname.SetReply));
+
+        //DnsDomainName
+        RegisterPacketType(RdmCommands.Get, RdmParameters.DnsDomainName, typeof(DnsDomainName.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.DnsDomainName, typeof(DnsDomainName.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.DnsDomainName, typeof(DnsDomainName.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.DnsDomainName, typeof(DnsDomainName.SetReply));
+    }
+
     private static void RegisterRdmNetMessages()
     {
+        //SearchDomain
+        RegisterPacketType(RdmCommands.Get, RdmParameters.SearchDomain, typeof(SearchDomain.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.SearchDomain, typeof(SearchDomain.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.SearchDomain, typeof(SearchDomain.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.SearchDomain, typeof(SearchDomain.SetReply));
+
+        //ComponentScope
+        RegisterPacketType(RdmCommands.Get, RdmParameters.ComponentScope, typeof(ComponentScope.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.ComponentScope, typeof(ComponentScope.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.ComponentScope, typeof(ComponentScope.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.ComponentScope, typeof(ComponentScope.SetReply));
+
+        //BrokerStatus
+        RegisterPacketType(RdmCommands.Get, RdmParameters.BrokerStatus, typeof(BrokerStatus.Get));
+        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BrokerStatus, typeof(BrokerStatus.GetReply));
+        RegisterPacketType(RdmCommands.Set, RdmParameters.BrokerStatus, typeof(BrokerStatus.Set));
+        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.BrokerStatus, typeof(BrokerStatus.SetReply));
+
         //Endpoint List
         RegisterPacketType(RdmCommands.Get, RdmParameters.EndpointList, typeof(EndpointList.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.EndpointList, typeof(EndpointList.Reply));
