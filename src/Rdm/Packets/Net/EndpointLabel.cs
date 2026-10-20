@@ -36,7 +36,7 @@ public class EndpointLabel
         protected override void ReadData(RdmBinaryReader data)
         {
             EndpointID = data.ReadUInt16();
-            Label = Encoding.ASCII.GetString(data.ReadBytes(Header.ParameterDataLength-2));
+            Label = data.ReadString(Header.ParameterDataLength - 2);
         }
 
         protected override void WriteData(RdmBinaryWriter data)
@@ -60,7 +60,7 @@ public class EndpointLabel
         protected override void ReadData(RdmBinaryReader data)
         {
             EndpointID = data.ReadUInt16();
-            Label = Encoding.ASCII.GetString(data.ReadBytes(Header.ParameterDataLength - 2));
+            Label = data.ReadString(Header.ParameterDataLength - 2);
         }
 
         protected override void WriteData(RdmBinaryWriter data)

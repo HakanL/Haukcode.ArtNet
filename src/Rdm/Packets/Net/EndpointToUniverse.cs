@@ -4,10 +4,14 @@
 /// This parameter is used to assign an Endpoint on an E1.33 device to a specific E1.31 DMX512 Universe.
 /// </summary>
 /// <remarks>
-/// This message shall only be used on E1.33 networks and shall not be implemented on an E1.20 network as an E1.20 network cannot span beyond the context of a single universe.
+/// Universe 0 means the endpoint is unpatched; 0xFFFF (composite) is only reported by a GET.
+/// E1.37-7 also allows this PID within a splitter to assign inputs to outputs.
 /// </remarks>
 public class EndpointToUniverse
 {
+    /// <summary>Highest universe a SET may assign.</summary>
+    public const ushort MaxUniverse = 63999;
+
     public enum UniverseMode
     {
         Disabled,
@@ -40,6 +44,7 @@ public class EndpointToUniverse
         public GetReply()
             : base(RdmCommands.GetResponse, RdmParameters.EndpointToUniverse)
         {
+            EndpointMode = UniverseMode.Standard;
         }
 
 
@@ -152,6 +157,10 @@ public class EndpointToUniverse
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            // "Only Universe Numbers in the range 0 - 63999 are valid in SET_COMMAND"
+            if (EndpointMode == UniverseMode.Composite || (EndpointMode == UniverseMode.Standard && UniverseNumber > MaxUniverse))
+                throw new InvalidOperationException($"A SET can only assign universe 0 (unpatched) or 1 to {MaxUniverse}.");
+
             data.WriteUInt16(EndpointID);
 
             switch (EndpointMode)

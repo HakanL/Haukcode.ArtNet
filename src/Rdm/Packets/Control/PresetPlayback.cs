@@ -60,6 +60,9 @@ public class PresetPlayback
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            if (Mode == PlayMode.Scene && (SceneNumber == (ushort)PlayMode.Off || SceneNumber == (ushort)PlayMode.All))
+                throw new InvalidOperationException("Scene numbers are 1 to 0xFFFE; use PlayMode.Off or PlayMode.All for 0 and 0xFFFF.");
+
             data.WriteUInt16(Mode == PlayMode.Scene ? SceneNumber : (ushort)Mode);
             data.WriteByte(Level);
         }
@@ -91,6 +94,9 @@ public class PresetPlayback
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            if (Mode == PlayMode.Scene && (SceneNumber == (ushort)PlayMode.Off || SceneNumber == (ushort)PlayMode.All))
+                throw new InvalidOperationException("Scene numbers are 1 to 0xFFFE; use PlayMode.Off or PlayMode.All for 0 and 0xFFFF.");
+
             data.WriteUInt16(Mode == PlayMode.Scene ? SceneNumber : (ushort)Mode);
             data.WriteByte(Level);
         }

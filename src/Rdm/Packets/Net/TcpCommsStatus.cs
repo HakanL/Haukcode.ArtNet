@@ -9,16 +9,22 @@ public class TcpCommsStatus
     /// <summary>Size of the NUL-padded scope field.</summary>
     public const int ScopeLength = 63;
 
-    internal static string ReadScope(RdmBinaryReader data) =>
-        Encoding.UTF8.GetString(data.ReadBytes(ScopeLength)).TrimEnd('\0');
+    internal static string ReadScope(RdmBinaryReader data)
+    {
+        // The scope ends at the first NUL
+        var bytes = data.ReadBytes(ScopeLength);
+        int end = Array.IndexOf(bytes, (byte)0);
+
+        return Encoding.UTF8.GetString(bytes, 0, end < 0 ? bytes.Length : end);
+    }
 
     internal static void WriteScope(RdmBinaryWriter data, string scope)
     {
         var field = new byte[ScopeLength];
         var bytes = Encoding.UTF8.GetBytes(scope ?? string.Empty);
 
-        // Truncate on a character boundary
-        int length = Math.Min(bytes.Length, ScopeLength);
+        // At most 62 octets, so the field always ends with a NUL; truncate on a character boundary
+        int length = Math.Min(bytes.Length, ScopeLength - 1);
         while (length > 0 && length < bytes.Length && (bytes[length] & 0xC0) == 0x80)
             length--;
 

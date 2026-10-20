@@ -7,6 +7,32 @@
 /// </summary>
 public class ParameterDescription
 {
+    /// <summary>
+    /// Min/max/default values on the wire (E1.20 10.4.2): 32 bits, values of narrower types padded
+    /// with zero bytes, and zero for data types other than 8/16/32-bit integers.
+    /// </summary>
+    public static uint EncodeValue(long value, ParameterDataTypes dataType) => dataType switch
+    {
+        ParameterDataTypes.UInt8 or ParameterDataTypes.Int8 => (uint)(value & 0xFF),
+        ParameterDataTypes.UInt16 or ParameterDataTypes.Int16 => (uint)(value & 0xFFFF),
+        ParameterDataTypes.UInt32 or ParameterDataTypes.Int32 => unchecked((uint)value),
+        _ => 0
+    };
+
+    /// <summary>
+    /// The value a min/max/default field holds for the data type, sign-extended for signed types.
+    /// </summary>
+    public static long DecodeValue(uint raw, ParameterDataTypes dataType) => dataType switch
+    {
+        ParameterDataTypes.UInt8 => raw & 0xFF,
+        ParameterDataTypes.Int8 => unchecked((sbyte)raw),
+        ParameterDataTypes.UInt16 => raw & 0xFFFF,
+        ParameterDataTypes.Int16 => unchecked((short)raw),
+        ParameterDataTypes.UInt32 => raw,
+        ParameterDataTypes.Int32 => unchecked((int)raw),
+        _ => 0
+    };
+
     public class Get : RdmRequestPacket
     {
         public Get()
@@ -51,13 +77,13 @@ public class ParameterDescription
         /// example: unsigned 8-bit character versus signed 16-bit word. Table A-15 enumerates the field
         /// codes.
         /// </summary>
-        public byte DataType { get; set; }
+        public ParameterDataTypes DataType { get; set; }
 
         /// <summary>
         /// Command Class defines whether Get and or Set messages are implemented for the specified
         /// PID. Table A-16 enumerates the field codes.
         /// </summary>
-        public byte CommandClass { get; set; }
+        public ParameterCommandClasses CommandClass { get; set; }
 
         /// <summary>
         /// Type is an unsigned 8-bit value enumerated by Table A-12. It defines the type of data that is
@@ -84,7 +110,7 @@ public class ParameterDescription
         /// 0x00 out to 32-bits. For example, an 8-bit data value of 0x12 shall be represented in the field as:
         /// 0x00000012.
         /// </summary>
-        public int MinValidValue { get; set; }
+        public long MinValidValue { get; set; }
 
         /// <summary>
         /// This is a 32-bit field that represents the highest value that data can reach. The format of the
@@ -93,7 +119,7 @@ public class ParameterDescription
         /// 0x00 out to 32-bits. For example, an 8-bit data value of 0x12 shall be represented in the field as:
         /// 0x00000012.
         /// </summary>
-        public int MaxValidValue { get; set; }
+        public long MaxValidValue { get; set; }
 
         /// <summary>
         /// This is a 32-bit field that represents the default value of that data. This field has no meaning for a
@@ -102,26 +128,26 @@ public class ParameterDescription
         /// with 0x00 out to 32-bits. For example, an 8-bit data value of 0x12 shall be represented in the field
         /// as: 0x00000012.
         /// </summary>
-        public int DefaultValue { get; set; }
+        public long DefaultValue { get; set; }
 
         /// <summary>
         /// The Description field is used to describe the function of the specified PID. This text field shall be
         /// variable up to 32 characters in length.
         /// </summary>
-        public string Description { get; set; } = null!;
+        public string Description { get; set; } = string.Empty;
 
         protected override void ReadData(RdmBinaryReader data)
         {
             ParameterId = (RdmParameters)data.ReadUInt16();
             PDLSize = data.ReadByte();
-            DataType = data.ReadByte();
-            CommandClass = data.ReadByte();
+            DataType = (ParameterDataTypes)data.ReadByte();
+            CommandClass = (ParameterCommandClasses)data.ReadByte();
             Type = data.ReadByte();
             Unit = data.ReadByte();
             Prefix = data.ReadByte();
-            MinValidValue = data.ReadHiLoInt32();
-            MaxValidValue = data.ReadHiLoInt32();
-            DefaultValue = data.ReadHiLoInt32();
+            MinValidValue = DecodeValue(data.ReadUInt32(), DataType);
+            MaxValidValue = DecodeValue(data.ReadUInt32(), DataType);
+            DefaultValue = DecodeValue(data.ReadUInt32(), DataType);
             Description = data.ReadString(Header.ParameterDataLength - 20);
         }
 
@@ -129,16 +155,15 @@ public class ParameterDescription
         {
             data.WriteUInt16((ushort)ParameterId);
             data.WriteByte(PDLSize);
-            data.WriteByte(DataType);
-            data.WriteByte(CommandClass);
+            data.WriteByte((byte)DataType);
+            data.WriteByte((byte)CommandClass);
             data.WriteByte(Type);
             data.WriteByte(Unit);
             data.WriteByte(Prefix);
-            data.WriteHiLoInt32(MinValidValue);
-            data.WriteHiLoInt32(MaxValidValue);
-            data.WriteHiLoInt32(DefaultValue);
+            data.WriteUInt32(EncodeValue(MinValidValue, DataType));
+            data.WriteUInt32(EncodeValue(MaxValidValue, DataType));
+            data.WriteUInt32(EncodeValue(DefaultValue, DataType));
             data.WriteString(Description);
-            ;
         }
     }
 }

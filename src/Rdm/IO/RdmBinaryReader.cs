@@ -54,7 +54,12 @@ public class RdmBinaryReader
         if (length <= 0)
             return string.Empty;
 
-        return Encoding.ASCII.GetString(this.reader.ReadBytes(length)).TrimEnd((char)0);
+        // The text ends at the first NUL (E1.20 10.1). Decoded as UTF-8, which is a superset of
+        // ASCII and what Unicode-capable responders send (E1.20 10.1.1).
+        var bytes = this.reader.ReadBytes(length);
+        int end = Array.IndexOf(bytes, (byte)0);
+
+        return Encoding.UTF8.GetString(bytes, 0, end < 0 ? bytes.Length : end);
     }
 
     public UId ReadUId()

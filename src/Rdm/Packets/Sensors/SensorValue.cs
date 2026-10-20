@@ -20,6 +20,9 @@ public class SensorValue
 
         protected override void WriteData(RdmBinaryWriter data)
         {
+            if (SensorNumber == 0xFF)
+                throw new InvalidOperationException("Sensor 0xFF (all sensors) can't be used with GET.");
+
             data.WriteByte(SensorNumber);
         }
 

@@ -6,6 +6,12 @@
 /// </summary>
 public class DeviceInfo
 {
+    /// <summary>RDM protocol version 1.0 (E1.20-2006/2010).</summary>
+    public const ushort RdmProtocolVersion1 = 0x0100;
+
+    /// <summary>RDM protocol version 2.0 (E1.20-2025).</summary>
+    public const ushort RdmProtocolVersion2 = 0x0200;
+
     public class Get : RdmRequestPacket
     {
         public Get()
@@ -33,7 +39,11 @@ public class DeviceInfo
         {
         }
 
-        public ushort RdmProtocolVersion { get; set; }
+        /// <summary>
+        /// The RDM version the device supports, major and minor in the high and low byte; see
+        /// <see cref="RdmProtocolVersion1"/> and <see cref="RdmProtocolVersion2"/>.
+        /// </summary>
+        public ushort RdmProtocolVersion { get; set; } = RdmProtocolVersion2;
 
         public ushort DeviceModelId { get; set; }
 

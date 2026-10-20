@@ -2,7 +2,7 @@
 
 public class DiscoveryState
 {
-    public enum DiscoveryStates
+    public enum DiscoveryStates : byte
     {
         Incomplete = 0x0,
         Incremental = 0x1,

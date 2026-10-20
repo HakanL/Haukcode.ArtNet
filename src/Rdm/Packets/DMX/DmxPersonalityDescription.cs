@@ -45,8 +45,8 @@ public class DmxPersonalityDescription
         {
             PersonalityIndex = data.ReadByte();
             DmxSlotsRequired = data.ReadUInt16();
-            if(Header.ParameterDataLength > 3)
-                Description = data.ReadString(Header.ParameterDataLength - 3);
+            // PDL 3 is legal and means an empty description
+            Description = data.ReadString(Header.ParameterDataLength - 3);
         }
 
         protected override void WriteData(RdmBinaryWriter data)
