@@ -157,4 +157,30 @@ public class ArtNetPacketLayoutTests
         var parsed = (ArtPollReplyPacket)ArtNetPacket.Parse(wire)!;
         Assert.AreEqual(new string('x', 16), parsed.ShortName);
     }
+
+    [TestMethod]
+    public void ArtAddressCopy_EncodesOnlyTheLowNibbleOfSwInSwOut()
+    {
+        var address = new ArtAddressPacket(new ArtPollReplyPacket { SwIn = [0xF1, 0, 0, 0], SwOut = [0xA2, 0, 0, 0] });
+
+        Assert.AreEqual((byte)0x81, address.SwIn[0]);
+        Assert.AreEqual((byte)0x82, address.SwOut[0]);
+    }
+
+    [TestMethod]
+    public void ArtRdm_RoundTripsFifoAvailAndFifoMax()
+    {
+        var parsed = RoundTrip(new ArtRdmPacket { FifoAvail = 3, FifoMax = 8, Net = 1, Address = 0x31, SubStartCode = 1, RdmData = [1, 2] }, 12 + 13 + 2);
+
+        Assert.AreEqual((byte)3, parsed.FifoAvail);
+        Assert.AreEqual((byte)8, parsed.FifoMax);
+        Assert.AreEqual((byte)1, parsed.Net);
+        Assert.AreEqual((byte)0x31, parsed.Address);
+    }
+
+    [TestMethod]
+    public void ArtRdmSub_RejectsSubCountZero()
+    {
+        Assert.ThrowsExactly<InvalidOperationException>(() => Write(new ArtRdmSubPacket { DeviceId = new UId(1, 1), SubCount = 0, RdmData = [] }));
+    }
 }

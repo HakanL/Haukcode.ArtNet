@@ -7,7 +7,10 @@ public class ArtSyncPacket : ArtNetPacket
     {
     }
 
-    public ushort Aux { get; set; }
+    /// <summary>
+    /// The Aux1/Aux2 bytes as received. They're sent as zero, as the spec requires.
+    /// </summary>
+    public ushort Aux { get; private set; }
 
     protected override int DataLength => 2;
 
@@ -28,6 +31,6 @@ public class ArtSyncPacket : ArtNetPacket
 
     protected override void WriteData(ref SpanBinaryWriter writer)
     {
-        writer.WriteUInt16(Aux);
+        writer.WriteZeros(2);
     }
 }

@@ -7,9 +7,11 @@ public class ArtTriggerPacket : ArtNetPacket
     {
     }
 
-    public byte Filler1 { get; set; }
+    /// <summary>As received; sent as zero, as the spec requires.</summary>
+    public byte Filler1 { get; private set; }
 
-    public byte Filler2 { get; set; }
+    /// <summary>As received; sent as zero, as the spec requires.</summary>
+    public byte Filler2 { get; private set; }
 
     public ushort OemCode { get; set; }
 
@@ -44,8 +46,7 @@ public class ArtTriggerPacket : ArtNetPacket
 
     protected override void WriteData(ref SpanBinaryWriter writer)
     {
-        writer.WriteByte(Filler1);
-        writer.WriteByte(Filler2);
+        writer.WriteZeros(2);
         writer.WriteUInt16(OemCode);
         writer.WriteByte(Key);
         writer.WriteByte(SubKey);

@@ -11,7 +11,8 @@ public class ArtTodDataPacket : ArtNetPacket
 
     public byte RdmVersion { get; set; }
 
-    public byte Port { get; set; }
+    /// <summary>The node's physical port, 1-4.</summary>
+    public byte Port { get; set; } = 1;
 
     public byte BindIndex { get; set; }
 

@@ -54,6 +54,10 @@ public class ArtRdmSubPacket : ArtNetPacket
         writer.WriteByte((byte)Command);
         writer.WriteUInt16(ParameterId);
         writer.WriteUInt16(SubDevice);
+        // "Zero is illegal"
+        if (SubCount == 0)
+            throw new InvalidOperationException("ArtRdmSub SubCount must be at least 1.");
+
         writer.WriteUInt16(SubCount);
         writer.WriteZeros(4);
         writer.WriteBytes(RdmData);

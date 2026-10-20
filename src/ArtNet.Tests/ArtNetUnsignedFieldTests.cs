@@ -61,7 +61,14 @@ public class ArtNetUnsignedFieldTests
     [TestMethod]
     public void Sync_Aux_ReadsBackInTheSameByteOrder()
     {
-        var parsed = RoundTrip(new ArtSyncPacket { Aux = 0x1234 });
+        // Senders transmit Aux as zero; a received value is read big-endian
+        var buffer = new byte[ArtNetPacket.MAX_PACKET_SIZE];
+        int length = new ArtSyncPacket().WriteToBuffer(buffer);
+        Assert.AreEqual(0, buffer[12] | buffer[13]);
+
+        buffer[12] = 0x12;
+        buffer[13] = 0x34;
+        var parsed = (ArtSyncPacket)ArtNetPacket.Parse(buffer.AsMemory(0, length))!;
 
         Assert.AreEqual((ushort)0x1234, parsed.Aux);
     }

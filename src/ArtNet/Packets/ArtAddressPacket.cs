@@ -49,8 +49,8 @@ public class ArtAddressPacket : ArtNetPacket
     {
         // Not all devices will be on code and set the address regardless of Bit 7. So better provide all the default values.
         BindIndex = src.BindIndex;
-        SwIn = src.SwIn.Select(x => (byte)(x | 0x80)).ToArray();
-        SwOut = src.SwOut.Select(x => (byte)(x | 0x80)).ToArray();
+        SwIn = src.SwIn.Select(x => (byte)((x & 0x0F) | 0x80)).ToArray();
+        SwOut = src.SwOut.Select(x => (byte)((x & 0x0F) | 0x80)).ToArray();
         SubSwitch = (byte)((src.SubSwitch & 0x000F) | 0x80);
         NetSwitch = (byte)((src.NetSwitch & 0x7F) | 0x80);
     }

@@ -13,7 +13,8 @@ public class ArtTimeCodePacket : ArtNetPacket
     }
 
     /// <summary>Ignored by receiver; sender sets to zero.</summary>
-    public byte Filler1 { get; set; }
+    /// <summary>As received; sent as zero, as the spec requires.</summary>
+    public byte Filler1 { get; private set; }
 
     /// <summary>0 is the master stream; other values identify extra streams.</summary>
     public byte StreamId { get; set; }
@@ -57,7 +58,7 @@ public class ArtTimeCodePacket : ArtNetPacket
 
     protected override void WriteData(ref SpanBinaryWriter writer)
     {
-        writer.WriteByte(Filler1);
+        writer.WriteByte(0);
         writer.WriteByte(StreamId);
         writer.WriteByte(Frames);
         writer.WriteByte(Seconds);
