@@ -193,7 +193,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     /// <summary>
     /// Art-Net 4 forbids broadcasting ArtDmx (unless <see cref="AllowDmxBroadcast"/>), ArtPollReply,
-    /// ArtRdm and ArtTodData.
+    /// ArtRdm, ArtTodData, ArtDataRequest/Reply, ArtNzs/ArtVlc and ArtFirmwareMaster/Reply.
     /// </summary>
     private void CheckBroadcastAllowed(IPEndPoint destination, ArtNetOpCodes opCode)
     {
@@ -203,7 +203,9 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         bool allowed = opCode switch
         {
             ArtNetOpCodes.Output => AllowDmxBroadcast,
-            ArtNetOpCodes.PollReply or ArtNetOpCodes.Rdm or ArtNetOpCodes.TodData => false,
+            ArtNetOpCodes.PollReply or ArtNetOpCodes.Rdm or ArtNetOpCodes.TodData or
+                ArtNetOpCodes.DataRequest or ArtNetOpCodes.DataReply or ArtNetOpCodes.Nzs or
+                ArtNetOpCodes.FirmwareMaster or ArtNetOpCodes.FirmwareReply => false,
             _ => true
         };
 
