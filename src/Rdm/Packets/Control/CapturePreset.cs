@@ -36,9 +36,14 @@ public class CapturePreset
         protected override void ReadData(RdmBinaryReader data)
         {
             SceneNumber = data.ReadUInt16();
-            UpFadeTime = data.ReadUInt16();
-            DownFadeTime = data.ReadUInt16();
-            WaitTime = data.ReadUInt16();
+
+            // The fade and wait times are optional: PDL is 2 (scene only) or 8
+            if (Header.ParameterDataLength >= 8)
+            {
+                UpFadeTime = data.ReadUInt16();
+                DownFadeTime = data.ReadUInt16();
+                WaitTime = data.ReadUInt16();
+            }
         }
 
         protected override void WriteData(RdmBinaryWriter data)
