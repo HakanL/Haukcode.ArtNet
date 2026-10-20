@@ -36,6 +36,7 @@ public class SupportedParameters
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            ParameterIds.Clear();
             for (int n = 0; n < base.Header.ParameterDataLength / 2; n++)
             {
                 ParameterIds.Add((RdmParameters)data.ReadUInt16());

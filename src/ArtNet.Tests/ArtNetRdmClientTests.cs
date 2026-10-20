@@ -29,8 +29,8 @@ public class ArtNetRdmClientTests
         var second = await ReceiveArtRdm(receiver);
 
         Assert.IsTrue(RdmPacket.IsChecksumValid(first.RdmData), "SendRdm's checksum");
-        Assert.AreEqual((byte)1, first.RdmData[TransactionNumberOffset]);
-        Assert.AreEqual((byte)2, second.RdmData[TransactionNumberOffset]);
+        Assert.AreEqual((byte)0, first.RdmData[TransactionNumberOffset]);
+        Assert.AreEqual((byte)1, second.RdmData[TransactionNumberOffset]);
 
         // Port-Address 0x0731 = Net 7, Sub-Net/Universe 0x31
         Assert.AreEqual((byte)0x07, first.Net);

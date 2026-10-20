@@ -44,21 +44,61 @@ public class RdmRobustnessTests
     }
 
     [TestMethod]
-    public void ShortReply_ReadsAnEmptyDescriptionInsteadOfThrowing()
+    public void ShortReply_IsRejected_AndAnEmptyDescriptionReadsAsEmpty()
     {
-        // PARAMETER_DESCRIPTION has 20 fixed bytes before the description; a 19-byte reply
-        // used to compute a length of -1
-        var header = new RdmHeader
+        // PARAMETER_DESCRIPTION has 20 fixed bytes before the description
+        RdmPacket Read(int parameterDataLength)
         {
-            Command = RdmCommands.GetResponse,
-            ParameterId = RdmParameters.ParameterDescription,
-            ParameterDataLength = 19,
+            var header = new RdmHeader
+            {
+                Command = RdmCommands.GetResponse,
+                ParameterId = RdmParameters.ParameterDescription,
+                ParameterDataLength = parameterDataLength,
+            };
+
+            using var content = new MemoryStream(new byte[parameterDataLength]);
+            return RdmPacket.ReadPacket(header, new RdmBinaryReader(content));
+        }
+
+        // The body is bounded by PDL, so a 19-byte reply can't read past its parameter data
+        Assert.ThrowsExactly<InvalidPacketException>(() => Read(19));
+
+        var reply = Assert.IsInstanceOfType<ParameterDescription.GetReply>(Read(20));
+        Assert.AreEqual(string.Empty, reply.Description);
+    }
+
+    [TestMethod]
+    public void ReadOverflowPacket_JoinsTheParameterData()
+    {
+        // SUPPORTED_PARAMETERS split over two messages: ACK_OVERFLOW, then ACK
+        byte[] Message(RdmResponseTypes responseType, params RdmParameters[] pids)
+        {
+            var reply = new SupportedParameters.GetReply { ResponseType = responseType };
+            reply.ParameterIds.AddRange(pids);
+            return WithChecksum(Encode(reply));
+        }
+
+        var packet = RdmPacket.ReadOverflowPacket(
+        [
+            Message(RdmResponseTypes.AckOverflow, RdmParameters.DeviceLabel, RdmParameters.DeviceInfo),
+            Message(RdmResponseTypes.Ack, RdmParameters.SoftwareVersionLabel),
+        ]);
+
+        var reply = Assert.IsInstanceOfType<SupportedParameters.GetReply>(packet);
+        CollectionAssert.AreEqual(new[] { RdmParameters.DeviceLabel, RdmParameters.DeviceInfo, RdmParameters.SoftwareVersionLabel }, reply.ParameterIds);
+    }
+
+    [TestMethod]
+    public void DiscoveryMuteNack_IsReadAsNack()
+    {
+        var nack = new Haukcode.ArtNet.Rdm.Packets.Management.RdmNack(RdmCommands.DiscoveryResponse, RdmParameters.DiscoveryMute)
+        {
+            Reason = Haukcode.ArtNet.Rdm.Packets.Management.NackReason.FormatError,
         };
 
-        using var content = new MemoryStream(new byte[20]);
-        var reply = Assert.IsInstanceOfType<ParameterDescription.GetReply>(RdmPacket.ReadPacket(header, new RdmBinaryReader(content)));
+        var parsed = Decode(Encode(nack));
 
-        Assert.AreEqual(string.Empty, reply.Description);
+        Assert.IsInstanceOfType<Haukcode.ArtNet.Rdm.Packets.Management.RdmNack>(parsed);
     }
 
     [TestMethod]

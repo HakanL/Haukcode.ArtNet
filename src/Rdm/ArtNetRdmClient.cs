@@ -22,23 +22,35 @@ public class ArtNetRdmClient : ArtNetClient
         return SendRdm(packet, targetAddress, targetUniverse, targetId, RdmId);
     }
 
+    /// <summary>Port-Addresses are 15 bits.</summary>
+    public const ushort MaxPortAddress = 0x7FFF;
+
+    /// <summary>The sub-device id that addresses all sub-devices.</summary>
+    public const ushort AllSubDevices = 0xFFFF;
+
     /// <param name="targetUniverse">The 15-bit Port-Address the device is on.</param>
     /// <remarks>
-    /// A transaction number is assigned unless the packet already has a non-zero one; responses
-    /// echo it, so it identifies which request a response belongs to.
+    /// Every packet gets the next transaction number, starting at 0 (E1.20 6.2.6: "increment this
+    /// field every time an RDM packet is transmitted"); responses echo it, so it identifies which
+    /// request a response belongs to.
     /// </remarks>
     public Task SendRdm(RdmPacket packet, IPEndPoint targetAddress, ushort targetUniverse, UId targetId, UId sourceId)
     {
+        if (targetUniverse > MaxPortAddress)
+            throw new ArgumentOutOfRangeException(nameof(targetUniverse), targetUniverse, $"The Port-Address must be 0 to {MaxPortAddress}.");
+
         //Fill in addition details
         packet.Header.SourceId = sourceId;
         packet.Header.DestinationId = targetId;
-
-        if (packet.Header.TransactionNumber == 0)
-            packet.Header.TransactionNumber = (byte)Interlocked.Increment(ref this.transactionNumber);
+        packet.Header.TransactionNumber = (byte)(Interlocked.Increment(ref this.transactionNumber) - 1);
 
         //Sub Devices
         if (targetId is SubDeviceUId subDevice)
             packet.Header.SubDevice = subDevice.SubDeviceId;
+
+        // E1.20 9: "GET commands sent to the SUB_DEVICE_ALL_CALL Sub-Device ID are not allowed"
+        if (packet.Header.Command == RdmCommands.Get && packet.Header.SubDevice == AllSubDevices)
+            throw new InvalidOperationException("A GET can't be sent to all sub-devices (0xFFFF).");
 
         //Create Rdm Packet
         using (var rdmData = new MemoryStream())
@@ -49,8 +61,8 @@ public class ArtNetRdmClient : ArtNetClient
             RdmPacket.WritePacket(packet, rdmWriter);
 
             //Write the checksum
-            rdmWriter.WriteUInt16((short)(RdmPacket.CalculateChecksum(rdmData.GetBuffer()) +
-                                          (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
+            rdmWriter.WriteUInt16((ushort)(RdmPacket.CalculateChecksum(rdmData.GetBuffer(), 0, (int)rdmData.Length) +
+                                           (int)RdmVersions.SubMessage + (int)DmxStartCodes.RDM));
 
             //Create sACN Packet
             var rdmPacket = new ArtRdmPacket

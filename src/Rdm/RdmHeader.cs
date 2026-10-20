@@ -52,7 +52,11 @@ public class RdmHeader
     /// Length of the parameter data. Set when the header is read and when the packet is written;
     /// set it yourself when parsing a body with <see cref="RdmPacket.ReadPacket(RdmHeader, RdmBinaryReader)"/>.
     /// </summary>
-    public byte ParameterDataLength { get; set; }
+    /// <remarks>
+    /// One message carries at most <see cref="MaxParameterDataLength"/> bytes; this is an int so a
+    /// response reassembled from ACK_OVERFLOW messages can be longer.
+    /// </remarks>
+    public int ParameterDataLength { get; set; }
 
     #endregion
 
@@ -92,7 +96,7 @@ public class RdmHeader
 
         // Save position so we can write length later.
         dataLengthPosition = data.BaseStream.Position;
-        data.WriteByte(ParameterDataLength);
+        data.WriteByte((byte)ParameterDataLength);
     }
 
     public void WriteLength(RdmBinaryWriter data)
@@ -105,7 +109,7 @@ public class RdmHeader
             throw new InvalidOperationException($"The parameter data is {parameterDataLength} bytes but an RDM message carries at most {MaxParameterDataLength}; split larger responses with ACK_OVERFLOW.");
 
         MessageLength = (byte)(data.BaseStream.Position - messageLengthPosition + 2);
-        ParameterDataLength = (byte)parameterDataLength;
+        ParameterDataLength = (int)parameterDataLength;
 
         //Write Message Length
         data.BaseStream.Seek(messageLengthPosition, System.IO.SeekOrigin.Begin);
@@ -113,7 +117,7 @@ public class RdmHeader
 
         //Write Parameter Data Length
         data.BaseStream.Seek(dataLengthPosition, System.IO.SeekOrigin.Begin);
-        data.WriteByte(ParameterDataLength);
+        data.WriteByte((byte)ParameterDataLength);
 
         //Move back to end of stream.
         data.BaseStream.Seek(0, System.IO.SeekOrigin.End);

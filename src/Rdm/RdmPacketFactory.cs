@@ -595,7 +595,8 @@ public static class RdmPacketFactory
 
     public static bool IsResponse(RdmHeader header)
     {
-        return header.Command == RdmCommands.GetResponse || header.Command == RdmCommands.SetResponse;
+        return header.Command == RdmCommands.GetResponse || header.Command == RdmCommands.SetResponse ||
+            header.Command == RdmCommands.DiscoveryResponse;
     }
 
     public static RdmPacket? BuildErrorResponse(RdmHeader header)

@@ -91,6 +91,7 @@ public class StatusMessage
 
         protected override void ReadData(RdmBinaryReader data)
         {
+            StatusMessages.Clear();
             for (int n = 0; n < (Header.ParameterDataLength / 9); n++)
             {
                 Status subDeviceStatus = new Status();

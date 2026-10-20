@@ -47,16 +47,89 @@ public abstract class RdmPacket
         RdmHeader header = new RdmHeader();
         header.ReadData(data);
 
-        RdmPacket? rdmPacket = RdmPacket.Create(header) ?? RdmPacket.Create(header, typeof(RdmRawPacket));
-        if (rdmPacket == null)
-            throw new UnknownRdmPacketException(header);
-
-        rdmPacket.ReadData(data);
+        var rdmPacket = ReadBody(header, ReadParameterData(header, data), typed: true);
 
         if (data.BytesLeft >= 2)
             rdmPacket.Checksum = data.ReadUInt16();
 
         return rdmPacket;
+    }
+
+    /// <summary>
+    /// Exactly the PDL bytes of parameter data, so a packet can't read into the checksum or the
+    /// next message.
+    /// </summary>
+    private static byte[] ReadParameterData(RdmHeader header, RdmBinaryReader data)
+    {
+        var parameterData = data.ReadBytes(header.ParameterDataLength);
+        if (parameterData.Length < header.ParameterDataLength)
+            throw new InvalidPacketException($"The message has {parameterData.Length} bytes of parameter data but its PDL is {header.ParameterDataLength}.");
+
+        return parameterData;
+    }
+
+    /// <summary>
+    /// Parses parameter data as the packet type registered for the header (or
+    /// <see cref="RdmRawPacket"/>), reading it from its own buffer.
+    /// </summary>
+    private static RdmPacket ReadBody(RdmHeader header, byte[] parameterData, bool typed)
+    {
+        RdmPacket? rdmPacket = (typed ? RdmPacket.Create(header) : null) ?? RdmPacket.Create(header, typeof(RdmRawPacket));
+        if (rdmPacket == null)
+            throw new UnknownRdmPacketException(header);
+
+        using var stream = new MemoryStream(parameterData);
+        try
+        {
+            rdmPacket.ReadData(new RdmBinaryReader(stream));
+        }
+        catch (EndOfStreamException)
+        {
+            throw new InvalidPacketException($"The {header.ParameterDataLength}-byte parameter data is too short for {rdmPacket.GetType().FullName}.");
+        }
+
+        return rdmPacket;
+    }
+
+    /// <summary>
+    /// Reads a response that was split with ACK_OVERFLOW: the parameter data of every message, in
+    /// order, is joined and parsed as one packet. Each message is RDM data as ArtRdm carries it
+    /// (from the Message Length byte on, ending with the checksum); every message but the last
+    /// has response type ACK_OVERFLOW.
+    /// </summary>
+    /// <exception cref="InvalidPacketException">A checksum is wrong, or the messages aren't one overflow sequence.</exception>
+    public static RdmPacket ReadOverflowPacket(IEnumerable<ReadOnlyMemory<byte>> rdmMessages, bool validateChecksum = true)
+    {
+        RdmHeader? header = null;
+        using var parameterData = new MemoryStream();
+
+        foreach (var message in rdmMessages)
+        {
+            if (header != null && (RdmResponseTypes)header.PortOrResponseType != RdmResponseTypes.AckOverflow)
+                throw new InvalidPacketException("Only the last message of an ACK_OVERFLOW sequence may have another response type.");
+
+            if (validateChecksum && !IsChecksumValid(message.Span))
+                throw new InvalidPacketException("The RDM checksum is missing or doesn't match the message.");
+
+            using var stream = new MemoryStream(message.ToArray());
+            var reader = new RdmBinaryReader(stream);
+
+            var messageHeader = new RdmHeader();
+            messageHeader.ReadData(reader);
+
+            if (header != null && (messageHeader.ParameterId != header.ParameterId || messageHeader.Command != header.Command))
+                throw new InvalidPacketException("The messages are for different parameters or command classes.");
+
+            parameterData.Write(ReadParameterData(messageHeader, reader));
+            header = messageHeader;
+        }
+
+        if (header == null)
+            throw new InvalidPacketException("No messages.");
+
+        header.ParameterDataLength = (int)parameterData.Length;
+
+        return ReadBody(header, parameterData.ToArray(), typed: true);
     }
 
     /// <summary>
@@ -83,9 +156,13 @@ public abstract class RdmPacket
         if (rdmData.IsEmpty)
             return false;
 
-        // Message Length counts the start code and sub-start code but not the checksum
+        // Message Length counts the start code and sub-start code but not the checksum; its range
+        // is 24 to 255
+        if (rdmData[0] < 24)
+            return false;
+
         int covered = rdmData[0] - 2;
-        if (covered <= 0 || rdmData.Length < covered + 2)
+        if (rdmData.Length < covered + 2)
             return false;
 
         ushort sum = (ushort)((int)DmxStartCodes.RDM + (int)RdmVersions.SubMessage);
@@ -112,38 +189,32 @@ public abstract class RdmPacket
     /// </summary>
     public static RdmPacket ReadPacket(RdmHeader header, RdmBinaryReader contentData)
     {
-        RdmPacket? rdmPacket = RdmPacket.Create(header);
-        if (rdmPacket != null)
-        {
-            rdmPacket.ReadData(contentData);
-            return rdmPacket;
-        }
-        else
-        {
-            RdmRawPacket? rawPacket2 = RdmPacket.Create(header, typeof(RdmRawPacket)) as RdmRawPacket;
-            if (rawPacket2 != null)
-            {
-                rawPacket2.ReadData(contentData);
-                return rawPacket2;
-            }
-        }
-
-        throw new UnknownRdmPacketException(header);
+        return ReadBody(header, ReadParameterData(header, contentData), typed: true);
     }
 
+    /// <summary>
+    /// Reads a packet when a type is registered for its command class and parameter; false
+    /// (and no packet) otherwise.
+    /// </summary>
     public static bool TryReadPacket(RdmBinaryReader data, out RdmPacket? rdmPacket)
     {
         RdmHeader header = new RdmHeader();
         header.ReadData(data);
 
-        rdmPacket = RdmPacket.Create(header);
-        if (rdmPacket != null)
+        var parameterData = ReadParameterData(header, data);
+
+        if (RdmPacket.Create(header) == null)
         {
-            rdmPacket.ReadData(data);
-            return true;
+            rdmPacket = null;
+            return false;
         }
 
-        return false;
+        rdmPacket = ReadBody(header, parameterData, typed: true);
+
+        if (data.BytesLeft >= 2)
+            rdmPacket.Checksum = data.ReadUInt16();
+
+        return true;
     }
 
     public static RdmRawPacket? ReadPacketRaw(RdmBinaryReader data)
@@ -151,9 +222,10 @@ public abstract class RdmPacket
         RdmHeader header = new RdmHeader();
         header.ReadData(data);
 
-        RdmRawPacket? rdmPacket = RdmPacket.Create(header, typeof(RdmRawPacket)) as RdmRawPacket;
-        if (rdmPacket != null)
-            rdmPacket.ReadData(data);
+        var rdmPacket = (RdmRawPacket)ReadBody(header, ReadParameterData(header, data), typed: false);
+
+        if (data.BytesLeft >= 2)
+            rdmPacket.Checksum = data.ReadUInt16();
 
         return rdmPacket;
     }
