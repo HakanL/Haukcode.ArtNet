@@ -222,19 +222,8 @@ public static class RdmPacketFactory
         RegisterPacketType(RdmCommands.Get, RdmParameters.BackgroundQueuedStatusPolicyDescription, typeof(BackgroundQueuedStatusPolicyDescription.Get));
         RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BackgroundQueuedStatusPolicyDescription, typeof(BackgroundQueuedStatusPolicyDescription.GetReply));
 
-        //BackgroundStatusType
-        RegisterPacketType(RdmCommands.Get, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.Get));
-        RegisterPacketType(RdmCommands.GetResponse, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.GetReply));
-        RegisterPacketType(RdmCommands.Set, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.Set));
-        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.BackgroundStatusType, typeof(BackgroundStatusType.SetReply));
 
-        //QueuedStatusEndpointCollection
-        RegisterPacketType(RdmCommands.Set, RdmParameters.QueuedStatusEndpointCollection, typeof(QueuedStatusEndpointCollection.Set));
-        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.QueuedStatusEndpointCollection, typeof(QueuedStatusEndpointCollection.SetReply));
 
-        //QueuedStatusUIDCollection
-        RegisterPacketType(RdmCommands.Set, RdmParameters.QueuedStatusUIDCollection, typeof(QueuedStatusUIDCollection.Set));
-        RegisterPacketType(RdmCommands.SetResponse, RdmParameters.QueuedStatusUIDCollection, typeof(QueuedStatusUIDCollection.SetReply));
     }
 
     private static void RegisterProductMessages()

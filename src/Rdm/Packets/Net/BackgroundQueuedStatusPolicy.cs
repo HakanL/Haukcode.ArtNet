@@ -1,24 +1,25 @@
 ﻿namespace Haukcode.ArtNet.Rdm.Packets.Net;
 
+/// <summary>
+/// This parameter is used to get or set the policy a gateway uses to collect queued and status
+/// messages in the background (E1.37-7 §7.1). It applies to the root device or a sub-device, not to
+/// an endpoint.
+/// </summary>
 public class BackgroundQueuedStatusPolicy
 {
     public class Get : RdmRequestPacket
     {
         public Get()
-            : base(RdmCommands.Get,RdmParameters.BackgroundQueuedStatusPolicy)
+            : base(RdmCommands.Get, RdmParameters.BackgroundQueuedStatusPolicy)
         {
         }
 
-        public ushort EndpointID { get; set; }
-
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteUInt16(EndpointID);
         }
     }
 
@@ -29,22 +30,18 @@ public class BackgroundQueuedStatusPolicy
         {
         }
 
-        public ushort EndpointID { get; set; }
-
         public byte CurrentPolicyID { get; set; }
 
         public byte PolicyCount { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadUInt16();
             CurrentPolicyID = data.ReadByte();
             PolicyCount = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteUInt16(EndpointID);
             data.WriteByte(CurrentPolicyID);
             data.WriteByte(PolicyCount);
         }
@@ -57,20 +54,16 @@ public class BackgroundQueuedStatusPolicy
         {
         }
 
-        public ushort EndpointID { get; set; }
-
-        public byte CurrentPolicyID { get; set; }
+        public byte PolicyID { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            EndpointID = data.ReadUInt16();
-            CurrentPolicyID = data.ReadByte();
+            PolicyID = data.ReadByte();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            data.WriteUInt16(EndpointID);
-            data.WriteByte(CurrentPolicyID);
+            data.WriteByte(PolicyID);
         }
     }
 
@@ -83,12 +76,10 @@ public class BackgroundQueuedStatusPolicy
 
         protected override void ReadData(RdmBinaryReader data)
         {
-            //Parameter Data Empty
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            //Parameter Data Empty
         }
     }
 }

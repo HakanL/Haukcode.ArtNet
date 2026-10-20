@@ -8,12 +8,6 @@
 /// </remarks>
 public class EndpointToUniverse
 {
-    public enum EndpointTypes
-    {
-        Virtual = 0,
-        Physical = 1
-    }
-
     public enum UniverseMode
     {
         Disabled,
@@ -65,8 +59,6 @@ public class EndpointToUniverse
             }
         }
 
-        public EndpointTypes EndpointType { get; set; }
-
         public UniverseMode EndpointMode { get; set; }
 
         protected override void ReadData(RdmBinaryReader data)
@@ -88,7 +80,6 @@ public class EndpointToUniverse
                     break;
 
             }
-            EndpointType = (EndpointTypes)data.ReadByte();
 
         }
 
@@ -109,7 +100,6 @@ public class EndpointToUniverse
                     break;
             }
 
-            data.WriteByte((byte)EndpointType);
         }
     }
 
@@ -186,14 +176,16 @@ public class EndpointToUniverse
         {
         }
 
+        public ushort EndpointID { get; set; }
+
         protected override void ReadData(RdmBinaryReader data)
         {
-            //Parameter Data Empty
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            //Parameter Data Empty
+            data.WriteUInt16(EndpointID);
         }
     }
 

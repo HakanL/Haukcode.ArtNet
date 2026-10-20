@@ -77,14 +77,16 @@ public class RdmTrafficEnable
         {
         }
 
+        public ushort EndpointID { get; set; }
+
         protected override void ReadData(RdmBinaryReader data)
         {
-            //Parameter Data Empty
+            EndpointID = data.ReadUInt16();
         }
 
         protected override void WriteData(RdmBinaryWriter data)
         {
-            //Parameter Data Empty
+            data.WriteUInt16(EndpointID);
         }
     }
 }
