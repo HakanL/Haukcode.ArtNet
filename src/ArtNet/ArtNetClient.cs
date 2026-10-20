@@ -524,6 +524,8 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
                 packet.OpCode == ArtNetOpCodes.Poll ||
                 packet.OpCode == ArtNetOpCodes.PollReply)
             {
+                OnPacketReceived(packet, sourceIP);
+
                 var parsedObject = ReferenceEquals(packet, this.receiveScratchDmxPacket) ? this.receiveScratchObject : new Internal.ReceiveDataPacket();
                 parsedObject.TimestampMS = timestampMS;
                 parsedObject.Source = sourceIP;
@@ -535,6 +537,16 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Called on the receive thread for every accepted packet, before it is handed to the channel
+    /// writer, so a derived client can watch for replies (<c>ArtNetRdmClient</c> matches ArtRdm
+    /// responses to its requests here). Keep it short and don't keep an ArtDmx packet: it is a
+    /// reused instance.
+    /// </summary>
+    protected virtual void OnPacketReceived(ArtNetPacket packet, IPEndPoint source)
+    {
     }
 
     /// <summary>

@@ -58,7 +58,14 @@ public class RdmBinaryWriter
     public const int MaxTextLength = 32;
 
     /// <summary>
-    /// Writes <paramref name="value"/> as ASCII, truncated to <see cref="MaxTextLength"/> characters.
+    /// Write text as UTF-8 instead of ASCII (E1.20-2025 10.1.1). Only set it when the controller
+    /// asked for Unicode with <see cref="RdmControllerFlags.Unicode"/>; <see cref="ArtNetRdmClient"/>
+    /// sets it from the request's controller flags.
+    /// </summary>
+    public bool AllowUnicode { get; set; }
+
+    /// <summary>
+    /// Writes <paramref name="value"/>, truncated to <see cref="MaxTextLength"/> bytes.
     /// </summary>
     public void WriteString(string value)
     {
@@ -66,16 +73,40 @@ public class RdmBinaryWriter
     }
 
     /// <summary>
-    /// Writes <paramref name="value"/> as ASCII, truncated to <paramref name="maxLength"/>
-    /// characters, for fields longer than the usual 32 (e.g. host and domain names).
+    /// Writes <paramref name="value"/> as ASCII (or UTF-8 with <see cref="AllowUnicode"/>),
+    /// truncated to <paramref name="maxLength"/> bytes, for fields longer than the usual 32
+    /// (e.g. host and domain names).
     /// </summary>
+    /// <remarks>
+    /// UTF-8 text is truncated between whole characters (text elements), so a base character
+    /// never loses its combining marks: E1.20-2025 10.1.1 says truncation shall not change the
+    /// meaning of the text.
+    /// </remarks>
     public void WriteString(string value, int maxLength)
     {
         if (string.IsNullOrEmpty(value))
             return;
 
-        var bytes = Encoding.ASCII.GetBytes(value);
-        this.writer.Write(bytes, 0, Math.Min(bytes.Length, maxLength));
+        if (!AllowUnicode)
+        {
+            var bytes = Encoding.ASCII.GetBytes(value);
+            this.writer.Write(bytes, 0, Math.Min(bytes.Length, maxLength));
+            return;
+        }
+
+        int length = 0;
+        var elements = StringInfo.GetTextElementEnumerator(value);
+        while (elements.MoveNext())
+        {
+            int elementLength = Encoding.UTF8.GetByteCount(elements.GetTextElement());
+            if (length + elementLength > maxLength)
+                break;
+
+            length += elementLength;
+        }
+
+        var utf8 = Encoding.UTF8.GetBytes(value);
+        this.writer.Write(utf8, 0, length);
     }
 
     public void WriteUid(UId value)

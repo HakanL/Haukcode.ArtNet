@@ -182,21 +182,33 @@ await client.QueuePacketForSending(null, triggerPacket);
 using Haukcode.ArtNet;
 using Haukcode.ArtNet.Rdm;
 using Haukcode.ArtNet.Rdm.Packets.Product;
+using Haukcode.ArtNet.Rdm.Packets.Management;
 
 // First, discover RDM devices by sending ArtTodRequest
 // Then send RDM commands to discovered devices
 
+using var client = new ArtNetRdmClient(localAddress, subnetMask, rdmId: new UId(0x7FF0, 0x00000001));
+
 var deviceUid = new UId(0x1234, 0x56789ABC);  // Device UID from TOD
-var universeId = 1;
-var deviceIp = IPAddress.Parse("192.168.1.50");
+ushort portAddress = 1;
+var node = new IPEndPoint(IPAddress.Parse("192.168.1.50"), ArtNetClient.DefaultPort);
 
-// Get device label
-var getLabel = new DeviceLabel.Get();
-await client.SendRdm(getLabel, deviceIp, (short)universeId, deviceUid);
+// Send a GET and wait for the matching response. ACK_OVERFLOW responses are collected and
+// joined, and ACK_TIMER responses are fetched with QUEUED_MESSAGE once they're ready.
+var response = await client.RequestAsync(new DeviceLabel.Get(), node, portAddress, deviceUid);
+if (response is DeviceLabel.GetReply label)
+    Console.WriteLine(label.Label);
+else if (response is RdmNack nack)
+    Console.WriteLine($"NACK: {nack.Reason}");
 
-// Handle RDM responses in your packet handler
-// Parse RdmPacket from ArtRdmPacket.RdmData
+// Or fire and forget, and parse responses yourself from ArtRdmPacket.RdmData
+await client.SendRdm(new DeviceLabel.Get(), node, portAddress, deviceUid);
 ```
+
+For a controller that drives RDM on a DMX line directly (not through an Art-Net node),
+`RdmDiscovery` runs the DISC_UNIQUE_BRANCH binary search over callbacks you supply for the
+line I/O, and `RdmPacket.WriteResponseMessages` splits a responder's large response into an
+ACK_OVERFLOW sequence.
 
 ## Usage Examples
 

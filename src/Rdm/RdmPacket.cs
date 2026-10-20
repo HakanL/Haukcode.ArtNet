@@ -262,6 +262,103 @@ public abstract class RdmPacket
         return checksum;
     }
 
+    /// <summary>
+    /// The checksum of an RDM message given as ArtRdm carries it (from the Message Length byte
+    /// on, without the checksum): the sum of every byte including the start code and sub-start
+    /// code, which aren't in the data.
+    /// </summary>
+    public static ushort CalculateMessageChecksum(ReadOnlySpan<byte> rdmData)
+    {
+        ushort checksum = (ushort)((int)DmxStartCodes.RDM + (int)RdmVersions.SubMessage);
+        foreach (byte item in rdmData)
+            checksum += item;
+        return checksum;
+    }
+
+    /// <summary>
+    /// Writes a response as one RDM message, or as an ACK_OVERFLOW sequence when its parameter
+    /// data doesn't fit in one (E1.20 6.3.2). Each message is RDM data as ArtRdm carries it,
+    /// from the Message Length byte on, ending with the checksum; send them one at a time, each
+    /// in reply to the controller repeating its request.
+    /// </summary>
+    /// <param name="recordSize">
+    /// Size of the repeating structure in the parameter data, which the spec doesn't allow to be
+    /// split across messages (6 for a list of UIDs, 2 for a list of PIDs); 1 for unstructured data.
+    /// </param>
+    /// <param name="leadingLength">
+    /// Bytes of fixed fields before the repeating structure. They go in the first message only;
+    /// "when the PD contains header data, it shall not be repeated in any subsequent overflow packets".
+    /// </param>
+    /// <remarks>
+    /// The header (destination, source, transaction number, message count, sub-device, command
+    /// and PID) is copied to every message. Every message but the last has response type
+    /// ACK_OVERFLOW; the last has the packet's own response type, ACK unless it was set to
+    /// something else (an <see cref="Packets.Management.RdmAckTimer"/> is written as one ACK_TIMER message). A real responder answers each repeated request with that
+    /// request's transaction number; set it on each message's header bytes (offset 13) or
+    /// rewrite the packet's <see cref="RdmHeader.TransactionNumber"/> and write it again.
+    /// </remarks>
+    public static IReadOnlyList<byte[]> WriteResponseMessages(RdmPacket packet, int recordSize = 1, int leadingLength = 0)
+    {
+        if (recordSize < 1 || recordSize > RdmHeader.MaxParameterDataLength)
+            throw new ArgumentOutOfRangeException(nameof(recordSize), recordSize, $"The record size must be 1 to {RdmHeader.MaxParameterDataLength}.");
+        if (leadingLength < 0 || leadingLength + recordSize > RdmHeader.MaxParameterDataLength)
+            throw new ArgumentOutOfRangeException(nameof(leadingLength), leadingLength, "The leading fields and one record must fit in one message.");
+
+        byte[] parameterData;
+        using (var stream = new MemoryStream())
+        {
+            WritePacket(packet, new RdmBinaryWriter(stream), onlyContent: true);
+            parameterData = stream.ToArray();
+        }
+
+        if (parameterData.Length > leadingLength && (parameterData.Length - leadingLength) % recordSize != 0)
+            throw new InvalidOperationException($"The {parameterData.Length - leadingLength} bytes after the leading fields aren't a whole number of {recordSize}-byte records.");
+
+        var messages = new List<byte[]>();
+        int offset = 0;
+        do
+        {
+            int capacity = RdmHeader.MaxParameterDataLength - (offset == 0 ? leadingLength : 0);
+            int chunk = parameterData.Length - offset <= RdmHeader.MaxParameterDataLength
+                ? parameterData.Length - offset
+                : (offset == 0 ? leadingLength : 0) + capacity / recordSize * recordSize;
+
+            bool last = offset + chunk == parameterData.Length;
+            messages.Add(WriteMessage(packet.Header, last ? (RdmResponseTypes)packet.Header.PortOrResponseType : RdmResponseTypes.AckOverflow, parameterData.AsSpan(offset, chunk)));
+            offset += chunk;
+        }
+        while (offset < parameterData.Length);
+
+        return messages;
+    }
+
+    private static byte[] WriteMessage(RdmHeader header, RdmResponseTypes responseType, ReadOnlySpan<byte> parameterData)
+    {
+        // Message Length counts the start code and sub-start code, which aren't in the data, but
+        // not the checksum
+        int messageLength = 24 + parameterData.Length;
+        var message = new byte[messageLength];
+
+        using (var stream = new MemoryStream(message))
+        {
+            var writer = new RdmBinaryWriter(stream);
+            writer.WriteByte((byte)messageLength);
+            writer.WriteUid(header.DestinationId);
+            writer.WriteUid(header.SourceId);
+            writer.WriteByte(header.TransactionNumber);
+            writer.WriteByte((byte)responseType);
+            writer.WriteByte(header.MessageCount);
+            writer.WriteUInt16(header.SubDevice);
+            writer.WriteByte((byte)header.Command);
+            writer.WriteUInt16((ushort)header.ParameterId);
+            writer.WriteByte((byte)parameterData.Length);
+            writer.WriteBytes(parameterData.ToArray());
+            writer.WriteUInt16(CalculateMessageChecksum(message.AsSpan(0, messageLength - 2)));
+        }
+
+        return message;
+    }
+
     public bool IsOverflow()
     {
         return (RdmResponseTypes) Header.PortOrResponseType == RdmResponseTypes.AckOverflow && (Header.Command == RdmCommands.GetResponse || Header.Command == RdmCommands.SetResponse);
