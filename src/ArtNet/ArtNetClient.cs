@@ -1,7 +1,12 @@
-﻿using Haukcode.ArtNet.Packets;
+﻿using System.Collections.Concurrent;
+using Haukcode.ArtNet.Packets;
 
 namespace Haukcode.ArtNet;
 
+/// <remarks>
+/// The send methods are not thread-safe: they reuse one packet and destination slot on the hot
+/// path, so call them from a single thread at a time (the receive side is independent).
+/// </remarks>
 public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.ReceiveDataPacket>
 {
     public class SendData : HighPerfComm.SendData
@@ -23,6 +28,9 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     }
 
     public const int DefaultPort = 6454;
+
+    /// <summary>Highest universe id accepted by <see cref="SendDmxData"/> (15-bit Port-Address + 1).</summary>
+    public const int MaxUniverseId = 32768;
     public const int ReceiveBufferSize = 680 * 20 * 200;
     private const int SendBufferSize = 680 * 20 * 200;
     private static readonly IPEndPoint _blankEndpoint = new(IPAddress.Any, 0);
@@ -63,7 +71,13 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     // measured hot spot on the sACN client at high universe counts). A receiver tolerates an
     // occasional sequence discontinuity, so even a benign race here would be harmless.
     private readonly byte[] sequenceIds = new byte[ushort.MaxValue + 1];
-    private readonly Dictionary<IPAddress, IPEndPoint> endPointCache = [];
+
+    // Read and written from both the receive thread and the send paths
+    private readonly ConcurrentDictionary<IPAddress, IPEndPoint> endPointCache = new();
+
+    // Ports our own datagrams leave from (the listen port and every send socket's ephemeral
+    // port), used to drop our own packets when they loop back to the listen socket
+    private readonly int[] ownSourcePorts;
 
     // Reused across SendDmxData calls instead of allocating a fresh ArtNetDmxPacket per packet.
     // Reconfigured in place and serialized synchronously inside QueuePacket before the next
@@ -86,9 +100,9 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     private IPEndPoint? pendingDestination;
     private readonly Func<SendData> pendingSendDataFactory;
 
-    // Serialized destinations, so the hot path never re-serializes an IPEndPoint. Only touched from
-    // the single queue-writer thread (the send-data factory).
-    private readonly Dictionary<IPEndPoint, SocketAddress> socketAddressCache = [];
+    // Serialized destinations, so the hot path never re-serializes an IPEndPoint. Concurrent so a
+    // caller that ignores the single-sender contract can't corrupt it.
+    private readonly ConcurrentDictionary<IPEndPoint, SocketAddress> socketAddressCache = new();
 
     /// <param name="senderCount">
     /// Number of sender threads/sockets, sharded by universe id. Art-Net is per-universe just like
@@ -134,6 +148,11 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
             this.sendSockets[i] = socket;
         }
 
+        this.ownSourcePorts = this.sendSockets
+            .Select(s => ((IPEndPoint)s.LocalEndPoint!).Port)
+            .Append(port)
+            .ToArray();
+
         StartReceive();
     }
 
@@ -143,13 +162,12 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// </summary>
     private SocketAddress GetSocketAddress(IPEndPoint endPoint)
     {
-        if (!this.socketAddressCache.TryGetValue(endPoint, out var socketAddress))
-        {
-            socketAddress = endPoint.Serialize();
-            this.socketAddressCache.Add(endPoint, socketAddress);
-        }
+        return this.socketAddressCache.GetOrAdd(endPoint, static e => e.Serialize());
+    }
 
-        return socketAddress;
+    private IPEndPoint GetEndPoint(IPAddress address)
+    {
+        return this.endPointCache.GetOrAdd(address, static (a, port) => new IPEndPoint(a, port), this.localEndPoint.Port);
     }
 
     /// <summary>
@@ -167,7 +185,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// Send data
     /// </summary>
     /// <param name="address">The optional address to unicast to</param>
-    /// <param name="universeId">The Universe ID</param>
+    /// <param name="universeId">The Universe ID, 1 to <see cref="MaxUniverseId"/> (Port-Address + 1)</param>
     /// <param name="dmxData">Up to 512 bytes of DMX data</param>
     /// <param name="important">Important</param>
     public Task SendDmxData(
@@ -176,6 +194,9 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         ReadOnlyMemory<byte> dmxData,
         bool important = false)
     {
+        if (universeId < 1 || universeId > MaxUniverseId)
+            throw new ArgumentOutOfRangeException(nameof(universeId), universeId, $"Universe id must be 1 to {MaxUniverseId}.");
+
         if (!IsOperational)
             return Task.CompletedTask;
 
@@ -224,8 +245,17 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     private byte GetNewSequenceId(ushort universeId)
     {
-        return unchecked(++this.sequenceIds[universeId]);
+        byte sequence = NextSequence(this.sequenceIds[universeId]);
+        this.sequenceIds[universeId] = sequence;
+
+        return sequence;
     }
+
+    /// <summary>
+    /// The Art-Net sequence after <paramref name="current"/>: 1 to 255, wrapping from 255 back
+    /// to 1, since 0 means "sequencing disabled".
+    /// </summary>
+    public static byte NextSequence(byte current) => (byte)(current % 255 + 1);
 
     /// <summary>
     /// Send packet
@@ -240,24 +270,16 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
 
     private IPEndPoint ResolveDestination(IPAddress? destination)
     {
-        IPEndPoint? sendDataDestination = null;
-
-        if (destination != null)
+        // No address, the limited broadcast or our own subnet's broadcast all go out as our subnet
+        // broadcast. Anything else (unicast, or a directed broadcast to another subnet) is sent as given.
+        if (destination == null ||
+            destination.Equals(IPAddress.Broadcast) ||
+            destination.Equals(this.broadcastEndPoint.Address))
         {
-            if (!this.endPointCache.TryGetValue(destination, out var ipEndPoint))
-            {
-                ipEndPoint = new IPEndPoint(destination, this.localEndPoint.Port);
-                this.endPointCache.Add(destination, ipEndPoint);
-            }
-
-            // Only works for when subnet mask is /24 or less
-            if (ipEndPoint.Address.GetAddressBytes().Last() == 255)
-                sendDataDestination = null;
-            else
-                sendDataDestination = ipEndPoint;
+            return this.broadcastEndPoint;
         }
 
-        return sendDataDestination ?? this.broadcastEndPoint;
+        return GetEndPoint(destination);
     }
 
     /// <summary>
@@ -321,24 +343,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
     /// <param name="important">Important</param>
     public Task SendPacketImmediately(IPAddress? destination, ArtNetPacket packet, bool important = false)
     {
-        IPEndPoint? sendDataDestination = null;
-
-        if (destination != null)
-        {
-            if (!this.endPointCache.TryGetValue(destination, out var ipEndPoint))
-            {
-                ipEndPoint = new IPEndPoint(destination, this.localEndPoint.Port);
-                this.endPointCache.Add(destination, ipEndPoint);
-            }
-
-            // Only works for when subnet mask is /24 or less
-            if (ipEndPoint.Address.GetAddressBytes().Last() == 255)
-                sendDataDestination = null;
-            else
-                sendDataDestination = ipEndPoint;
-        }
-
-        return SendPacketImmediately(sendDataDestination ?? this.broadcastEndPoint, packet, important);
+        return SendPacketImmediately(ResolveDestination(destination), packet, important);
     }
 
     public async Task SendPacketImmediately(IPEndPoint destination, ArtNetPacket packet, bool important = false)
@@ -458,7 +463,7 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
         if (packet != null)
         {
             // Protect against UDP loopback where we receive our own packets, except for poll/pollreply commands.
-            if (!LocalEndPoint.Equals(sourceIP) ||
+            if (!IsOwnPacket(sourceIP) ||
                 packet.OpCode == ArtNetOpCodes.Poll ||
                 packet.OpCode == ArtNetOpCodes.PollReply)
             {
@@ -466,20 +471,27 @@ public class ArtNetClient : HighPerfComm.Client<ArtNetClient.SendData, Internal.
                 parsedObject.TimestampMS = timestampMS;
                 parsedObject.Source = sourceIP;
                 parsedObject.Packet = packet;
-
-                if (!this.endPointCache.TryGetValue(destinationIP, out var ipEndPoint))
-                {
-                    ipEndPoint = new IPEndPoint(destinationIP, this.localEndPoint.Port);
-                    this.endPointCache.Add(destinationIP, ipEndPoint);
-                }
-
-                parsedObject.Destination = ipEndPoint ?? this.broadcastEndPoint;
+                parsedObject.Destination = GetEndPoint(destinationIP);
 
                 return parsedObject;
             }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// True when the datagram came from one of our own sockets: the listen socket or a send socket,
+    /// which is bound to an ephemeral port. Comparing only against the listen endpoint missed
+    /// everything sent from the send sockets.
+    /// </summary>
+    private bool IsOwnPacket(IPEndPoint source)
+    {
+        var localAddress = this.localEndPoint.Address;
+        if (!localAddress.Equals(IPAddress.Any) && !localAddress.Equals(source.Address))
+            return false;
+
+        return Array.IndexOf(this.ownSourcePorts, source.Port) >= 0;
     }
 
     protected override void Dispose(bool disposing)
