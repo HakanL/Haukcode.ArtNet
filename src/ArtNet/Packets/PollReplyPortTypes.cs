@@ -8,6 +8,7 @@ public enum PollReplyPortTypes
     ColortranCmx = 3,
     Adb62_5 = 4,
     ArtNet = 5,
+    Dali = 6,
 
     IsInputPort = 64,
     IsOutputPort = 128,

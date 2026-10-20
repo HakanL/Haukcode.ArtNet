@@ -27,7 +27,20 @@ public class RdmHeader
 
     public byte PortOrResponseType { get; set; }
 
+    /// <summary>
+    /// In a response, the number of queued messages. In a request, E1.20-2025 calls this byte
+    /// Controller Flags (see <see cref="ControllerFlags"/>).
+    /// </summary>
     public byte MessageCount { get; set; }
+
+    /// <summary>
+    /// Request-side view of the <see cref="MessageCount"/> byte (E1.20-2025 6.2.8).
+    /// </summary>
+    public RdmControllerFlags ControllerFlags
+    {
+        get => (RdmControllerFlags)MessageCount;
+        set => MessageCount = (byte)value;
+    }
 
     public ushort SubDevice { get; set; }
 

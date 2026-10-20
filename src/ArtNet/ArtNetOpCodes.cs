@@ -68,17 +68,24 @@ public enum ArtTimeCodeTypes : byte
 public enum ArtNetStyles
 {
     StNode = 0x00,
+    StController = 0x01,
+
+    [Obsolete("Renamed to StController, as in the Art-Net 4 spec.")]
     StServer = 0x01,
     StMedia = 0x02,
     StRoute = 0x03,
     StBackup = 0x04,
-    StConfig = 0x05
+    StConfig = 0x05,
+    StVisual = 0x06
 }
 
 [Flags]
 public enum ArtIpProgCommand : byte
 {
     None = 0,
+
+    [Obsolete("Deprecated in Art-Net 4; the port is always 6454.")]
+    ProgramPort = (1 << 0),
     Netmask = (1 << 1),
     IpAddress = (1 << 2),
     ResetToDefault = (1 << 3),
@@ -145,7 +152,25 @@ public enum ArtAddressCommand : byte
     AcRdmDisable0 = 0xD0,
     AcRdmDisable1 = 0xD1,
     AcRdmDisable2 = 0xD2,
-    AcRdmDisable3 = 0xD3
+    AcRdmDisable3 = 0xD3,
+
+    // Set the BackgroundQueuePolicy (rev DL)
+    AcBqp0 = 0xE0,
+    AcBqp1 = 0xE1,
+    AcBqp2 = 0xE2,
+    AcBqp3 = 0xE3,
+    AcBqp4 = 0xE4,
+    AcBqp5 = 0xE5,
+    AcBqp6 = 0xE6,
+    AcBqp7 = 0xE7,
+    AcBqp8 = 0xE8,
+    AcBqp9 = 0xE9,
+    AcBqp10 = 0xEA,
+    AcBqp11 = 0xEB,
+    AcBqp12 = 0xEC,
+    AcBqp13 = 0xED,
+    AcBqp14 = 0xEE,
+    AcBqp15 = 0xEF
 }
 
 public enum ArtNetOemCodes

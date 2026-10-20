@@ -6,5 +6,8 @@ public enum StatusTypes
     GetLastMessage = 1,
     Advisory = 2,
     Warning = 3,
-    Error = 4
+    Error = 4,
+    AdvisoryCleared = 0x12,
+    WarningCleared = 0x13,
+    ErrorCleared = 0x14
 }

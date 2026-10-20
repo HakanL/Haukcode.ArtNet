@@ -22,6 +22,12 @@ public enum SlotIds
     ColorAddBlue = 0x0207,
     ColorCorrection = 0x0208,
     ColorScroll = 0x0209,
+    ColorAddLime = 0x020A,
+    ColorAddIndigo = 0x020B,
+    ColorAddCyan = 0x020C,
+    ColorAddDeepRed = 0x020D,
+    ColorAddDeepBlue = 0x020E,
+    ColorAddNaturalWhite = 0x020F,
     ColorSemaphore = 0x0210,
     ColorAddAmber = 0x0211,
     ColorAddWhite = 0x0212,
@@ -30,6 +36,7 @@ public enum SlotIds
     ColorSubUV = 0x0215,
     ColorHue = 0x0216,
     ColorSaturation = 0x0217,
+    ColorAddUV = 0x0218,
 
     //Image Functions
     StaticGoboWheel = 0x0301,
@@ -52,5 +59,9 @@ public enum SlotIds
     LampControl = 0x0501,
     FixtureControl = 0x0502,
     FixtureSpeed = 0x0503,
-    Macro = 0x0504
+    Macro = 0x0504,
+    PowerControl = 0x0505,
+    FanControl = 0x0506,
+    HeaterControl = 0x0507,
+    FountainControl = 0x0508
 }
