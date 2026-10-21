@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    Lets consumers step into this library from the NuGet package: the PDB is
+    embedded in the DLL (so the package carries it without a symbol server),
+    and SourceLink, built into the .NET SDK, maps it to the GitHub source of
+    the commit the package was built from.
+  -->
+  <PropertyGroup>
+    <DebugType>embedded</DebugType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>
