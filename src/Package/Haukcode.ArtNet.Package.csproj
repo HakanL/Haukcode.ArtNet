@@ -15,15 +15,8 @@
     <RepositoryUrl>https://github.com/HakanL/Haukcode.ArtNet</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>ArtNet</PackageTags>
-    <PackageReleaseNotes>
-      3.0.0 - Split RDM into a separate project
-      2.0.0 - Rewrite to use HighPerfComm library
-      1.2.2 - Bug fixes
-      1.1.0 - Implemented ArtSync
-      1.0.18 - Fixed bug in RdmPacketFactory
-      1.0.17 - Fixed bug in ArtNetReplyPacket
-      1.0.0 - Initial release
-    </PackageReleaseNotes>
+    <!-- Release notes live in CHANGELOG.md at the repository root -->
+    <PackageReleaseNotes>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../CHANGELOG.md'))</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
   </PropertyGroup>
