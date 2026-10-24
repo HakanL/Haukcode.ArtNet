@@ -525,6 +525,10 @@ src/
 Samples/                 # Example applications
 ```
 
+## Used in production
+
+This library is used in [DMX Core 100](https://dmxcore.com), a DMX lighting controller for permanent installations that runs on Windows, macOS and Linux, or on its own touchscreen hardware. There it sends, receives, records and routes Art-Net, and monitors RDM devices over Art-Net.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.
