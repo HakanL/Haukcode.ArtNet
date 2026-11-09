@@ -29,6 +29,11 @@ Standards compliance pass against Art-Net 4 and ANSI E1.20-2025.
 - Timecode generator sample: restart and drift fixes.
 - The package targets net10.0 and embeds its PDB with SourceLink, so the
   debugger can step into the library source (5.0.149 and later).
+- Unicast output leaves through the network interface that owns the local
+  address, not whichever one the routing table prefers. On Linux a host with
+  two interfaces on one subnet, or with the other interface holding the lower
+  route metric, sent unicast from the wrong interface (needs Haukcode.Network
+  1.1.32, Utils.BindToInterfaceOfAddress).
 
 ## 4.0 (2026-06-02) - breaking
 
